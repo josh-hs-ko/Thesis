@@ -35,6 +35,9 @@ module OptimisedPredicate {I J} {e : J → I} {D E} (O : Orn e D E) where
   OptPD : Desc (e ⋈ proj₁)
   OptPD = ⌊ O ⊗ ⌈ singOrn D ⌉ ⌋
 
+  OptPO : Orn π₁ E OptPD
+  OptPO = diffOrn-l O ⌈ singOrn D ⌉
+
   OptP : ∀ {i} → e ⁻¹ i → μ D i → Set
   OptP j x = μ OptPD (j , (ok (_ , x)))
 
@@ -95,7 +98,7 @@ module OptimisedPredicate {I J} {e : J → I} {D E} (O : Orn e D E) where
                   decouple (cong proj₁ (SpanMorphism.triangle-l (proj₁ (proj₂ OptP-pullback (proj₁ (proj₁ μE-pullback)))) (j' , y))) refl)
                j)
 
-open OptimisedPredicate public using (OptPD; OptP)
+open OptimisedPredicate public using (OptPD; OptPO; OptP)
 
 OptPRD : ∀ {I J} {e : J → I} {D E} → ROrn e D E → ∀ {X} → ⟦ D ⟧ X → RDesc (e ⋈ proj₁)
 OptPRD {D = D} O xs = toRDesc (pcROrn O (toROrn (erode D xs)))
