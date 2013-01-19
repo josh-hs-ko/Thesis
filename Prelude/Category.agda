@@ -9,9 +9,6 @@ open import Relation.Binary using (Setoid)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
 
---------
--- basics
-
 record Category {ℓ₀ ℓ₁ ℓ₂ : Level} : Set (suc (ℓ₀ ⊔ ℓ₁ ⊔ ℓ₂)) where
   infix 1 _==>_
   infix 1 _≈_
@@ -53,10 +50,10 @@ idF C = record { object   = Function.id
                ; id-preserving   = λ {X} → Setoid.refl (Category.Morphism C X X)
                ; comp-preserving = λ {X} {Y} {Z} f g → Setoid.refl (Category.Morphism C X Z) }
 
-_•_ : {ℓ₀ ℓ₁ ℓ₂ ℓ₃ ℓ₄ ℓ₅ ℓ₆ ℓ₇ ℓ₈ : Level}
+_⋆_ : {ℓ₀ ℓ₁ ℓ₂ ℓ₃ ℓ₄ ℓ₅ ℓ₆ ℓ₇ ℓ₈ : Level}
       {C : Category {ℓ₀} {ℓ₁} {ℓ₂}} {D : Category {ℓ₃} {ℓ₄} {ℓ₅}} {E : Category {ℓ₆} {ℓ₇} {ℓ₈}} →
       Functor D E → Functor C D → Functor C E
-_•_ {C = C} {D} {E} F G =
+_⋆_ {C = C} {D} {E} F G =
   record { object   = object F ∘ object G
          ; morphism = morphism F ∘ morphism G
          ; ≈-respecting    = ≈-respecting F ∘ ≈-respecting G

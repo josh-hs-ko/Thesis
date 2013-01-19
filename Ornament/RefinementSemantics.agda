@@ -39,10 +39,10 @@ module OptimisedPredicate {I J} {e : J → I} {D E} (O : Orn e D E) where
   OptP j x = μ OptPD (j , (ok (_ , x)))
 
   l : Slice Fun (Σ I (μ D))
-  l = object (SliceMap (FamF • Ind)) (slice _ (_ , O))
+  l = object (SliceMap (FamF ⋆ Ind)) (slice _ (_ , O))
 
   r : Slice Fun (Σ I (μ D))
-  r = object (SliceMap (FamF • Ind)) (slice _ (_ , ⌈ singOrn D ⌉))
+  r = object (SliceMap (FamF ⋆ Ind)) (slice _ (_ , ⌈ singOrn D ⌉))
 
   μE-span : Span (SliceCategory Fun (Σ I (μ D))) l r
   μE-span = span l (sliceMorphism id frefl)

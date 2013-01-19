@@ -76,7 +76,7 @@ SpanUL {C = C} =
          ; comp-preserving = λ {s} {t} {u} f g → Setoid.refl (Category.Morphism C (Span.M s) (Span.M u)) }
 
 SpanUR : {ℓ₀ ℓ₁ ℓ₂ : Level} {C : Category {ℓ₀} {ℓ₁} {ℓ₂}} {L R : Category.Object C} → Functor (SpanCategory C L R) (SliceCategory C R)
-SpanUR = SpanUL • SpanFlip
+SpanUR = SpanUL ⋆ SpanFlip
 
 SpanMap : {ℓ₀ ℓ₁ ℓ₂ ℓ₃ ℓ₄ ℓ₅ : Level} {C : Category {ℓ₀} {ℓ₁} {ℓ₂}} {D : Category {ℓ₃} {ℓ₄} {ℓ₅}} (F : Functor C D) →
           {L R : Category.Object C} → Functor (SpanCategory C L R) (SpanCategory D (object F L) (object F R))
