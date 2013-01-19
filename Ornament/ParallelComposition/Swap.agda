@@ -99,8 +99,8 @@ private
 --------
 -- predicate swap
 
-FSwap-⊗ : FSwap (RSem' O) → FSwap (RSem' P) → FSwap (RSem' ⌈ O ⊗ P ⌉)
-FSwap-⊗ (wrap s) (wrap t) =
+⊗-FSwap : FSwap (RSem' O) → FSwap (RSem' P) → FSwap (RSem' ⌈ O ⊗ P ⌉)
+⊗-FSwap (wrap s) (wrap t) =
   wrap λ { {._} (ok (j , k)) →
            record { Q = λ x → Swap.Q (s j) x × Swap.Q (t k) x
                   ; s = λ x → Setoid.trans (IsoSetoid Fun) (splittingIso x) (prodIso (Swap.s (s j) x) (Swap.s (t k) x)) } }

@@ -173,5 +173,5 @@ sinsert = Upgrade.u u insert insert-sorted
 
 svinsert : (y : Val) → ∀ {b n} → SVec b n → SVec (b ⊓ y) (suc n)
 svinsert = Upgrade.u u insert (λ y xs → insert-sorted y xs ** insert-length y xs)
-  where r = λ b n → FRefinement.comp (toFRefinement (FSwap-⊗ ⌈ SListO ⌉ (VecO Val) idFSwap (LengthFSwap Val))) (ok (ok b , ok (ok tt , ok (tt , n))))
+  where r = λ b n → FRefinement.comp (toFRefinement (⊗-FSwap ⌈ SListO ⌉ (VecO Val) idFSwap (LengthFSwap Val))) (ok (ok b , ok (ok tt , ok (tt , n))))
         u = ∀[ y ∶ Val ] ∀⁺[[ b ∶ _ ]] ∀⁺[[ n ∶ _ ]] r b n ⇀ toUpgrade (r (b ⊓ y) (suc n))

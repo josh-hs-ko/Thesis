@@ -41,8 +41,8 @@ TreeD = wrap λ _ → σ Bool λ { false → ∎
 -- leftist trees
 
 LTreeO : OrnDesc Nat ! TreeD
-LTreeO = wrap λ { (con (false , _)) → ∇ false ∎
-                ; (con (true  , r)) → ∇ true (Δ[ r' ∶ Nat ] Δ[ _ ∶ r ≤' r' ] ṿ (ok r') * ṿ (ok r)) }
+LTreeO = wrap λ { (ok (con (false , _))) → ∇ false ∎
+                ; (ok (con (true  , r))) → ∇ true (Δ[ r' ∶ Nat ] Δ[ _ ∶ r ≤' r' ] ṿ (ok r') * ṿ (ok r)) }
 
 
 --------
@@ -64,13 +64,13 @@ preorder (con (true , x , t , u)) = x ∷ preorder t ++ preorder u
 -- min-heaps
 
 HeapO : OrnDesc Val ! TreeD
-HeapO = wrap λ b → σ Bool λ { false → ∎
-                            ; true  → Δ[ x ∶ Val ] Δ[ _ ∶ b ≤ x ] ṿ (ok x) * ṿ (ok x) }
+HeapO = wrap λ { (ok b) → σ Bool λ { false → ∎
+                                   ; true  → Δ[ x ∶ Val ] Δ[ _ ∶ b ≤ x ] ṿ (ok x) * ṿ (ok x) } }
 
 ITreeD-HeapD : Orn ! ⌊ ITreeO Val ⌋ ⌊ HeapO ⌋
 ITreeD-HeapD =
-  wrap λ b → σ Bool λ { false → ∎
-                      ; true → σ[ x ∶ Val ] Δ[ _ ∶ b ≤ x ] ṿ refl * ṿ refl }
+  wrap λ { (ok b) → σ Bool λ { false → ∎
+                             ; true → σ[ x ∶ Val ] Δ[ _ ∶ b ≤ x ] ṿ refl * ṿ refl } }
 
 Heap : Val → Set
 Heap = μ ⌊ HeapO ⌋
@@ -93,11 +93,9 @@ toList : ∀ {b r} → LHeap b r → List Val
 toList = preorder ∘ forget ITreeD-HeapD ∘ forget (diffOrn-l ⌈ HeapO ⌉ ⌈ LTreeO ⌉)
 
 lhrelax : ∀ {b b'} → b' ≤ b → ∀ {r} → LHeap b r → LHeap b' r
-lhrelax = ?
-  where re = λ b r → FRefinement.comp (toFRefinement (FSwap-⊗ ⌈ HeapO ⌉ ⌈ LTreeO ⌉ idFSwap idFSwap)) (ok (ok b , ok r))
-        u = ∀⁺[[ b ∶ _ ]] ∀⁺[[ b' ∶ _ ]] ∀⁺[ _ ∶ b' ≤ b ] ∀[[ r ∶ _ ]] re b r ⇀ re b' r
-
-{-
+lhrelax = Upgrade.u u id (λ { b'≤b _ (p , q) → relax b'≤b p , q })
+  where re = λ b r → FRefinement.comp (toFRefinement (⊗-FSwap ⌈ HeapO ⌉ ⌈ LTreeO ⌉ idFSwap idFSwap)) (ok (ok b , ok r))
+        u = ∀⁺[[ b ∶ _ ]] ∀⁺[[ b' ∶ _ ]] ∀⁺[ _ ∶ b' ≤ b ] ∀⁺[[ r ∶ _ ]] re b r ⇀ toUpgrade (re b' r)
 
 makeT : (x : Val) → ∀ {r} (t : LHeap x r) → ∀ {r'} (t' : LHeap x r') → Σ Nat (LHeap x)
 makeT x {r} t {r'} t' with r ≤'? r'
@@ -116,7 +114,7 @@ mutual
   merge' {b} {r} (con (x , b≤x , l , r≤l , t , u)) {b'} {con (true , r')} (con (x' , b'≤x' , l' , r'≤l' , t' , u')) =
     merge'-with x b≤x l r≤l t u x' b'≤x' l' r'≤l' t' u' (x ≤? x')
 
-  -- avoiding with-matching to circumvent a likeyly bug of Agda
+  -- avoiding with-matching to circumvent a likely bug of Agda
 
   merge'-with :
     ∀ {b r} → (x : Val) (b≤x : b ≤ x) (l : Nat) (r≤l : r ≤' l) (t : LHeap x l) (u : LHeap x r) →
@@ -139,8 +137,8 @@ insert y h = merge h {r' = suc zero} (con (y , ≤-refl , zero , ≤'-refl , con
 -- weight-biased leftist trees
 
 WLTreeO : OrnDesc Nat ! TreeD
-WLTreeO = wrap λ { (con (false , _)) → ∇ false ∎
-                 ; (con (true ,  n)) → ∇ true (Δ[ l ∶ Nat ] Δ[ r ∶ Nat ] Δ[ _ ∶ r ≤' l ] Δ[ _ ∶ n ≡ l + r ] ṿ (ok l) * ṿ (ok r)) }
+WLTreeO = wrap λ { (ok (con (false , _))) → ∇ false ∎
+                 ; (ok (con (true ,  n))) → ∇ true (Δ[ l ∶ Nat ] Δ[ r ∶ Nat ] Δ[ _ ∶ r ≤' l ] Δ[ _ ∶ n ≡ l + r ] ṿ (ok l) * ṿ (ok r)) }
 
 
 --------
@@ -153,12 +151,9 @@ WLHeap : Val → Nat → Set
 WLHeap b n = μ WLHeapD (ok b , ok n)
 
 wlhrelax : ∀ {b b'} → b' ≤ b → ∀ {n} → WLHeap b n → WLHeap b' n
-wlhrelax {b} {b'} b'≤b {r} h =
-  Iso.from (Refinement.ℜ re (ok (ok b' , ok r)))
-    ((id ** (relax b'≤b ** id))
-      (Iso.to (Refinement.ℜ re (ok (ok b , ok r))) h))
-  where re : Refinement (μ TreeD) (μ WLHeapD)
-        re = toRefinement (FSwap-⊗ ⌈ HeapO ⌉ ⌈ WLTreeO ⌉ idSwap idSwap)
+wlhrelax = Upgrade.u u id (λ { b'≤b _ (p , q) → relax b'≤b p , q })
+  where re = λ b r → FRefinement.comp (toFRefinement (⊗-FSwap ⌈ HeapO ⌉ ⌈ WLTreeO ⌉ idFSwap idFSwap)) (ok (ok b , ok r))
+        u = ∀⁺[[ b ∶ _ ]] ∀⁺[[ b' ∶ _ ]] ∀⁺[ _ ∶ b' ≤ b ] ∀⁺[[ n ∶ _ ]] re b n ⇀ toUpgrade (re b' n)
 
 {-# NO_TERMINATION_CHECK #-}  -- to skip the construction of the well-ordering (_<'_) on natural numbers
 
@@ -195,5 +190,3 @@ mutual
   wmakeT x {n} t {n'} t' with n ≤'? n'
   wmakeT x {n} t {n'} t' | yes n≤n' = con (x , ≤-refl , n' , n , n≤n' , comm n n' , t' , t)
   wmakeT x {n} t {n'} t' | no  n≰n' = con (x , ≤-refl , n , n' , ≰'-invert n≰n' , refl , t , t')
-
--}

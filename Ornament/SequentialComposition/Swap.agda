@@ -64,8 +64,8 @@ private
                            (proj₁ (proj₁ (⊗-is-Pullback (⌈ O ⊗ P ⌉ ⊙ Q) ⌈ singOrn D ⌉))) (proj₂ (⊗-is-Pullback (⌈ O ⊗ P ⌉ ⊙ Q) ⌈ singOrn D ⌉))
                            (proj₁ (proj₁ (⊗-is-Pullback ⌈ O ⊗ P ⌉ ⌈ singOrn D ⌉))) (proj₂ (⊗-is-Pullback ⌈ O ⊗ P ⌉ ⌈ singOrn D ⌉)))
 
-FSwap-⊗-⊙ : FSwap (RSem' ⌈ O ⊗ P ⌉) → FSwap (RSem' (⌈ O ⊗ P ⌉ ⊙ Q))
-FSwap-⊗-⊙ s =
+⊗-⊙-FSwap : FSwap (RSem' ⌈ O ⊗ P ⌉) → FSwap (RSem' (⌈ O ⊗ P ⌉ ⊙ Q))
+⊗-⊙-FSwap s =
   wrap λ { {._} (ok l) →
            record { Q = Swap.Q (FSwap.comp s (ok (g l)))
                   ; s = λ x → Setoid.trans (IsoSetoid Fun) (compIso famIso (ok l , ok (_ , x))) (Swap.s (FSwap.comp s (ok (g l))) x) } }
