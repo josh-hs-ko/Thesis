@@ -112,7 +112,7 @@ greedy-theorem =
     foldR ((min Q •Λ (S º))º) º
       ⊆⟨ proj₂ (foldR-con-lemma (foldR ((min Q •Λ (S º))º) º)) ⟩
     foldR (fun con) • foldR ((min Q •Λ (S º))º) º
-      ⊆⟨ hylo-least D (fun con) (min Q •Λ (S º) º) M M-prefix-point ⟩
+      ⊆⟨ hylo-least D (fun con) ((min Q •Λ (S º))º) M M-prefix-point ⟩
     min R •Λ H
       ⊆⟨ min-monotonic ⊆-refl (foldR-con-lemma (foldR S º)) ⟩
     min R •Λ (foldR S º)
@@ -127,5 +127,5 @@ GreedySolution x = μ ⌊ GreedySolutionOD ⌋ (_ , x)
 
 optimisation-proof : ∀ {i} (x : X i) (sol : GreedySolution x) → Λ (min R •Λ (foldR S º)) x (forget ⌈ GreedySolutionOD ⌉ sol)
 optimisation-proof x sol =
-  _⊑_.comp (_⊆_.comp greedy-theorem x) (forget ⌈ GreedySolutionOD ⌉ sol)
+  modus-ponens-⊆ greedy-theorem x (forget ⌈ GreedySolutionOD ⌉ sol)
     (proj₂ (Iso.to Fun (Refinement.i (FRefinement.comp (toFRefinement (algOrn-FSwap D ((min Q •Λ (S º))º))) (ok (_ , x)))) sol))

@@ -102,6 +102,9 @@ record _⊑_ {A : Set} (s t : ℘ A) : Set where
   field
     comp : ∀ x → s x → t x
 
+modus-ponens-⊑ : {A : Set} {s t : ℘ A} → s ⊑ t → ∀ x → s x → t x
+modus-ponens-⊑ = _⊑_.comp
+
 _⊒_ : {A : Set} → ℘ A → ℘ A → Set
 s ⊒ t = t ⊑ s
 
@@ -138,6 +141,9 @@ record _⊆_ {I : Set} {X Y : I → Set} (R S : X ↝ Y) : Set where
   field
     comp : ∀ {i} (x : X i) → Λ R x ⊑ Λ S x
 
+modus-ponens-⊆ : {I : Set} {X Y : I → Set} {R S : X ↝ Y} → R ⊆ S → ∀ {i} (x : X i) (y : Y i) → Λ R x y → Λ S x y
+modus-ponens-⊆ (wrap R⊆S) = modus-ponens-⊑ ∘ R⊆S
+
 infix 3 _⊇_
 
 _⊇_ : {I : Set} {X Y : I → Set} → (X ↝ Y) → (X ↝ Y) → Set
@@ -160,13 +166,13 @@ R ⊇ S = S ⊆ R
                     ; trans         = ⊆-trans } }
 
 º-monotonic : {I : Set} {X Y : I → Set} {R S : X ↝ Y} → R ⊆ S → R º ⊆ S º
-º-monotonic (wrap R⊆S) = wrap λ y → wrap λ x r → _⊑_.comp (R⊆S x) y r
+º-monotonic R⊆S = wrap λ y → wrap λ x r → modus-ponens-⊆ R⊆S x y r
 
 •-monotonic-l : {I : Set} {X Y Z : I → Set} {R S : X ↝ Y} (T : Y ↝ Z) → R ⊆ S → T • R ⊆ T • S
-•-monotonic-l T (wrap R⊆S) = wrap λ x → wrap λ { z (y , r , t) → y , _⊑_.comp (R⊆S x) y r , t }
+•-monotonic-l T R⊆S = wrap λ x → wrap λ { z (y , r , t) → y , modus-ponens-⊆ R⊆S x y r , t }
 
 •-monotonic-r : {I : Set} {X Y Z : I → Set} {R S : X ↝ Y} (T : Z ↝ X) → R ⊆ S → R • T ⊆ S • T
-•-monotonic-r T (wrap R⊆S) = wrap λ z → wrap λ { y (x , t , r) → x , t , _⊑_.comp (R⊆S x) y r }
+•-monotonic-r T R⊆S = wrap λ z → wrap λ { y (x , t , r) → x , t , modus-ponens-⊆ R⊆S x y r }
 
 
 --------

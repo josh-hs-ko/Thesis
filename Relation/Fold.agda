@@ -51,10 +51,10 @@ foldR-con-lemma {I} {D} {X} R =
   where open EqReasoning (≃-Setoid X (μ D)) renaming (_≈⟨_⟩_ to _≃⟨_⟩_; _∎ to _□)
 
 foldR-least : {I : Set} (D : Desc I) {X : I → Set} (R : Ḟ D X ↝ X) (S : μ D ↝ X) → R • Ṙ D S • (fun con)º ⊆ S → foldR R ⊆ S
-foldR-least {I} D {X} R S (wrap prefix-point) =
+foldR-least {I} D {X} R S prefix-point =
   wrap λ d → wrap (induction D (λ {i} d → (x : X i) → foldR' R d x → Λ S d x)
                                (λ { {i} ds all x (xs , rs , r) →
-                                    _⊑_.comp (prefix-point (con ds)) x (xs , (ds , refl , aux (D at i) ds all xs rs) , r)}) d)
+                                    modus-ponens-⊆ prefix-point (con ds) x (xs , (ds , refl , aux (D at i) ds all xs rs) , r)}) d)
   where
     aux : (D' : RDesc I) (ds : ⟦ D' ⟧ (μ D)) (all : All D' (λ {i} d → (x : X i) → foldR' R d x → Λ S d x) ds)
           (xs : ⟦ D' ⟧ X) (rs : mapFoldR D D' R ds xs) → mapR D' S ds xs
@@ -64,7 +64,7 @@ foldR-least {I} D {X} R S (wrap prefix-point) =
     aux (D' * E') (ds , es) (all , all') (xs , xs') (.xs , rs , .xs' , rs' , refl) = xs , aux D' ds all xs rs , xs' , aux E' es all' xs' rs' , refl
 
 foldR-greatest : {I : Set} (D : Desc I) {X : I → Set} (R : Ḟ D X ↝ X) (S : μ D ↝ X) → S ⊆ R • Ṙ D S • (fun con)º → S ⊆ foldR R
-foldR-greatest {I} D {X} R S (wrap postfix-point) =
+foldR-greatest {I} D {X} R S postfix-point =
   wrap λ { {i} d → wrap λ x s → induction D (λ {i} d → (x : X i) → Λ S d x → foldR' R d x) alg d x s }
   where
     aux : (D' : RDesc I) (ds : ⟦ D' ⟧ (μ D)) (all : All D' (λ {i} d → (x : X i) → Λ S d x → foldR' R d x) ds)
@@ -75,7 +75,7 @@ foldR-greatest {I} D {X} R S (wrap postfix-point) =
     aux (D' * E') (ds , es) (all , all') (xs , xs') (.xs , ss , .xs' , ss' , refl) = xs , aux D' ds all xs ss , xs' , aux E' es all' xs' ss' , refl
     alg : {i : I} (ds : Ḟ D (μ D) i) → All (D at i) (λ {i} d → (x : X i) → Λ S d x → foldR' R d x) ds →
           (x : X i) → Λ S (con ds) x → foldR' R (con {D = D} ds) x
-    alg {i} ds all x s with _⊑_.comp (postfix-point (con ds)) x s
+    alg {i} ds all x s with modus-ponens-⊆ postfix-point (con ds) x s
     alg {i} ds all x s | xs , (.ds , refl , ss) , r = xs , aux (D at i) ds all xs ss , r
 
 foldR-computation-⊆ : {I : Set} (D : Desc I) {X : I → Set} (R : Ḟ D X ↝ X) → foldR {D = D} R • fun con ⊆ R • Ṙ D (foldR R)
