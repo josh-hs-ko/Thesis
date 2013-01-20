@@ -23,6 +23,9 @@ open import Relation.Binary.PropositionalEquality using (_≡_; refl; trans; sym
 open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅) renaming (refl to hrefl)
 
 
+--------
+-- algebraic ornaments
+
 algOrn : ∀ {I} (D : Desc I) → ∀ {J} → (Ḟ D J ↝ J) → OrnDesc (Σ I J) proj₁ D
 algOrn D {J} R = wrap λ { {._} (ok (i , j)) → Δ[ js ∶ Ḟ D J i ] Δ[ r ∶ Λ R js j ] erode (D at i) js }
 
@@ -95,24 +98,9 @@ algOrn-iso {I} D {J} R =
 algOrn-FSwap : ∀ {I} (D : Desc I) → ∀ {J} (R : Ḟ D J ↝ J) → FSwap (RSem' ⌈ algOrn D R ⌉)
 algOrn-FSwap D R = wrap λ { {._} (ok (i , j)) → record { Q = λ x → Λ (foldR R) x j; s = λ x → algOrn-iso D R x } }
 
-{-
 
-open import Function using (const)
-open import Data.Bool using (Bool; false; true)
-open import Data.Nat
-open import Thesis.Examples.Nat
-
-listAlg : Set → Ḟ NatD (_⁻¹_ (! {A = ⊤})) ↝ _⁻¹_ (! {A = ⊤})
-listAlg A (false , _) = any
-listAlg A (true  , _) = const A
-
-ListO : Set → OrnDesc _ proj₁ NatD
-ListO A = algOrn NatD (listAlg A)
-
-test : μ ⌊ ListO ℕ ⌋ (tt , ok tt)
-test = con ((true , ok tt) , 0 , con ((false , tt) , tt , tt))
-
--}
+--------
+-- ornamental algebras
 
 mutual
 

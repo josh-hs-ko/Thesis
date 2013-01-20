@@ -121,7 +121,7 @@ mutual
   insert y (con (false , _)) = y ∷ []
   insert y (con (true  , x , xs)) = insert-with y x xs (y ≤? x)
 
-  -- avoiding with-matching to circumvent a likeyly bug of Agda
+  -- avoiding with-matching to circumvent a likely bug of Agda
 
   insert-with : (y x : Val) → List Val → Dec (y ≤ x) → List Val
   insert-with y x xs (yes _) = y ∷ x ∷ xs
