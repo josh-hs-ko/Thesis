@@ -44,7 +44,7 @@ hylo-fixed-point =
       ≃⟨ Setoid.sym (≃-Setoid X Y) (•-cong-l R (•-cong-r (S º) (•-cong-l (Ṙ D (foldR R)) (Ṙ-preserves-conv D (foldR S)))))  ⟩
     R • (Ṙ D (foldR R) • Ṙ D (foldR S º)) • S º
       ≃⟨ Setoid.sym (≃-Setoid X Y) (•-cong-l R (•-cong-r (S º) (Ṙ-preserves-comp D (foldR R) (foldR S º)))) ⟩
-    R • (Ṙ D (foldR R • foldR S º)) • S º
+    R • Ṙ D (foldR R • foldR S º) • S º
   □
   where open EqReasoning (≃-Setoid X Y) renaming (_≈⟨_⟩_ to _≃⟨_⟩_; _∎ to _□)
 

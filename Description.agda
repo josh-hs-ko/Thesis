@@ -95,8 +95,11 @@ reflection {I} D = induction D (λ x → fold con x ≡ x) (λ {i} xs all → co
     aux (σ S D')  (s , xs)   all          = cong (_,_ s) (aux (D' s) xs all)
     aux (D' * E') (xs , xs') (all , all') = cong₂ _,_ (aux D' xs all) (aux E' xs' all')
 
+mapF : ∀ {I} (D : RDesc I) {X Y} → (X ⇒ Y) → ⟦ D ⟧ X → ⟦ D ⟧ Y
+mapF ∎       f xs         = tt
+mapF (ṿ i)   f x          = f x
+mapF (σ S D) f (s , xs)   = s , mapF (D s) f xs
+mapF (D * E) f (xs , xs') = mapF D f xs , mapF E f xs'
+
 remove-recursive-objects : ∀ {I} (D : RDesc I) {X} → ⟦ D ⟧ X → ⟦ D ⟧ (const ⊤)
-remove-recursive-objects ∎ xs = tt
-remove-recursive-objects (ṿ i) xs = tt
-remove-recursive-objects (σ S D) (s , xs) = s , remove-recursive-objects (D s) xs
-remove-recursive-objects (D * D') (xs , xs') = remove-recursive-objects D xs , remove-recursive-objects D' xs'
+remove-recursive-objects D = mapF D !
