@@ -63,6 +63,9 @@ fun f = wrap (return ∘ f)
 idR : ∀ {I} {X : I → Set} → X ↝ X
 idR = fun id
 
+α : ∀ {I} {D : Desc I} → Ḟ D (μ D) ↝ μ D
+α = fun con
+
 infix 6 _º
 
 _º : ∀ {I} {X Y : I → Set} → (X ↝ Y) → Y ↝ X

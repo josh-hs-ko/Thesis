@@ -29,8 +29,6 @@ open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅) rena
 algOrn : ∀ {I} (D : Desc I) → ∀ {J} → (Ḟ D J ↝ J) → OrnDesc (Σ I J) proj₁ D
 algOrn D {J} R = wrap λ { {._} (ok (i , j)) → Δ[ js ∶ Ḟ D J i ] Δ[ r ∶ Λ R js j ] erode (D at i) js }
 
-{-
-
 algOrn-iso : ∀ {I} (D : Desc I) → ∀ {J} (R : Ḟ D J ↝ J) →
              ∀ {i} (x : μ D i) → ∀ {j} → Iso Fun (OptP ⌈ algOrn D R ⌉ (ok (i , j)) x) (Λ (foldR R) x j)
 algOrn-iso {I} D {J} R =
@@ -100,8 +98,6 @@ algOrn-iso {I} D {J} R =
 algOrn-FSwap : ∀ {I} (D : Desc I) → ∀ {J} (R : Ḟ D J ↝ J) → FSwap (RSem' ⌈ algOrn D R ⌉)
 algOrn-FSwap D R = wrap λ { {._} (ok (i , j)) → record { Q = λ x → Λ (foldR R) x j; s = λ x → algOrn-iso D R x } }
 
--}
-
 
 --------
 -- ornamental algebras
@@ -123,8 +119,6 @@ mutual
 ornAlg : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → Ḟ D (_⁻¹_ e) ↝ (_⁻¹_ e)
 ornAlg (wrap O) = wrap λ js j → ornProp (O j) js
 
-
-{-
 
 --------
 -- algebraic ornamentation with an ornamental algebra produces an isomorphic datatype
@@ -181,16 +175,3 @@ AOOA-theorem : ∀ {I J} {e : J → I} {D E} → (O : Orn e D E) → IsoOrn (twe
 AOOA-theorem {e = e} O =
   (record { to = λ j → e j , ok j; from = und ∘ proj₂; to-from-inverse = λ { (.(e j) , ok j) → refl }; from-to-inverse = frefl } , refl) ,
   ft-existence O , ft-existence-unique O
-
--}
-
-
---------
--- ornamental algebra derived from an algebraic ornament is equivalent to the original algebra
-
-OAAO-theorem :
-  ∀ {I J} (D : Desc I) (R : Ḟ D J ↝ J) → let f = fun (λ {i} → ok ∘ _,_ i) in f • R ≃ ornAlg ⌈ algOrn D R ⌉ • Ṙ D f
-OAAO-theorem {I} {J} D R = {!!}
-  where 
-    f : J ↝ (_⁻¹_ proj₁)
-    f = fun (λ {i} → ok ∘ _,_ i)
