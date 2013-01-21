@@ -64,7 +64,7 @@ idR : ∀ {I} {X : I → Set} → X ↝ X
 idR = fun id
 
 α : ∀ {I} {D : Desc I} → Ḟ D (μ D) ↝ μ D
-α = fun con
+α {D = D} = fun (con {D = D})
 
 infix 6 _º
 
