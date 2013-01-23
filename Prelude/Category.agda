@@ -4,7 +4,7 @@ open import Thesis.Prelude.Equality
 
 open import Level
 open import Function using (_∘_)
-open import Data.Product using (Σ; _,_)
+open import Data.Product using (Σ; _,_; _×_)
 open import Relation.Binary using (Setoid)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
@@ -64,4 +64,35 @@ _⋆_ {C = C} {D} {E} F G =
              λ {X} {Y} {Z} f g → Setoid.trans (Morphism E (object F (object G X)) (object F (object G Z)))
                                               (≈-respecting F (comp-preserving G f g)) (comp-preserving F (morphism G f) (morphism G g)) }
   where open Category
+        open Functor
+
+record NatTrans {ℓ₀ ℓ₁ ℓ₂ ℓ₃ ℓ₄ ℓ₅ : Level} {C : Category {ℓ₀} {ℓ₁} {ℓ₂}} {D : Category {ℓ₃} {ℓ₄} {ℓ₅}}
+                (F G : Functor C D) : Set (ℓ₀ ⊔ ℓ₁ ⊔ ℓ₂ ⊔ ℓ₃ ⊔ ℓ₄ ⊔ ℓ₅) where
+  open Category
+  open Category C using () renaming (_==>_ to _=C=>_)
+  open Category D using () renaming (_==>_ to _=D=>_; _≈_ to _≈D_; _·_ to _·D_)
+  open Functor
+  field
+    comp : (X : Object C) → object F X =D=> object G X
+    naturality : {X Y : Object C} (f : X =C=> Y) →  morphism G f ·D comp X ≈D comp Y ·D morphism F f
+
+Funct : {ℓ₀ ℓ₁ ℓ₂ ℓ₃ ℓ₄ ℓ₅ : Level} (C : Category {ℓ₀} {ℓ₁} {ℓ₂}) (D : Category {ℓ₃} {ℓ₄} {ℓ₅}) → Category
+Funct C D =
+  record { Object   = Functor C D
+         ; Morphism =
+             λ F G → record { Carrier = NatTrans F G
+                            ; _≈_ = λ t u → (X : Object C) → NatTrans.comp t X ≈D NatTrans.comp u X
+                            ; isEquivalence =
+                                record { refl  = λ X → Setoid.refl (Morphism D (object F X) (object G X))
+                                       ; sym   = λ eqs X → Setoid.sym (Morphism D (object F X) (object G X)) (eqs X)
+                                       ; trans = λ eqs eqs' X → Setoid.trans (Morphism D (object F X) (object G X)) (eqs X) (eqs' X) } }
+         ; _·_ = λ t u → record { comp = λ X → NatTrans.comp t X ·D NatTrans.comp u X; naturality = {!!} }
+         ; id  = {!!}
+         ; id-l   = {!!}
+         ; id-r   = {!!}
+         ; assoc  = {!!}
+         ; cong-l = {!!}
+         ; cong-r = {!!} }
+  where open Category
+        open Category D using () renaming (_≈_ to _≈D_;_·_ to _·D_)
         open Functor
