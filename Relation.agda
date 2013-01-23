@@ -10,7 +10,7 @@ open import Data.Empty using (⊥)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; _×_)
 open import Relation.Binary using (Setoid; Preorder)
-open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; sym; trans) renaming (setoid to ≡-Setoid)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; cong₂; sym; trans) renaming (setoid to ≡-Setoid)
 
 
 --------
@@ -284,6 +284,18 @@ mapR-preserves-conv (σ S D) R (s , xs)   (.s , ys)  (.ys , rs , refl)          
 mapR-preserves-conv (D * E) R (xs , xs') (ys , ys') (.ys , rs , .ys' , rs' , refl) =
   xs , mapR-preserves-conv D R xs ys rs , xs' , (mapR-preserves-conv E R xs' ys' rs' , refl)
 
+mapR-fun-computation : {I : Set} (D : RDesc I) {X Y : I → Set} (f : X ⇒ Y) → ∀ xs → mapR D (fun (λ {i} → f {i})) xs (mapF D f xs)
+mapR-fun-computation ∎ f xs               = tt
+mapR-fun-computation (ṿ i) f x            = refl
+mapR-fun-computation (σ S D) f (s , xs)   = mapF (D s) f xs , mapR-fun-computation (D s) f xs , refl
+mapR-fun-computation (D * E) f (xs , xs') = mapF D f xs , mapR-fun-computation D f xs , mapF E f xs' , mapR-fun-computation E f xs' , refl
+
+mapR-fun-unique : {I : Set} (D : RDesc I) {X Y : I → Set} (f : X ⇒ Y) → ∀ xs ys → mapR D (fun (λ {i} → f {i})) xs ys → mapF D f xs ≡ ys
+mapR-fun-unique ∎       f xs         ys         r                            = refl
+mapR-fun-unique (ṿ i)   f x          y          r                            = r
+mapR-fun-unique (σ S D) f (s , xs)   (.s , ys)  (.ys , r , refl)             = cong (_,_ s) (mapR-fun-unique (D s) f xs ys r)
+mapR-fun-unique (D * E) f (xs , xs') (ys , ys') (.ys , r , .ys' , r' , refl) = cong₂ _,_ (mapR-fun-unique D f xs ys r)
+                                                                                         (mapR-fun-unique E f xs' ys' r')
 
 --------
 -- relators
@@ -299,7 +311,11 @@ mapR-preserves-conv (D * E) R (xs , xs') (ys , ys') (.ys , rs , .ys' , rs' , ref
 
 Ṙ-preserves-conv : {I : Set} (D : Desc I) {X Y : I → Set} (R : X ↝ Y) → Ṙ D (R º) ≃ Ṙ D R º
 Ṙ-preserves-conv D R = wrap (λ {i} ys → wrap λ xs → mapR-preserves-conv (D at i) (R º) ys xs) ,
-                      wrap (λ {i} ys → wrap λ xs → mapR-preserves-conv (D at i) R     xs ys)
+                       wrap (λ {i} ys → wrap λ xs → mapR-preserves-conv (D at i)  R    xs ys)
 
 Ṙ-preserves-comp : {I : Set} (D : Desc I) {X Y Z : I → Set} (R : Y ↝ Z) (S : X ↝ Y) → Ṙ D (R • S) ≃ Ṙ D R • Ṙ D S
 Ṙ-preserves-comp D R S = wrap (λ {i} → mapR-preserves-comp-⊑ (D at i) R S) , wrap (λ {i} → mapR-preserves-comp-⊒ (D at i) R S)
+
+fun-preserves-map : {I : Set} (D : Desc I) {X Y : I → Set} (f : X ⇒ Y) → fun (Ḟ-map D (λ {i} → f {i})) ≃ Ṙ D (fun f)
+fun-preserves-map D f = wrap (λ {i} xs → wrap λ { ._ refl → mapR-fun-computation (D at i) f xs }) ,
+                        wrap (λ {i} xs → wrap (mapR-fun-unique (D at i) f xs))
