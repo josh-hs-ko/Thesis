@@ -6,6 +6,7 @@ open import Level
 open import Function using (_∘_)
 open import Data.Product using (Σ; _,_; _×_)
 open import Relation.Binary using (Setoid)
+import Relation.Binary.EqReasoning as EqReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
 
@@ -76,6 +77,50 @@ record NatTrans {ℓ₀ ℓ₁ ℓ₂ ℓ₃ ℓ₄ ℓ₅ : Level} {C : Categor
     comp : (X : Object C) → object F X =D=> object G X
     naturality : {X Y : Object C} (f : X =C=> Y) →  morphism G f ·D comp X ≈D comp Y ·D morphism F f
 
+private
+
+  NatTrans-comp-natural :
+    {ℓ₀ ℓ₁ ℓ₂ ℓ₃ ℓ₄ ℓ₅ : Level} {C : Category {ℓ₀} {ℓ₁} {ℓ₂}} {D : Category {ℓ₃} {ℓ₄} {ℓ₅}} {F G H : Functor C D} →
+    (t : NatTrans G H) (u : NatTrans F G) →
+    {X Y : Category.Object C} (f : Category._==>_ C X Y) →
+    Category._≈_ D (Category._·_ D (Functor.morphism H f) (Category._·_ D (NatTrans.comp t X) (NatTrans.comp u X)))
+                   (Category._·_ D (Category._·_ D (NatTrans.comp t Y) (NatTrans.comp u Y)) (Functor.morphism F f))
+  NatTrans-comp-natural {D = D} {F} {G} {H} t u {X} {Y} f =
+    begin
+      morphism H f · (comp t X · comp u X)
+        ≈⟨ Setoid.sym (Morphism (object F X) (object H Y)) (assoc (morphism H f) (comp t X) (comp u X)) ⟩
+      (morphism H f · comp t X) · comp u X
+        ≈⟨ cong-r (comp u X) (naturality t f) ⟩
+      (comp t Y · morphism G f) · comp u X
+        ≈⟨ assoc (comp t Y) (morphism G f) (comp u X) ⟩
+      comp t Y · (morphism G f · comp u X)
+        ≈⟨ cong-l (comp t Y) (naturality u f) ⟩
+      comp t Y · (comp u Y · morphism F f)
+        ≈⟨ Setoid.sym (Morphism (object F X) (object H Y)) (assoc (comp t Y) (comp u Y) (morphism F f)) ⟩
+      (comp t Y · comp u Y) · morphism F f
+    ∎
+    where open Category D
+          open Functor
+          open NatTrans
+          open EqReasoning (Morphism (object F X) (object H Y))
+
+NatTrans-id-natural :
+  {ℓ₀ ℓ₁ ℓ₂ ℓ₃ ℓ₄ ℓ₅ : Level} {C : Category {ℓ₀} {ℓ₁} {ℓ₂}} {D : Category {ℓ₃} {ℓ₄} {ℓ₅}} (F : Functor C D) →
+  {X Y : Category.Object C} (f : Category._==>_ C X Y) →
+  Category._≈_ D (Category._·_ D (Functor.morphism F f) (Category.id D))
+                 (Category._·_ D (Category.id D) (Functor.morphism F f))
+NatTrans-id-natural {D = D} F {X} {Y} f =
+  begin
+    morphism F f · id
+      ≈⟨ id-r (morphism F f) ⟩
+    morphism F f
+      ≈⟨ Setoid.sym ((Morphism (object F X) (object F Y))) (id-l (morphism F f)) ⟩
+    id · morphism F f
+  ∎
+  where open Category D
+        open Functor
+        open EqReasoning (Morphism (object F X) (object F Y))
+
 Funct : {ℓ₀ ℓ₁ ℓ₂ ℓ₃ ℓ₄ ℓ₅ : Level} (C : Category {ℓ₀} {ℓ₁} {ℓ₂}) (D : Category {ℓ₃} {ℓ₄} {ℓ₅}) → Category
 Funct C D =
   record { Object   = Functor C D
@@ -86,13 +131,13 @@ Funct C D =
                                 record { refl  = λ X → Setoid.refl (Morphism D (object F X) (object G X))
                                        ; sym   = λ eqs X → Setoid.sym (Morphism D (object F X) (object G X)) (eqs X)
                                        ; trans = λ eqs eqs' X → Setoid.trans (Morphism D (object F X) (object G X)) (eqs X) (eqs' X) } }
-         ; _·_ = λ t u → record { comp = λ X → NatTrans.comp t X ·D NatTrans.comp u X; naturality = {!!} }
-         ; id  = {!!}
-         ; id-l   = {!!}
-         ; id-r   = {!!}
-         ; assoc  = {!!}
-         ; cong-l = {!!}
-         ; cong-r = {!!} }
+         ; _·_ = λ t u → record { comp = λ X → NatTrans.comp t X ·D NatTrans.comp u X; naturality = NatTrans-comp-natural t u }
+         ; id  = λ {F} → record { comp = λ X → id D; naturality = NatTrans-id-natural F }
+         ; id-l   = λ t X → id-l D (NatTrans.comp t X)
+         ; id-r   = λ t X → id-r D (NatTrans.comp t X)
+         ; assoc  = λ t u v X → assoc D (NatTrans.comp t X) (NatTrans.comp u X) (NatTrans.comp v X)
+         ; cong-l = λ t eq X → cong-l D (NatTrans.comp t X) (eq X)
+         ; cong-r = λ t eq X → cong-r D (NatTrans.comp t X) (eq X) }
   where open Category
         open Category D using () renaming (_≈_ to _≈D_;_·_ to _·D_)
         open Functor
