@@ -8,9 +8,10 @@ open import Thesis.Relation
 
 open import Function using (id; _∘_)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; _×_)
+open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
 open import Relation.Binary using (Setoid)
 import Relation.Binary.EqReasoning as EqReasoning
+import Relation.Binary.PreorderReasoning as PreorderReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; cong₂; subst)
 
 
@@ -121,3 +122,68 @@ foldR-computation' D {X} R =
     R • Ṙ D (foldR R) • α º
   □
   where open EqReasoning (≃-Setoid (μ D) X) renaming (_≈⟨_⟩_ to _≃⟨_⟩_; _∎ to _□)
+
+foldR-fusion-⊇ :
+  {I : Set} (D : Desc I) {X Y : I → Set} (R : X ↝ Y) (S : Ḟ D X ↝ X) (T : Ḟ D Y ↝ Y) → R • S ⊇ T • Ṙ D R → R • foldR {D = D} S ⊇ foldR T
+foldR-fusion-⊇ D {X} {Y} R S T fusion-condition =
+  foldR-least D T (R • foldR S)
+    (begin
+       R • foldR S
+         ⊇⟨ •-monotonic-l R (proj₁ (idR-r (foldR S))) ⟩
+       R • foldR S • idR
+         ⊇⟨ •-monotonic-l R (•-monotonic-l (foldR S)
+              (proj₁ (iso-idR (λ i → Relation.Binary.Setoid.sym (IsoSetoid Fun) (μ-iso D i))))) ⟩
+       R • foldR S • α • α º
+         ⊇⟨ •-monotonic-l R (proj₁ (•-assoc (foldR S) α (α º))) ⟩
+       R • (foldR {D = D} S • α) • α º
+         ⊇⟨ •-monotonic-l R (•-monotonic-r (α º) (proj₂ (foldR-computation D S))) ⟩
+       R • (S • Ṙ D (foldR S)) • α º
+         ⊇⟨ proj₁ (•-assoc R (S • Ṙ D (foldR S)) (α º)) ⟩
+       (R • (S • Ṙ D (foldR S))) • α º
+         ⊇⟨ •-monotonic-r (α º) (proj₁ (•-assoc R S (Ṙ D (foldR S)))) ⟩
+       ((R • S) • Ṙ D (foldR S)) • α º
+         ⊇⟨ •-monotonic-r (α º) (•-monotonic-r (Ṙ D (foldR S)) fusion-condition) ⟩
+       ((T • Ṙ D R) • Ṙ D (foldR S)) • α º
+         ⊇⟨ •-monotonic-r (α º) (proj₂ (•-assoc T (Ṙ D R) (Ṙ D (foldR S)))) ⟩
+       (T • Ṙ D R • Ṙ D (foldR S)) • α º
+         ⊇⟨ •-monotonic-r (α º) (•-monotonic-l T (proj₁ (Ṙ-preserves-comp D R (foldR S)))) ⟩
+       (T • Ṙ D (R • foldR S)) • α º
+         ⊇⟨ proj₂ (•-assoc T (Ṙ D (R • foldR S)) (α º)) ⟩
+       T • Ṙ D (R • foldR S) • α º
+     □)
+  where open PreorderReasoning (⊇-Preorder (μ D) Y) renaming (_∼⟨_⟩_ to _⊇⟨_⟩_; _∎ to _□)
+
+foldR-fusion-⊆ :
+  {I : Set} (D : Desc I) {X Y : I → Set} (R : X ↝ Y) (S : Ḟ D X ↝ X) (T : Ḟ D Y ↝ Y) → R • S ⊆ T • Ṙ D R → R • foldR {D = D} S ⊆ foldR T
+foldR-fusion-⊆ D {X} {Y} R S T fusion-condition =
+  foldR-greatest D T (R • foldR S)
+    (begin
+       R • foldR S
+         ⊆⟨ •-monotonic-l R (proj₂ (idR-r (foldR S))) ⟩
+       R • foldR S • idR
+         ⊆⟨ •-monotonic-l R (•-monotonic-l (foldR S)
+              (proj₂ (iso-idR (λ i → Relation.Binary.Setoid.sym (IsoSetoid Fun) (μ-iso D i))))) ⟩
+       R • foldR S • α • α º
+         ⊆⟨ •-monotonic-l R (proj₂ (•-assoc (foldR S) α (α º))) ⟩
+       R • (foldR {D = D} S • α) • α º
+         ⊆⟨ •-monotonic-l R (•-monotonic-r (α º) (proj₁ (foldR-computation D S))) ⟩
+       R • (S • Ṙ D (foldR S)) • α º
+         ⊆⟨ proj₂ (•-assoc R (S • Ṙ D (foldR S)) (α º)) ⟩
+       (R • (S • Ṙ D (foldR S))) • α º
+         ⊆⟨ •-monotonic-r (α º) (proj₂ (•-assoc R S (Ṙ D (foldR S)))) ⟩
+       ((R • S) • Ṙ D (foldR S)) • α º
+         ⊆⟨ •-monotonic-r (α º) (•-monotonic-r (Ṙ D (foldR S)) fusion-condition) ⟩
+       ((T • Ṙ D R) • Ṙ D (foldR S)) • α º
+         ⊆⟨ •-monotonic-r (α º) (proj₁ (•-assoc T (Ṙ D R) (Ṙ D (foldR S)))) ⟩
+       (T • Ṙ D R • Ṙ D (foldR S)) • α º
+         ⊆⟨ •-monotonic-r (α º) (•-monotonic-l T (proj₂ (Ṙ-preserves-comp D R (foldR S)))) ⟩
+       (T • Ṙ D (R • foldR S)) • α º
+         ⊆⟨ proj₁ (•-assoc T (Ṙ D (R • foldR S)) (α º)) ⟩
+       T • Ṙ D (R • foldR S) • α º
+     □)
+  where open PreorderReasoning (⊆-Preorder (μ D) Y) renaming (_∼⟨_⟩_ to _⊆⟨_⟩_; _∎ to _□)
+
+foldR-fusion :
+  {I : Set} (D : Desc I) {X Y : I → Set} (R : X ↝ Y) (S : Ḟ D X ↝ X) (T : Ḟ D Y ↝ Y) → R • S ≃ T • Ṙ D R → R • foldR {D = D} S ≃ foldR T
+foldR-fusion D R S T (fusion-condition-⊆ , fusion-condition-⊇) =
+  foldR-fusion-⊆ D R S T fusion-condition-⊆ , foldR-fusion-⊇ D R S T fusion-condition-⊇

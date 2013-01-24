@@ -10,6 +10,7 @@ open import Data.Empty using (⊥)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; _×_)
 open import Relation.Binary using (Setoid; Preorder)
+import Relation.Binary.EqReasoning as EqReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; cong₂; sym; trans) renaming (setoid to ≡-Setoid)
 
 
@@ -168,6 +169,16 @@ R ⊇ S = S ⊆ R
                     ; reflexive     = λ { {._} refl → ⊆-refl }
                     ; trans         = ⊆-trans } }
 
+⊇-Preorder : {I : Set} (X Y : I → Set) → Preorder _ _ _
+⊇-Preorder X Y =
+  record { Carrier = X ↝ Y
+         ; _≈_ = _≡_
+         ; _∼_ = _⊇_
+         ; isPreorder =
+             record { isEquivalence = Setoid.isEquivalence (≡-Setoid _)
+                    ; reflexive     = λ { {._} refl → ⊆-refl }
+                    ; trans         = flip ⊆-trans } }
+
 º-monotonic : {I : Set} {X Y : I → Set} {R S : X ↝ Y} → R ⊆ S → R º ⊆ S º
 º-monotonic R⊆S = wrap λ y → wrap λ x r → modus-ponens-⊆ R⊆S x y r
 
@@ -194,13 +205,6 @@ R ≃ S = (R ⊆ S) × (R ⊇ S)
              record { refl  = ⊆-refl , ⊆-refl
                     ; sym   = λ { (p , q) → q , p }
                     ; trans = λ { (R⊆S , S⊆R) (S⊆T , T⊆S) → ⊆-trans R⊆S S⊆T , ⊆-trans T⊆S S⊆R } } }
-
-iso-conv : {I : Set} {X Y : I → Set} → (iso : ∀ i → Iso Fun (X i) (Y i)) →
-               fun (λ {i} → Iso.to Fun (iso i)) º ≃ fun (λ {i} → Iso.from Fun (iso i))
-iso-conv iso =
-  (wrap (λ {i} y → wrap (λ x eq → trans (sym (cong (from (iso i)) eq)) (from-to-inverse (iso i) x)))) ,
-  (wrap (λ {i} y → wrap (λ x eq → trans (sym (cong (to   (iso i)) eq)) (to-from-inverse (iso i) y))))
-  where open Iso Fun
 
 fun-preserves-comp : {I : Set} {X Y Z : I → Set} (f : Y ⇒ Z) (g : X ⇒ Y) → fun (λ {i} → f {i} ∘ g) ≃ fun f • fun g
 fun-preserves-comp f g = wrap (λ x → wrap λ { ._ refl → g x , refl , refl }) , wrap (λ x → wrap λ { ._ (._ , refl , refl) → refl })
@@ -229,6 +233,27 @@ idR-r R = (wrap λ x → wrap λ { y (.x , refl , r) → r }) , wrap (λ x → w
 •-assoc : {I : Set} {X Y Z W : I → Set} (R : Z ↝ W) (S : Y ↝ Z) (T : X ↝ Y) → (R • S) • T ≃ R • (S • T)
 •-assoc R S T = wrap (λ x → wrap λ { w (y , t , z , s , r) → z , (y , t , s) , r }) ,
                 wrap (λ x → wrap λ { w (z , (y , t , s) , r) → y , t , z , s , r })
+
+iso-conv : {I : Set} {X Y : I → Set} → (isos : ∀ i → Iso Fun (X i) (Y i)) →
+               fun (λ {i} → Iso.to Fun (isos i)) º ≃ fun (λ {i} → Iso.from Fun (isos i))
+iso-conv isos =
+  (wrap (λ {i} y → wrap (λ x eq → trans (sym (cong (from (isos i)) eq)) (from-to-inverse (isos i) x)))) ,
+  (wrap (λ {i} y → wrap (λ x eq → trans (sym (cong (to   (isos i)) eq)) (to-from-inverse (isos i) y))))
+  where open Iso Fun
+
+iso-idR : {I : Set} {X Y : I → Set} → (isos : ∀ i → Iso Fun (X i) (Y i)) →
+            fun (λ {i} → Iso.to Fun (isos i)) • fun (λ {i} → Iso.to Fun (isos i)) º ≃ idR
+iso-idR {Y = Y} isos =
+  begin
+    fun (λ {i} → Iso.to Fun (isos i)) • fun (λ {i} → Iso.to Fun (isos i)) º
+      ≃⟨ •-cong-l (fun (λ {i} → Iso.to Fun (isos i))) (iso-conv isos) ⟩
+    fun (λ {i} → Iso.to Fun (isos i)) • fun (λ {i} → Iso.from Fun (isos i))
+      ≃⟨ Setoid.sym (≃-Setoid Y Y) (fun-preserves-comp (λ {i} → Iso.to Fun (isos i)) (λ {i} → Iso.from Fun (isos i))) ⟩
+    fun (λ {i} → Iso.to Fun (isos i) ∘ Iso.from Fun (isos i))
+      ≃⟨ fun-cong (λ {i} → Iso.to-from-inverse Fun (isos i)) ⟩
+    idR
+  □
+  where open EqReasoning (≃-Setoid Y Y) renaming (_≈⟨_⟩_ to _≃⟨_⟩_; _∎ to _□)
 
 
 --------
