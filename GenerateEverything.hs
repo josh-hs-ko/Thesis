@@ -14,7 +14,7 @@ output_file :: FilePath
 output_file = "Everything.agda"
 
 header :: [String]
-header = ["module Thesis.Everything where", ""]
+header = [ "module Thesis.Everything where", "" ]
 
 prefix :: String
 prefix = "Thesis."
@@ -43,7 +43,7 @@ process :: [FilePath] -> String
 process =
   unlines .
   (header ++) .
-  map (("import " ++) . (prefix ++). concat . intersperse ".") .
+  map (("import " ++) . (prefix ++) . concat . intersperse ".") .
   sortBy (comparing
     ((maybe maxBound id . flip findIndex ordering . (==) . head)
      &&& tail)) .
