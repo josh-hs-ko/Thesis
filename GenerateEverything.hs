@@ -9,6 +9,13 @@ import System.IO
 import System.FilePath
 import System.FilePath.Find
 
+
+output_file :: FilePath
+output_file = "Everything.agda"
+
+header :: [String]
+header = ["module Thesis.Everything where", ""]
+
 prefix :: String
 prefix = "Thesis."
 
@@ -25,20 +32,20 @@ exclusion =
     fileName ==? "Playground.agda",
     fileName ==? "Scribble.agda" ]
 
-process :: [FilePath] -> String
-process =
-  unlines .
-  ("module Thesis.Everything where":) . ("":) .
-  map (("import " ++) . (prefix ++). concat . intersperse ".") .
-  sortBy
-    (comparing
-      ((maybe (-1) id . flip findIndex ordering . (==) . head) &&& tail)) .
-  map (map (takeWhile isAlpha) . tail . splitPath)
-
 main :: IO ()
 main = do
   files <- find always
              (extension ==? ".agda" &&? (not . or <$> sequence exclusion))
              "."
-  writeFile "Everything.agda" (process files)
+  writeFile output_file (process files)
+
+process :: [FilePath] -> String
+process =
+  (unlines header ++) .
+  unlines .
+  map (("import " ++) . (prefix ++). concat . intersperse ".") .
+  sortBy (comparing
+    ((maybe maxBound id . flip findIndex ordering . (==) . head)
+     &&& tail)) .
+  map (map (takeWhile isAlpha) . tail . splitPath)
 
