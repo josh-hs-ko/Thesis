@@ -41,8 +41,8 @@ main = do
 
 process :: [FilePath] -> String
 process =
-  (unlines header ++) .
   unlines .
+  (header ++) .
   map (("import " ++) . (prefix ++). concat . intersperse ".") .
   sortBy (comparing
     ((maybe maxBound id . flip findIndex ordering . (==) . head)
