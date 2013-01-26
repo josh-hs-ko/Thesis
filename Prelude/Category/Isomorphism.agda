@@ -14,20 +14,20 @@ record Iso (X Y : Object) : Set (ℓ₁ ⊔ ℓ₂) where
   field
     to   : X ==> Y
     from : Y ==> X
-    to-from-inverse : to · from ≈ id
     from-to-inverse : from · to ≈ id
-
-open Iso
+    to-from-inverse : to · from ≈ id
 
 private
 
   sym : {X Y : Object} → Iso X Y → Iso Y X
-  sym i = record { to   = from i
-                 ; from = to i
-                 ; to-from-inverse = from-to-inverse i
-                 ; from-to-inverse = to-from-inverse i }
+  sym i = record { to   = Iso.from i
+                 ; from = Iso.to i
+                 ; from-to-inverse = Iso.to-from-inverse i
+                 ; to-from-inverse = Iso.from-to-inverse i }
 
   module Transitivity {X Y Z : Object} (i : Iso X Y) (j : Iso Y Z) where
+
+    open Iso
 
     inverse : (to j · to i) · (from i · from j) ≈ id
     inverse =
@@ -53,21 +53,36 @@ IsoSetoid =
          ; isEquivalence =
              record { refl = record { to   = id
                                     ; from = id
-                                    ; to-from-inverse = id-l id
-                                    ; from-to-inverse = id-l id }
+                                    ; from-to-inverse = id-l id
+                                    ; to-from-inverse = id-l id }
                     ; sym = sym
-                    ; trans = λ i j → record { to   = to j · to i
-                                             ; from = from i · from j
-                                             ; to-from-inverse = Transitivity.inverse i j
-                                             ; from-to-inverse = Transitivity.inverse (sym j) (sym i) } } }
+                    ; trans = λ i j → record { to   = Iso.to j · Iso.to i
+                                             ; from = Iso.from i · Iso.from j
+                                             ; from-to-inverse = Transitivity.inverse (sym j) (sym i)
+                                             ; to-from-inverse = Transitivity.inverse i j } } }
 
 terminal-iso : (X Y : Object) → Terminal C X → Terminal C Y → Iso X Y
 terminal-iso X Y tx ty =
   record { to   = proj₁ (ty X)
          ; from = proj₁ (tx Y)
-         ; to-from-inverse = Setoid.trans (Morphism Y Y) 
-                               (Setoid.sym (Morphism Y Y) (proj₂ (ty Y) (proj₁ (ty X) · proj₁ (tx Y))))
-                               (proj₂ (ty Y) id)
-         ; from-to-inverse = Setoid.trans (Morphism X X)
-                               (Setoid.sym (Morphism X X) (proj₂ (tx X) (proj₁ (tx Y) · proj₁ (ty X))))
-                               (proj₂ (tx X) id) }
+         ; from-to-inverse =
+             Setoid.trans (Morphism X X)
+               (Setoid.sym (Morphism X X) (proj₂ (tx X) (proj₁ (tx Y) · proj₁ (ty X))))
+               (proj₂ (tx X) id)
+         ; to-from-inverse =
+             Setoid.trans (Morphism Y Y) 
+               (Setoid.sym (Morphism Y Y) (proj₂ (ty Y) (proj₁ (ty X) · proj₁ (tx Y))))
+               (proj₂ (ty Y) id)}
+
+record PartOfIso {X Y : Object} (to : X ==> Y) : Set (ℓ₁ ⊔ ℓ₂) where
+  field
+    from : Y ==> X
+    from-to-inverse : from · to ≈ id
+    to-from-inverse : to · from ≈ id
+
+toIso : {X Y : Object} {to : X ==> Y} → PartOfIso to → Iso X Y
+toIso {to = to} iso =
+  record { to   = to
+         ; from = PartOfIso.from iso
+         ; from-to-inverse = PartOfIso.from-to-inverse iso
+         ; to-from-inverse = PartOfIso.to-from-inverse iso }

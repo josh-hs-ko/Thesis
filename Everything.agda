@@ -3,7 +3,6 @@ module Thesis.Everything where
 import Thesis.Prelude.Category
 import Thesis.Prelude.Category.Isomorphism
 import Thesis.Prelude.Category.Isomorphism.Functor
-import Thesis.Prelude.Category.Isomorphism.Midpoint
 import Thesis.Prelude.Category.Pullback
 import Thesis.Prelude.Category.Pullback.Midpoint
 import Thesis.Prelude.Category.Slice
