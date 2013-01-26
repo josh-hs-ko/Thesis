@@ -21,7 +21,7 @@ open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; con
 
 IsoOrn : ∀ {I J} {e : J → I} {D E} → Orn e D E → Set₁
 IsoOrn {I} {J} {e} {D} {E} O =
-  (Σ[ eiso ∶ Iso I J ] Iso.from eiso ≡ e) ×
+  PartOfIso e ×
   (Σ[ existence ∶ (∀ {i} (j : e ⁻¹ i) {X} (xs : Ḟ D X i) → ⟦ OptPRD (Orn.comp O j) xs ⟧ (const ⊤)) ]
      (∀ {i} (j : e ⁻¹ i) {X} (xs : Ḟ D X i) → Unique (≡-Setoid _) (existence j xs)))
 

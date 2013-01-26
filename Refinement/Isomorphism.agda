@@ -29,14 +29,12 @@ toFunIso r (ex , un) =
               ; from-to-inverse = λ { (x , p) → cong (_,_ x) (un x p) } }))
 
 IsoFRefinement : {I J : Set} {e : J → I} {X : I → Set} {Y : J → Set} → FRefinement e X Y → Set
-IsoFRefinement {I} {J} {e} r =
-  (Σ[ idx-iso ∶ Iso Fun I J ] Iso.from Fun idx-iso ≡ e) × (∀ {i} (j : e ⁻¹ i) → IsoRefinement (FRefinement.comp r j))
+IsoFRefinement {I} {J} {e} r = PartOfIso Fun e × (∀ {i} (j : e ⁻¹ i) → IsoRefinement (FRefinement.comp r j))
 
 memIso : {I J : Set} {e : J → I} {X : I → Set} {Y : J → Set} →
          (r : FRefinement e X Y) → IsoFRefinement r → ∀ {i} (j : e ⁻¹ i) → Iso Fun (X i) (Y (und j))
 memIso r (_ , irs) j = toFunIso (FRefinement.comp r j) (irs j)
 
 toFamIso : {I J : Set} {e : J → I} {X : I → Set} {Y : J → Set} (r : FRefinement e X Y) → IsoFRefinement r → Iso Fam (I , X) (J , Y)
-toFamIso r ((idx-iso , refl) , irs) =
-  Setoid.sym (IsoSetoid Fam) (mkFamIso (Setoid.sym (IsoSetoid Fun) idx-iso)
-                                       (λ j → Setoid.sym (IsoSetoid Fun) (memIso r ((idx-iso , refl) , irs) (ok j))))
+toFamIso r (idx-iso , irs) =
+  Setoid.sym (IsoSetoid Fam) (mkFamIso (toIso Fun idx-iso) (λ j → Setoid.sym (IsoSetoid Fun) (memIso r (idx-iso , irs) (ok j))))

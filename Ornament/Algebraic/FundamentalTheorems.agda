@@ -72,7 +72,7 @@ ft-existence-unique {I} {J} {e = e} (wrap O) (ok (.(e j) , ok j)) {X} = aux (O (
 
 AOOA-theorem : ∀ {I J} {e : J → I} {D E} → (O : Orn e D E) → IsoOrn (tweakOrn O)
 AOOA-theorem {e = e} O =
-  (record { to = λ j → e j , ok j; from = und ∘ proj₂; to-from-inverse = λ { (.(e j) , ok j) → refl }; from-to-inverse = frefl } , refl) ,
+  record { from = λ j → e j , ok j; to-from-inverse = frefl; from-to-inverse = λ { (.(e j) , ok j) → refl } } ,
   ft-existence O , ft-existence-unique O
 
 
