@@ -2,7 +2,7 @@ module Thesis.Prelude.Implication where
 
 open import Level
 open import Function using (id; _∘_)
-open import Relation.Binary using (Setoid; Preorder)
+open import Relation.Binary using (module Setoid; Preorder)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl) renaming (setoid to ≡-Setoid)
 
 ⇐-Preorder : {ℓ : Level} → Preorder _ _ _

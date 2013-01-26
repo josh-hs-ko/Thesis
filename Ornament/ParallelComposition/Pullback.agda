@@ -20,7 +20,7 @@ open import Thesis.Ornament.Category
 open import Function using (id; _∘_)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_) renaming (map to _**_)
-open import Relation.Binary using (Setoid)
+open import Relation.Binary using (module Setoid)
 import Relation.Binary.EqReasoning as EqReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; cong; cong₂; sym; trans; proof-irrelevance)
 open import Relation.Binary.HeterogeneousEquality
@@ -292,22 +292,18 @@ module IsPullback {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P
             (SliceMorphism.m (SpanMorphism.m L-to-⋈) , proj₁ ∘ integrate)
             (begin
                (pull ∘ SliceMorphism.m (SpanMorphism.m L-to-⋈) , forget ⌈ O ⊗ P ⌉ ∘ proj₁ ∘ integrate)
-                 ≈⟨ Setoid.sym (Morphism Fam (Slice.T p') (object Ind (I , D))) 
-                     (cong-r Fam {Slice.T p'} {e ⋈ f , μ ⌊ O ⊗ P ⌋} {I , μ D}
-                                 {e ∘ π₁ , forget O ∘ forget (diffOrn-l O P)} {pull , forget ⌈ O ⊗ P ⌉}
-                                 (SliceMorphism.m (SpanMorphism.m L-to-⋈) , proj₁ ∘ integrate)
-                                 (SliceMorphism.triangle p-to-l)) ⟩
+                 ≈⟨ Setoid.sym setoid
+                      (cong-r Fam (SliceMorphism.m (SpanMorphism.m L-to-⋈) , proj₁ ∘ integrate) (SliceMorphism.triangle p-to-l)) ⟩
                (e ∘ π₁ ∘ SliceMorphism.m (SpanMorphism.m L-to-⋈) , forget O ∘ forget (diffOrn-l O P) ∘ proj₁ ∘ integrate)
-                 ≈⟨ cong-l Fam {Slice.T p'} {J , μ E} {I , μ D}
-                               {π₁ ∘ SliceMorphism.m (SpanMorphism.m L-to-⋈) , forget (diffOrn-l O P) ∘ proj₁ ∘ integrate}
-                               {SliceMorphism.m p'-to-l} (e , forget O)
-                               ((λ t → und-from≡ {f = e} (FamMorphismEq.e (SliceMorphism.triangle p'-to-l) t)) ,
-                                pointwise (λ t → proj₁ (proj₂ (integrate t)))) ⟩
+                 ≈⟨ cong-l Fam (e , forget O)
+                      ((λ t → und-from≡ {f = e} (FamMorphismEq.e (SliceMorphism.triangle p'-to-l) t)) ,
+                       pointwise (λ t → proj₁ (proj₂ (integrate t)))) ⟩
                (e ∘ FamMorphism.e (SliceMorphism.m p'-to-l) , forget O ∘ FamMorphism.u (SliceMorphism.m p'-to-l))
                  ≈⟨ SliceMorphism.triangle p'-to-l ⟩
                Slice.s p'
              □)
-      where open EqReasoning (Morphism Fam (Slice.T p') (object Ind (I , D))) renaming (_∎ to _□)
+      where setoid = Morphism Fam (Slice.T p') (object Ind (I , D))
+            open EqReasoning setoid renaming (_∎ to _□)
 
     p'-to-p : SpanMorphism (SliceCategory Fam (object Ind (I , D))) l r (span p' p'-to-l p'-to-r) (span p p-to-l p-to-r)
     p'-to-p = spanMorphism med

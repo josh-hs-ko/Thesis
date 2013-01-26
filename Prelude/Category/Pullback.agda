@@ -10,11 +10,11 @@ open import Thesis.Prelude.Category.Span
 open import Level
 open import Function using (_∘_)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
-open import Relation.Binary using (Setoid)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
 open Category
 open Functor
+
 
 Pullback : {ℓ₀ ℓ₁ ℓ₂ : Level} (C : Category {ℓ₀} {ℓ₁} {ℓ₂}) {B : Object C} (f g : Slice C B) → Object C → Set (ℓ₀ ⊔ ℓ₁ ⊔ ℓ₂)
 Pullback C {B} f g X = Σ (Σ[ s ∶ Span (SliceCategory C B) f g ] Slice.T (Span.M s) ≡ X) (Terminal (SpanCategory (SliceCategory C B) f g) ∘ proj₁)

@@ -5,7 +5,7 @@ open import Thesis.Prelude.Category
 open import Level
 open import Function using ()
 open import Data.Product using (Σ; _,_)
-open import Relation.Binary using (Setoid)
+open import Relation.Binary using (module Setoid)
 import Relation.Binary.EqReasoning as EqReasoning
 
 open Functor
@@ -32,7 +32,7 @@ two-triangles :
 two-triangles C B {s} {t} {u} f g =
   begin
     Slice.s u · (SliceMorphism.m f · SliceMorphism.m g)
-      ≈⟨ Setoid.sym (Morphism (Slice.T s) B) (assoc (Slice.s u) (SliceMorphism.m f) (SliceMorphism.m g)) ⟩
+      ≈⟨ Setoid.sym setoid (assoc (Slice.s u) (SliceMorphism.m f) (SliceMorphism.m g)) ⟩
     (Slice.s u · SliceMorphism.m f) · SliceMorphism.m g
       ≈⟨ cong-r (SliceMorphism.m g) (SliceMorphism.triangle f) ⟩
     Slice.s t · SliceMorphism.m g
@@ -40,7 +40,8 @@ two-triangles C B {s} {t} {u} f g =
     Slice.s s
   ∎
   where open Category C
-        open EqReasoning (Morphism (Slice.T s) B)
+        setoid = Morphism (Slice.T s) B
+        open EqReasoning setoid
 
 SliceCategory : {ℓ₀ ℓ₁ ℓ₂ : Level} (C : Category {ℓ₀} {ℓ₁} {ℓ₂}) (B : Category.Object C) → Category
 SliceCategory C B =

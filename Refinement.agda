@@ -10,7 +10,7 @@ open import Thesis.Prelude.Equality
 open import Function using (id; _∘_; const)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; <_,_>; uncurry) renaming (map to _**_)
-open import Relation.Binary using (Setoid)
+open import Relation.Binary using (module Setoid)
 import Relation.Binary.EqReasoning as EqReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; cong; sym; trans)
 open import Relation.Binary.HeterogeneousEquality using (_≅_; ≅-to-≡; ≡-to-≅; ≡-subst-removable) renaming (cong to hcong; trans to htrans)

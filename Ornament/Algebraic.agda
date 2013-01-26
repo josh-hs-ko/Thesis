@@ -16,7 +16,7 @@ open import Thesis.Relation
 open import Function using (id; type-signature)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
-open import Relation.Binary using (Setoid)
+open import Relation.Binary using (module Setoid)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; trans; sym)
 open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅) renaming (refl to hrefl)
 

@@ -11,7 +11,7 @@ open import Thesis.Prelude.Product
 
 open import Function using (_∘_; type-signature)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; <_,_>) renaming (map to _**_)
-open import Relation.Binary using (Setoid)
+open import Relation.Binary using (module Setoid)
 import Relation.Binary.EqReasoning as EqReasoning
 open import Relation.Binary.PropositionalEquality
   using (_≡_; refl; subst; cong; cong₂; sym; trans; proof-irrelevance; module ≡-Reasoning) renaming (setoid to ≡-Setoid)
@@ -164,14 +164,15 @@ module CanonicalPullback {B : Category.Object Fam} (f g : Slice Fam B) where
                   (Slice.s g · SliceMorphism.m (Span.r p)) · med
                     ≈⟨ assoc (Slice.s g) (SliceMorphism.m (Span.r p)) med ⟩
                   Slice.s g · (SliceMorphism.m (Span.r p) · med)
-                    ≈⟨ Setoid.refl (Morphism (Slice.T (Span.M p')) B) ⟩
+                    ≈⟨ Setoid.refl setoid ⟩
                   Slice.s g · SliceMorphism.m (Span.r p')
                     ≈⟨ SliceMorphism.triangle (Span.r p') ⟩
                   Slice.s (Span.M p')
                 ∎))
         (Setoid.refl (Morphism (Slice.T (Span.M p')) (Slice.T f)))
         (Setoid.refl (Morphism (Slice.T (Span.M p')) (Slice.T g)))
-      where open EqReasoning (Morphism (Slice.T (Span.M p')) B)
+      where setoid = Morphism (Slice.T (Span.M p')) B
+            open EqReasoning setoid
 
     assemble-inv : (med : Slice.T (Span.M p') ==> Slice.T (Span.M p)) (eq : _) →
                    assemble (SliceMorphism.m (Span.l p) · med) (SliceMorphism.m (Span.r p) · med) eq ≈ med
@@ -208,15 +209,15 @@ module CanonicalPullback {B : Category.Object Fam} (f g : Slice Fam B) where
                                 (Setoid.sym (Morphism (Slice.T (Span.M p)) B) (SliceMorphism.triangle (Span.r p))))
       in begin
            assemble (SliceMorphism.m (Span.l p')) (SliceMorphism.m (Span.r p')) eq
-             ≈⟨ Setoid.sym (Morphism (Slice.T (Span.M p')) (Slice.T (Span.M p)))
-                  (cong-assemble {eq = eq'} {eq} (SpanMorphism.triangle-l p'-to'-p) (SpanMorphism.triangle-r p'-to'-p)) ⟩
+             ≈⟨ Setoid.sym setoid (cong-assemble {eq = eq'} {eq} (SpanMorphism.triangle-l p'-to'-p) (SpanMorphism.triangle-r p'-to'-p)) ⟩
            assemble (SliceMorphism.m (Span.l p) · SliceMorphism.m (SpanMorphism.m p'-to'-p))
                     (SliceMorphism.m (Span.r p) · SliceMorphism.m (SpanMorphism.m p'-to'-p))
                     eq'
              ≈⟨ assemble-inv (SliceMorphism.m (SpanMorphism.m p'-to'-p)) eq' ⟩
            SliceMorphism.m (SpanMorphism.m p'-to'-p)
          ∎
-      where open EqReasoning (Morphism (Slice.T (Span.M p')) (Slice.T (Span.M p)))
+      where setoid = Morphism (Slice.T (Span.M p')) (Slice.T (Span.M p))
+            open EqReasoning setoid
 
 module CanonicalPullbackInFun {B' : Category.Object Fam} (f' g' : Slice Fam B') where
 
@@ -257,7 +258,8 @@ module CanonicalPullbackInFun {B' : Category.Object Fam} (f' g' : Slice Fam B') 
                     ≈⟨ SliceMorphism.triangle (Span.r p') ⟩
                   Slice.s (Span.M p')
                 ∎)) frefl frefl
-      where open EqReasoning (FunSetoid (Slice.T (Span.M p')) B)
+      where setoid = FunSetoid (Slice.T (Span.M p')) B
+            open EqReasoning setoid
 
     assemble-inv : (med : Slice.T (Span.M p') → Slice.T (Span.M p)) (eq : _) →
                    assemble (SliceMorphism.m (Span.l p) ∘ med) (SliceMorphism.m (Span.r p) ∘ med) eq ≐ med
@@ -288,7 +290,8 @@ module CanonicalPullbackInFun {B' : Category.Object Fam} (f' g' : Slice Fam B') 
              ≈⟨ assemble-inv (SliceMorphism.m (SpanMorphism.m p'-to'-p)) eq' ⟩
            SliceMorphism.m (SpanMorphism.m p'-to'-p)
          ∎
-      where open EqReasoning (FunSetoid (Slice.T (Span.M p')) (Slice.T (Span.M p)))
+      where setoid = FunSetoid (Slice.T (Span.M p')) (Slice.T (Span.M p))
+            open EqReasoning setoid
 
 Mix : {B : Category.Object Fam} (f g : Slice Fam B) → FamObject
 Mix f g = Slice.T (Span.M (CanonicalPullback.p f g))
@@ -352,7 +355,7 @@ module PullbackPreserving
           c'-to-p' · p'-to-c'
             ≈⟨ Setoid.refl (Morphism p' p') {c'-to-p' · p'-to-c'} ⟩
           morphism (SpanMap (SliceMap FamF)) c-to-p · morphism (SpanMap (SliceMap FamF)) p-to-c
-            ≈⟨ Setoid.sym (Morphism p' p')
+            ≈⟨ Setoid.sym setoid
                  {morphism (SpanMap (SliceMap FamF)) (c-to-p ·′ p-to-c)}
                  {morphism (SpanMap (SliceMap FamF)) c-to-p · morphism (SpanMap (SliceMap FamF)) p-to-c}
                  (comp-preserving (SpanMap (SliceMap FamF)) c-to-p p-to-c) ⟩
@@ -364,7 +367,8 @@ module PullbackPreserving
           id
         ∎
         where open Category (SpanCategory (SliceCategory Fam B) f g) using () renaming (_·_ to _·′_; id to id′)
-              open EqReasoning (Morphism p' p')
+              setoid = Morphism p' p'
+              open EqReasoning setoid
 
       uniqueness : q'-to-p' ≈ q'-to'-p'
       uniqueness =
@@ -375,7 +379,7 @@ module PullbackPreserving
             ≈⟨ cong-l {_} {_} {_} {q'-to-c'} {p'-to-c' · q'-to'-p'} c'-to-p'
                  (CanonicalPullbackInFun.Universality.uniqueness f g q' q'-to'-c') ⟩
           c'-to-p' · (p'-to-c' · q'-to'-p')
-            ≈⟨ Setoid.sym (Morphism q' p')
+            ≈⟨ Setoid.sym setoid
                  {(c'-to-p' · p'-to-c') · q'-to'-p'} {c'-to-p' · (p'-to-c' · q'-to'-p')}
                  (assoc c'-to-p' p'-to-c' q'-to'-p') ⟩
           (c'-to-p' · p'-to-c') · q'-to'-p'
@@ -384,7 +388,8 @@ module PullbackPreserving
             ≈⟨ id-l q'-to'-p' ⟩
           q'-to'-p'
         ∎
-        where open EqReasoning (Morphism q' p')
+        where setoid = Morphism q' p'
+              open EqReasoning setoid
 
 FamF-preserves-pullback : Pullback-preserving FamF
 FamF-preserves-pullback f g ._ ((p , refl) , term-p) =

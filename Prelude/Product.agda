@@ -6,7 +6,6 @@ open import Thesis.Prelude.Equality
 
 open import Function using (_∘_; type-signature)
 open import Data.Product using (Σ; _,_; _×_; curry) renaming (map to _**_)
-open import Relation.Binary using (Setoid)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; sym; cong₂)
 open import Relation.Binary.HeterogeneousEquality using (_≅_) renaming (refl to hrefl)
 

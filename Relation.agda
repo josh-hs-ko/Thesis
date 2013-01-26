@@ -248,12 +248,13 @@ iso-idR {Y = Y} isos =
     fun (λ {i} → Iso.to Fun (isos i)) • fun (λ {i} → Iso.to Fun (isos i)) º
       ≃⟨ •-cong-l (fun (λ {i} → Iso.to Fun (isos i))) (iso-conv isos) ⟩
     fun (λ {i} → Iso.to Fun (isos i)) • fun (λ {i} → Iso.from Fun (isos i))
-      ≃⟨ Setoid.sym (≃-Setoid Y Y) (fun-preserves-comp (λ {i} → Iso.to Fun (isos i)) (λ {i} → Iso.from Fun (isos i))) ⟩
+      ≃⟨ Setoid.sym setoid (fun-preserves-comp (λ {i} → Iso.to Fun (isos i)) (λ {i} → Iso.from Fun (isos i))) ⟩
     fun (λ {i} → Iso.to Fun (isos i) ∘ Iso.from Fun (isos i))
       ≃⟨ fun-cong (λ {i} → Iso.to-from-inverse Fun (isos i)) ⟩
     idR
   □
-  where open EqReasoning (≃-Setoid Y Y) renaming (_≈⟨_⟩_ to _≃⟨_⟩_; _∎ to _□)
+  where setoid = ≃-Setoid Y Y
+        open EqReasoning setoid renaming (_≈⟨_⟩_ to _≃⟨_⟩_; _∎ to _□)
 
 
 --------

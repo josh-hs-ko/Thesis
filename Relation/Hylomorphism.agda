@@ -12,7 +12,7 @@ open import Thesis.Relation.Fold
 
 open import Function using (_∘_; flip)
 open import Data.Product using (Σ; _,_; proj₁; proj₂)
-open import Relation.Binary using (Setoid)
+open import Relation.Binary using (module Setoid)
 import Relation.Binary.PreorderReasoning as PreorderReasoning
 import Relation.Binary.EqReasoning as EqReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
@@ -27,11 +27,11 @@ hylo-fixed-point =
     foldR R • foldR S º
       ≃⟨ •-cong-l (foldR R) (º-cong (foldR-computation' D S)) ⟩
     foldR R • (S • Ṙ D (foldR S) • α º) º
-      ≃⟨ Setoid.sym (≃-Setoid X Y) (•-cong-l (foldR R) (º-cong (•-assoc S (Ṙ D (foldR S)) (α º)))) ⟩
+      ≃⟨ Setoid.sym setoid (•-cong-l (foldR R) (º-cong (•-assoc S (Ṙ D (foldR S)) (α º)))) ⟩
     foldR R • ((S • Ṙ D (foldR S)) • α º) º
       ≃⟨ •-cong-l (foldR R) (º-preserves-comp (S • Ṙ D (foldR S)) (α º)) ⟩
     foldR R • α • (S • Ṙ D (foldR S)) º
-      ≃⟨ Setoid.sym (≃-Setoid X Y) (•-assoc (foldR R) α ((S • Ṙ D (foldR S)) º)) ⟩
+      ≃⟨ Setoid.sym setoid (•-assoc (foldR R) α ((S • Ṙ D (foldR S)) º)) ⟩
     (foldR {D = D} R • α) • (S • Ṙ D (foldR S)) º
       ≃⟨ •-cong-r ((S • Ṙ D (foldR S)) º) (foldR-computation D R) ⟩
     (R • Ṙ D (foldR R)) • (S • Ṙ D (foldR S)) º
@@ -39,14 +39,15 @@ hylo-fixed-point =
     (R • Ṙ D (foldR R)) • Ṙ D (foldR S) º • S º
       ≃⟨ •-assoc R (Ṙ D (foldR R)) (Ṙ D (foldR S) º • S º) ⟩
     R • Ṙ D (foldR R) • Ṙ D (foldR S) º • S º
-      ≃⟨ Setoid.sym (≃-Setoid X Y) (•-cong-l R (•-assoc (Ṙ D (foldR R)) (Ṙ D (foldR S) º) (S º))) ⟩
+      ≃⟨ Setoid.sym setoid (•-cong-l R (•-assoc (Ṙ D (foldR R)) (Ṙ D (foldR S) º) (S º))) ⟩
     R • (Ṙ D (foldR R) • Ṙ D (foldR S) º) • S º
-      ≃⟨ Setoid.sym (≃-Setoid X Y) (•-cong-l R (•-cong-r (S º) (•-cong-l (Ṙ D (foldR R)) (Ṙ-preserves-conv D (foldR S)))))  ⟩
+      ≃⟨ Setoid.sym setoid (•-cong-l R (•-cong-r (S º) (•-cong-l (Ṙ D (foldR R)) (Ṙ-preserves-conv D (foldR S)))))  ⟩
     R • (Ṙ D (foldR R) • Ṙ D (foldR S º)) • S º
-      ≃⟨ Setoid.sym (≃-Setoid X Y) (•-cong-l R (•-cong-r (S º) (Ṙ-preserves-comp D (foldR R) (foldR S º)))) ⟩
+      ≃⟨ Setoid.sym setoid (•-cong-l R (•-cong-r (S º) (Ṙ-preserves-comp D (foldR R) (foldR S º)))) ⟩
     R • Ṙ D (foldR R • foldR S º) • S º
   □
-  where open EqReasoning (≃-Setoid X Y) renaming (_≈⟨_⟩_ to _≃⟨_⟩_; _∎ to _□)
+  where setoid = ≃-Setoid X Y
+        open EqReasoning setoid renaming (_≈⟨_⟩_ to _≃⟨_⟩_; _∎ to _□)
 
 hylo-least : (T : X ↝ Y) → R • Ṙ D T • S º ⊆ T → hylo ⊆ T
 hylo-least T =

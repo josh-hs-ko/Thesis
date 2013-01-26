@@ -35,7 +35,7 @@ private
         (to j · to i) · (from i · from j)
           ≈⟨ assoc (to j) (to i) (from i · from j) ⟩
         to j · (to i · (from i · from j))
-          ≈⟨ cong-l (to j) (Setoid.sym (Morphism Z Y) (assoc (to i) (from i) (from j))) ⟩
+          ≈⟨ Setoid.sym setoid (cong-l (to j) (assoc (to i) (from i) (from j))) ⟩
         to j · ((to i · from i) · from j)
           ≈⟨ cong-l (to j) (cong-r (from j) (to-from-inverse i)) ⟩
         to j · (id · from j)
@@ -44,7 +44,8 @@ private
           ≈⟨ to-from-inverse j ⟩
         id
       ∎
-      where open EqReasoning (Morphism Z Z)
+      where setoid = Morphism Z Z
+            open EqReasoning setoid
 
 IsoSetoid : Setoid _ _
 IsoSetoid =
@@ -72,7 +73,7 @@ terminal-iso X Y tx ty =
          ; to-from-inverse =
              Setoid.trans (Morphism Y Y) 
                (Setoid.sym (Morphism Y Y) (proj₂ (ty Y) (proj₁ (ty X) · proj₁ (tx Y))))
-               (proj₂ (ty Y) id)}
+               (proj₂ (ty Y) id) }
 
 record PartOfIso {X Y : Object} (to : X ==> Y) : Set (ℓ₁ ⊔ ℓ₂) where
   field

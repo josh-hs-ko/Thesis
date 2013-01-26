@@ -9,7 +9,7 @@ open import Thesis.Refinement
 
 open import Function using (_∘_)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; <_,_>)
-open import Relation.Binary using (Setoid)
+open import Relation.Binary using (module Setoid)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; cong)
 open import Relation.Binary.HeterogeneousEquality using (_≅_) renaming (refl to hrefl)
 

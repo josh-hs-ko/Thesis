@@ -9,7 +9,7 @@ open import Thesis.Relation
 open import Function using (id; _∘_)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
-open import Relation.Binary using (Setoid)
+open import Relation.Binary using (module Setoid)
 import Relation.Binary.EqReasoning as EqReasoning
 import Relation.Binary.PreorderReasoning as PreorderReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; cong₂; subst)
@@ -44,14 +44,15 @@ foldR-α-lemma : {I : Set} {D : Desc I} {X : I → Set} (R : X ↝ μ D) → fol
 foldR-α-lemma {I} {D} {X} R =
   begin
     foldR α • R
-      ≃⟨ Setoid.sym (≃-Setoid X (μ D)) (•-cong-r R (fun-preserves-fold D con)) ⟩
+      ≃⟨ Setoid.sym setoid (•-cong-r R (fun-preserves-fold D con)) ⟩
     fun (fold con) • R
       ≃⟨ •-cong-r R (fun-cong (reflection D)) ⟩
     fun id • R
       ≃⟨ idR-l R ⟩
     R
   □
-  where open EqReasoning (≃-Setoid X (μ D)) renaming (_≈⟨_⟩_ to _≃⟨_⟩_; _∎ to _□)
+  where setoid = ≃-Setoid X (μ D)
+        open EqReasoning setoid renaming (_≈⟨_⟩_ to _≃⟨_⟩_; _∎ to _□)
 
 foldR-least : {I : Set} (D : Desc I) {X : I → Set} (R : Ḟ D X ↝ X) (S : μ D ↝ X) → R • Ṙ D S • α º ⊆ S → foldR R ⊆ S
 foldR-least {I} D {X} R S prefix-point =
@@ -121,7 +122,8 @@ foldR-computation' D {X} R =
       ≃⟨ •-assoc R (Ṙ D (foldR R)) (α º) ⟩
     R • Ṙ D (foldR R) • α º
   □
-  where open EqReasoning (≃-Setoid (μ D) X) renaming (_≈⟨_⟩_ to _≃⟨_⟩_; _∎ to _□)
+  where setoid = ≃-Setoid (μ D) X
+        open EqReasoning setoid renaming (_≈⟨_⟩_ to _≃⟨_⟩_; _∎ to _□)
 
 foldR-fusion-⊇ :
   {I : Set} (D : Desc I) {X Y : I → Set} (R : X ↝ Y) (S : Ḟ D X ↝ X) (T : Ḟ D Y ↝ Y) → R • S ⊇ T • Ṙ D R → R • foldR {D = D} S ⊇ foldR T

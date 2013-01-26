@@ -18,7 +18,7 @@ open import Thesis.Refinement
 
 open import Function using (id)
 open import Data.Product using (Σ; _,_; proj₁; proj₂)
-open import Relation.Binary using (Setoid)
+open import Relation.Binary using (module Setoid)
 import Relation.Binary.PreorderReasoning as PreorderReasoning
 import Relation.Binary.EqReasoning as EqReasoning
 

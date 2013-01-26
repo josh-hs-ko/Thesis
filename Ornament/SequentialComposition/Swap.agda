@@ -28,6 +28,7 @@ open import Relation.Binary using (module Setoid)
 import Relation.Binary.EqReasoning as EqReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
+
 private
 
   open Category Fam
@@ -106,19 +107,20 @@ private
            (SpanMorphism.m med'')
            (begin
               morphism Ind (_ , diffOrn-l (O ⊙ P) ⌈ singOrn D ⌉) · SliceMorphism.m (SpanMorphism.m med'')
-                ≈⟨ sym (cong-r (morphism Ind (_ , diffOrn-l (O ⊙ P) ⌈ singOrn D ⌉) · SliceMorphism.m (SpanMorphism.m med''))
-                               (PartOfIso.from-to-inverse Fam piso)) ⟩
+                ≈⟨ Setoid.sym setoid
+                     (cong-r (morphism Ind (_ , diffOrn-l (O ⊙ P) ⌈ singOrn D ⌉) · SliceMorphism.m (SpanMorphism.m med''))
+                             (PartOfIso.from-to-inverse Fam piso)) ⟩
               PartOfIso.from Fam piso · morphism Ind (_ , P) ·
                 morphism Ind (_ , diffOrn-l (O ⊙ P) ⌈ singOrn D ⌉) · SliceMorphism.m (SpanMorphism.m med'')
-                ≈⟨ sym (cong-l (PartOfIso.from Fam piso) (cong-r (SliceMorphism.m (SpanMorphism.m med''))
-                               (comp-preserving Ind (_ , P) (_ , diffOrn-l (O ⊙ P) ⌈ singOrn D ⌉)))) ⟩
+                ≈⟨ Setoid.sym setoid
+                     (cong-l (PartOfIso.from Fam piso) (cong-r (SliceMorphism.m (SpanMorphism.m med''))
+                             (comp-preserving Ind (_ , P) (_ , diffOrn-l (O ⊙ P) ⌈ singOrn D ⌉)))) ⟩
               PartOfIso.from Fam piso · morphism Ind (_ , P ⊙ diffOrn-l (O ⊙ P) ⌈ singOrn D ⌉) · SliceMorphism.m (SpanMorphism.m med'')
                 ≈⟨ cong-l (PartOfIso.from Fam piso) (SpanMorphism.triangle-l med'') ⟩
               PartOfIso.from Fam piso · SliceMorphism.m (Span.l q)
             □)
            (SpanMorphism.triangle-r med''))
       where setoid = Morphism (Slice.T (Span.M q)) (object Ind (_ , F))
-            open Setoid setoid
             open EqReasoning setoid renaming (_∎ to _□)
 
   p-pullback : Pullback Fam (slice _ (morphism Ind (_ , O))) (slice _ (morphism Ind (_ , ⌈ singOrn D ⌉)))

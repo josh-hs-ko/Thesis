@@ -2,7 +2,7 @@ module Thesis.Prelude.Equality where
 
 open import Level
 open import Data.Product using (Σ; _,_)
-open import Relation.Binary using (Setoid)
+open import Relation.Binary using (Setoid; module Setoid)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 open import Relation.Binary.HeterogeneousEquality using (_≅_) renaming (refl to hrefl)
 
@@ -26,8 +26,8 @@ proof-irrelevance' refl refl {refl} {refl} = hrefl
 
 Unique : {ℓ₀ ℓ₁ : Level} (S : Setoid ℓ₀ ℓ₁) → Setoid.Carrier S → Set (ℓ₀ ⊔ ℓ₁)
 Unique S x = (y : Carrier) → x ≈ y
-  where open Relation.Binary.Setoid S
+  where open Setoid S
 
 equal : {ℓ₀ ℓ₁ : Level} (S : Setoid ℓ₀ ℓ₁) → Σ[ x ∶ Setoid.Carrier S ] Unique S x → ∀ y z → Setoid._≈_ S y z
 equal S (x , u) y z = trans (sym (u y)) (u z)
-  where open Relation.Binary.Setoid S
+  where open Setoid S

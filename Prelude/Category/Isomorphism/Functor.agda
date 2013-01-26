@@ -6,7 +6,7 @@ module Thesis.Prelude.Category.Isomorphism.Functor
 
 open import Thesis.Prelude.Category.Isomorphism
 
-open import Relation.Binary using (Setoid)
+open import Relation.Binary using (module Setoid)
 import Relation.Binary.EqReasoning as EqReasoning
 
 open Category
@@ -20,14 +20,15 @@ private
   inverse {X} {Y} i =
     begin
       morphism F to ·D morphism F from
-        ≈⟨ Setoid.sym (Morphism D (object F Y) (object F Y)) (comp-preserving F to from) ⟩
+        ≈⟨ Setoid.sym setoid (comp-preserving F to from) ⟩
       morphism F (to ·C from)
         ≈⟨ ≈-respecting F to-from-inverse ⟩
       morphism F (id C)
         ≈⟨ id-preserving F ⟩
       id D
     ∎
-    where open EqReasoning (Morphism D (object F Y) (object F Y))
+    where setoid = Morphism D (object F Y) (object F Y)
+          open EqReasoning setoid
           open Iso C i
 
 iso-preserving : {X Y : Object C} → Iso C X Y → Iso D (object F X) (object F Y)

@@ -24,7 +24,7 @@ open import Thesis.Ornament.ParallelComposition.Pullback
 
 open import Function using (id; _∘_)
 open import Data.Product using (Σ; proj₁; proj₂; _,_; _×_; <_,_>) renaming (map to _**_)
-open import Relation.Binary using (Setoid)
+open import Relation.Binary using (module Setoid)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; cong; trans; sym; module ≡-Reasoning) renaming (setoid to ≡-Setoid)
 open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅; ≡-subst-removable) renaming (refl to hrefl; cong to hcong; trans to htrans)
 

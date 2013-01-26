@@ -7,7 +7,7 @@ open import Thesis.Prelude.Category.Pullback
 
 open import Level
 open import Data.Product using (Σ; _,_; proj₁; proj₂)
-open import Relation.Binary using (Setoid)
+open import Relation.Binary using (module Setoid)
 import Relation.Binary.EqReasoning as EqReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
@@ -41,8 +41,7 @@ module PullbackPreserving
           (SliceMorphism.m (Span.l q'))
           (begin
              Slice.s (Slice.T g) · SliceMorphism.m (Span.l q')
-               ≈⟨ Setoid.sym (Morphism (Slice.T (Span.M q')) B)
-                    (cong-r (SliceMorphism.m (Span.l q')) (SliceMorphism.triangle (Slice.s g))) ⟩
+               ≈⟨ Setoid.sym setoid (cong-r (SliceMorphism.m (Span.l q')) (SliceMorphism.triangle (Slice.s g))) ⟩
              (Slice.s f · SliceMorphism.m (Slice.s g)) · SliceMorphism.m (Span.l q')
                ≈⟨ assoc (Slice.s f) (SliceMorphism.m (Slice.s g)) (SliceMorphism.m (Span.l q')) ⟩
              Slice.s f · (SliceMorphism.m (Slice.s g) · SliceMorphism.m (Span.l q'))
@@ -50,7 +49,8 @@ module PullbackPreserving
              Slice.s f · Slice.s (Span.M q')
            ∎))
         (SliceMorphism.triangle (Span.l q'))
-      where open EqReasoning (Morphism (Slice.T (Span.M q')) B)
+      where setoid = Morphism (Slice.T (Span.M q')) B
+            open EqReasoning setoid
 
     Tq-to-h : SliceMorphism (SliceCategory C B) f Tq h
     Tq-to-h =
@@ -59,8 +59,7 @@ module PullbackPreserving
           (SliceMorphism.m (Span.r q'))
           (begin
              Slice.s (Slice.T h) · SliceMorphism.m (Span.r q')
-               ≈⟨ Setoid.sym (Morphism (Slice.T (Span.M q')) B)
-                    (cong-r (SliceMorphism.m (Span.r q')) (SliceMorphism.triangle (Slice.s h))) ⟩
+               ≈⟨ Setoid.sym setoid (cong-r (SliceMorphism.m (Span.r q')) (SliceMorphism.triangle (Slice.s h))) ⟩
              (Slice.s f · SliceMorphism.m (Slice.s h)) · SliceMorphism.m (Span.r q')
                ≈⟨ assoc (Slice.s f) (SliceMorphism.m (Slice.s h)) (SliceMorphism.m (Span.r q')) ⟩
              Slice.s f · (SliceMorphism.m (Slice.s h) · SliceMorphism.m (Span.r q'))
@@ -68,7 +67,8 @@ module PullbackPreserving
              Slice.s f · Slice.s (Span.M q')
            ∎))
         (SliceMorphism.triangle (Span.r q'))
-      where open EqReasoning (Morphism (Slice.T (Span.M q')) B)
+      where setoid = Morphism (Slice.T (Span.M q')) B
+            open EqReasoning setoid
 
     q : Span (SliceCategory (SliceCategory C B) f) g h
     q = span Tq Tq-to-g Tq-to-h
@@ -92,8 +92,7 @@ module PullbackPreserving
             (SliceMorphism.m (SpanMorphism.m q'-to'-p'))
             (begin
                Slice.s (Slice.T (Span.M p)) · SliceMorphism.m (SpanMorphism.m q'-to'-p')
-                 ≈⟨ Setoid.sym (Morphism (Slice.T (Span.M q')) B)
-                      (cong-r (SliceMorphism.m (SpanMorphism.m q'-to'-p')) (SliceMorphism.triangle (Slice.s (Span.M p)))) ⟩
+                 ≈⟨ Setoid.sym setoid (cong-r (SliceMorphism.m (SpanMorphism.m q'-to'-p')) (SliceMorphism.triangle (Slice.s (Span.M p)))) ⟩
                (Slice.s f · SliceMorphism.m (Slice.s (Span.M p))) · SliceMorphism.m (SpanMorphism.m q'-to'-p')
                  ≈⟨ assoc (Slice.s f) (SliceMorphism.m (Slice.s (Span.M p))) (SliceMorphism.m (SpanMorphism.m q'-to'-p')) ⟩
                Slice.s f · (SliceMorphism.m (Slice.s (Span.M p)) · SliceMorphism.m (SpanMorphism.m q'-to'-p'))
@@ -101,7 +100,8 @@ module PullbackPreserving
                Slice.s f · Slice.s (Span.M q')
              ∎))
           (SliceMorphism.triangle (SpanMorphism.m q'-to'-p'))
-        where open EqReasoning (Morphism (Slice.T (Span.M q')) B)
+        where setoid = Morphism (Slice.T (Span.M q')) B
+              open EqReasoning setoid
 
       q-to'-p : SpanMorphism (SliceCategory (SliceCategory C B) f) g h q p
       q-to'-p = spanMorphism m-q-to'-p (SpanMorphism.triangle-l q'-to'-p') (SpanMorphism.triangle-r q'-to'-p')

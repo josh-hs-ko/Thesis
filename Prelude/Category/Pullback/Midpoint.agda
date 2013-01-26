@@ -14,7 +14,7 @@ open import Thesis.Prelude.Equality
 open import Thesis.Prelude.Category.Pullback
 
 open import Data.Product using (Σ; _,_; proj₁; proj₂)
-open import Relation.Binary using (Setoid)
+open import Relation.Binary using (module Setoid)
 import Relation.Binary.EqReasoning as EqReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
@@ -63,8 +63,7 @@ module Universality (W : Span (SliceCategory C Z) f g) where
   lemma-X×Z-X =
     begin
       Span.l X×Z · (SpanMorphism.m X×Y×Z-to-X×Z · SpanMorphism.m W-to-X×Y×Z')
-        ≈⟨ Setoid.sym (Morphism (Slice.T (Span.M W)) X)
-             (assoc (Span.l X×Z) (SpanMorphism.m X×Y×Z-to-X×Z) (SpanMorphism.m W-to-X×Y×Z')) ⟩
+        ≈⟨ Setoid.sym setoid (assoc (Span.l X×Z) (SpanMorphism.m X×Y×Z-to-X×Z) (SpanMorphism.m W-to-X×Y×Z')) ⟩
       (Span.l X×Z · SpanMorphism.m X×Y×Z-to-X×Z) · SpanMorphism.m W-to-X×Y×Z'
         ≈⟨ cong-r (SpanMorphism.m W-to-X×Y×Z') (SpanMorphism.triangle-l X×Y×Z-to-X×Z) ⟩
       (Span.l X×Y · Span.l X×Y×Z) · SpanMorphism.m W-to-X×Y×Z'
@@ -75,14 +74,14 @@ module Universality (W : Span (SliceCategory C Z) f g) where
         ≈⟨ SpanMorphism.triangle-l W-to-X×Y ⟩
       Span.l X×Z · SliceMorphism.m (Span.l W)
     ∎
-    where open EqReasoning (Morphism (Slice.T (Span.M W)) X)
+    where setoid = Morphism (Slice.T (Span.M W)) X
+          open EqReasoning setoid
 
   lemma-Y×Z-Y : Span.l Y×Z · (SpanMorphism.m X×Y×Z-to-Y×Z · SpanMorphism.m W-to-X×Y×Z') ≈ Span.l Y×Z · SliceMorphism.m (Span.r W)
   lemma-Y×Z-Y =
     begin
       Span.l Y×Z · (SpanMorphism.m X×Y×Z-to-Y×Z · SpanMorphism.m W-to-X×Y×Z')
-        ≈⟨ Setoid.sym (Morphism (Slice.T (Span.M W)) Y)
-             (assoc (Span.l Y×Z) (SpanMorphism.m X×Y×Z-to-Y×Z) (SpanMorphism.m W-to-X×Y×Z')) ⟩
+        ≈⟨ Setoid.sym setoid (assoc (Span.l Y×Z) (SpanMorphism.m X×Y×Z-to-Y×Z) (SpanMorphism.m W-to-X×Y×Z')) ⟩
       (Span.l Y×Z · SpanMorphism.m X×Y×Z-to-Y×Z) · SpanMorphism.m W-to-X×Y×Z'
         ≈⟨ cong-r (SpanMorphism.m W-to-X×Y×Z') (SpanMorphism.triangle-l X×Y×Z-to-Y×Z) ⟩
       (Span.r X×Y · Span.l X×Y×Z) · SpanMorphism.m W-to-X×Y×Z'
@@ -93,39 +92,40 @@ module Universality (W : Span (SliceCategory C Z) f g) where
         ≈⟨ SpanMorphism.triangle-r W-to-X×Y ⟩
       Span.l Y×Z · SliceMorphism.m (Span.r W)
     ∎
-    where open EqReasoning (Morphism (Slice.T (Span.M W)) Y)
+    where setoid = Morphism (Slice.T (Span.M W)) Y
+          open EqReasoning setoid
 
   lemma-X×Z-Z : Span.r X×Z · (SpanMorphism.m X×Y×Z-to-X×Z · SpanMorphism.m W-to-X×Y×Z') ≈ Span.r X×Z · SliceMorphism.m (Span.l W)
   lemma-X×Z-Z =
     begin
       Span.r X×Z · (SpanMorphism.m X×Y×Z-to-X×Z · SpanMorphism.m W-to-X×Y×Z')
-        ≈⟨ Setoid.sym (Morphism (Slice.T (Span.M W)) Z)
-            (assoc (Span.r X×Z) (SpanMorphism.m X×Y×Z-to-X×Z) (SpanMorphism.m W-to-X×Y×Z')) ⟩
+        ≈⟨ Setoid.sym setoid (assoc (Span.r X×Z) (SpanMorphism.m X×Y×Z-to-X×Z) (SpanMorphism.m W-to-X×Y×Z')) ⟩
       (Span.r X×Z · SpanMorphism.m X×Y×Z-to-X×Z) · SpanMorphism.m W-to-X×Y×Z'
         ≈⟨ cong-r (SpanMorphism.m W-to-X×Y×Z') (SpanMorphism.triangle-r X×Y×Z-to-X×Z) ⟩
       Span.r X×Y×Z · SpanMorphism.m W-to-X×Y×Z'
         ≈⟨ SpanMorphism.triangle-r W-to-X×Y×Z' ⟩
       Slice.s (Span.M W)
-        ≈⟨ Setoid.sym (Morphism (Slice.T (Span.M W)) Z) (SliceMorphism.triangle (Span.l W)) ⟩
+        ≈⟨ Setoid.sym setoid (SliceMorphism.triangle (Span.l W)) ⟩
       Span.r X×Z · SliceMorphism.m (Span.l W)
     ∎
-    where open EqReasoning (Morphism (Slice.T (Span.M W)) Z)
+    where setoid = Morphism (Slice.T (Span.M W)) Z
+          open EqReasoning setoid
 
   lemma-Y×Z-Z : Span.r Y×Z · (SpanMorphism.m X×Y×Z-to-Y×Z · SpanMorphism.m W-to-X×Y×Z') ≈ Span.r Y×Z · SliceMorphism.m (Span.r W)
   lemma-Y×Z-Z =
     begin
       Span.r Y×Z · (SpanMorphism.m X×Y×Z-to-Y×Z · SpanMorphism.m W-to-X×Y×Z')
-        ≈⟨ Setoid.sym (Morphism (Slice.T (Span.M W)) Z)
-            (assoc (Span.r Y×Z) (SpanMorphism.m X×Y×Z-to-Y×Z) (SpanMorphism.m W-to-X×Y×Z')) ⟩
+        ≈⟨ Setoid.sym setoid (assoc (Span.r Y×Z) (SpanMorphism.m X×Y×Z-to-Y×Z) (SpanMorphism.m W-to-X×Y×Z')) ⟩
       (Span.r Y×Z · SpanMorphism.m X×Y×Z-to-Y×Z) · SpanMorphism.m W-to-X×Y×Z'
         ≈⟨ cong-r (SpanMorphism.m W-to-X×Y×Z') (SpanMorphism.triangle-r X×Y×Z-to-Y×Z) ⟩
       Span.r X×Y×Z · SpanMorphism.m W-to-X×Y×Z'
         ≈⟨ SpanMorphism.triangle-r W-to-X×Y×Z' ⟩
       Slice.s (Span.M W)
-        ≈⟨ Setoid.sym (Morphism (Slice.T (Span.M W)) Z) (SliceMorphism.triangle (Span.r W)) ⟩
+        ≈⟨ Setoid.sym setoid (SliceMorphism.triangle (Span.r W)) ⟩
       Span.r Y×Z · SliceMorphism.m (Span.r W)
     ∎
-    where open EqReasoning (Morphism (Slice.T (Span.M W)) Z)
+    where setoid = Morphism (Slice.T (Span.M W)) Z
+          open EqReasoning setoid
 
   W-to-X×Y×Z : SpanMorphism (SliceCategory C Z) f g W X×Y×Z-pullback
   W-to-X×Y×Z =
@@ -152,35 +152,33 @@ module Universality (W : Span (SliceCategory C Z) f g) where
     lemma-X×Y-X =
       begin
         Span.l X×Y · (Span.l X×Y×Z · SliceMorphism.m (SpanMorphism.m m'))
-          ≈⟨ Setoid.sym (Morphism (Slice.T (Span.M W)) X)
-               (assoc (Span.l X×Y) (Span.l X×Y×Z) (SliceMorphism.m (SpanMorphism.m m'))) ⟩
+          ≈⟨ Setoid.sym setoid (assoc (Span.l X×Y) (Span.l X×Y×Z) (SliceMorphism.m (SpanMorphism.m m'))) ⟩
         (Span.l X×Y · Span.l X×Y×Z) · SliceMorphism.m (SpanMorphism.m m')
-          ≈⟨ Setoid.sym (Morphism (Slice.T (Span.M W)) X)
-               (cong-r (SliceMorphism.m (SpanMorphism.m m')) (SpanMorphism.triangle-l X×Y×Z-to-X×Z)) ⟩
+          ≈⟨ Setoid.sym setoid (cong-r (SliceMorphism.m (SpanMorphism.m m')) (SpanMorphism.triangle-l X×Y×Z-to-X×Z)) ⟩
         (Span.l X×Z · SpanMorphism.m X×Y×Z-to-X×Z) · SliceMorphism.m (SpanMorphism.m m')
           ≈⟨ assoc (Span.l X×Z) (SpanMorphism.m X×Y×Z-to-X×Z) (SliceMorphism.m (SpanMorphism.m m')) ⟩
         Span.l X×Z · (SpanMorphism.m X×Y×Z-to-X×Z · SliceMorphism.m (SpanMorphism.m m'))
           ≈⟨ cong-l (Span.l X×Z) (SpanMorphism.triangle-l m') ⟩
         Span.l X×Z · SliceMorphism.m (Span.l W)
       ∎
-      where open EqReasoning (Morphism (Slice.T (Span.M W)) X)
+      where setoid = Morphism (Slice.T (Span.M W)) X
+            open EqReasoning setoid
 
     lemma-X×Y-Y : Span.r X×Y · (Span.l X×Y×Z · SliceMorphism.m (SpanMorphism.m m')) ≈ Span.l Y×Z · SliceMorphism.m (Span.r W)
     lemma-X×Y-Y =
       begin
         Span.r X×Y · (Span.l X×Y×Z · SliceMorphism.m (SpanMorphism.m m'))
-          ≈⟨ Setoid.sym (Morphism (Slice.T (Span.M W)) Y)
-               (assoc (Span.r X×Y) (Span.l X×Y×Z) (SliceMorphism.m (SpanMorphism.m m'))) ⟩
+          ≈⟨ Setoid.sym setoid (assoc (Span.r X×Y) (Span.l X×Y×Z) (SliceMorphism.m (SpanMorphism.m m'))) ⟩
         (Span.r X×Y · Span.l X×Y×Z) · SliceMorphism.m (SpanMorphism.m m')
-          ≈⟨ Setoid.sym (Morphism (Slice.T (Span.M W)) Y)
-               (cong-r (SliceMorphism.m (SpanMorphism.m m')) (SpanMorphism.triangle-l X×Y×Z-to-Y×Z)) ⟩
+          ≈⟨ Setoid.sym setoid (cong-r (SliceMorphism.m (SpanMorphism.m m')) (SpanMorphism.triangle-l X×Y×Z-to-Y×Z)) ⟩
         (Span.l Y×Z · SpanMorphism.m X×Y×Z-to-Y×Z) · SliceMorphism.m (SpanMorphism.m m')
           ≈⟨ assoc (Span.l Y×Z) (SpanMorphism.m X×Y×Z-to-Y×Z) (SliceMorphism.m (SpanMorphism.m m')) ⟩
         Span.l Y×Z · (SpanMorphism.m X×Y×Z-to-Y×Z · SliceMorphism.m (SpanMorphism.m m'))
           ≈⟨ cong-l (Span.l Y×Z) (SpanMorphism.triangle-r m') ⟩
         Span.l Y×Z · SliceMorphism.m (Span.r W)
       ∎
-      where open EqReasoning (Morphism (Slice.T (Span.M W)) Y)
+      where setoid = Morphism (Slice.T (Span.M W)) Y
+            open EqReasoning setoid
 
     uniqueness : SliceMorphism.m (SpanMorphism.m W-to-X×Y×Z) ≈ SliceMorphism.m (SpanMorphism.m m')
     uniqueness =

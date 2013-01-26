@@ -8,7 +8,7 @@ open import Thesis.Prelude.Category.Slice
 open import Level
 open import Function using (_∘_)
 open import Data.Product using (Σ; _,_; proj₁; _×_)
-open import Relation.Binary using (Setoid)
+open import Relation.Binary using (module Setoid)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
 open Functor

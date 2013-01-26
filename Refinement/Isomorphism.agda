@@ -11,7 +11,7 @@ open import Thesis.Refinement
 open import Function using (id; const; _∘_)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; <_,_>)
-open import Relation.Binary using (Setoid)
+open import Relation.Binary using (module Setoid)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong) renaming (setoid to ≡-Setoid)
 
 
