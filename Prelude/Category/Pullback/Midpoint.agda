@@ -1,3 +1,7 @@
+-- *The Midpoint Lemma:*
+-- Let X, Y, Z be objects of a category C, and X × Y, X × Z, Y × Z, and (X × Y) × Z be products.
+-- Then (X × Y) × Z is a pullback of the projections X × Z → Z and Y × Z → Z.
+
 open import Thesis.Prelude.Category
 open import Thesis.Prelude.Category.Slice
 open import Thesis.Prelude.Category.Span

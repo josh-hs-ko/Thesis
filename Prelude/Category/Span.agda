@@ -1,3 +1,5 @@
+-- Definition of span categories. Products and product preservation are also defined here.
+
 module Thesis.Prelude.Category.Span where
 
 open import Thesis.Prelude.Category

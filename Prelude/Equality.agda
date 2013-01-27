@@ -1,3 +1,6 @@
+-- This module defines the J rule for propositional equality, a generalised K rule for heterogeneous equality,
+-- and a predicate specifying when an element of a setoid is the unique inhabitant of the setoid.
+
 module Thesis.Prelude.Equality where
 
 open import Level

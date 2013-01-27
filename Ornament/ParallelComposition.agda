@@ -1,3 +1,5 @@
+-- Parallel composition of ornaments.
+
 module Thesis.Ornament.ParallelComposition where
 
 open import Thesis.Prelude.InverseImage

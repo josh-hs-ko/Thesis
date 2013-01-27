@@ -1,3 +1,5 @@
+-- Definition of hylomorphisms and the *Hylomorphism Theorem*.
+
 open import Thesis.Description
 open import Thesis.Relation
 

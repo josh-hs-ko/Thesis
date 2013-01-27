@@ -1,3 +1,5 @@
+-- Various ways to construct isomorphisms in *Fun*.
+
 module Thesis.Prelude.Function.Isomorphism where
 
 open import Thesis.Prelude.Equality

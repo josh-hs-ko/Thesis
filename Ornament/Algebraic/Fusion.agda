@@ -1,3 +1,5 @@
+-- Fold fusion theorems for algebraic ornamentation.
+
 module Thesis.Ornament.Algebraic.Fusion where
 
 open import Thesis.Prelude.Function

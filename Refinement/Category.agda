@@ -1,3 +1,5 @@
+-- Families of refinements form a category *FRef*.
+
 module Thesis.Refinement.Category where
 
 open import Thesis.Prelude.Category

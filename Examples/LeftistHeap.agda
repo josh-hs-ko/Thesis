@@ -1,3 +1,5 @@
+-- The ordering property and balancing properties of leftist heaps are treated separately when needed.
+
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_) renaming (map to _**_)
 open import Relation.Nullary using (¬_; Dec; yes; no)
 

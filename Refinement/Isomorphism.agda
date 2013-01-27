@@ -1,3 +1,5 @@
+-- A sufficient condition for establishing an isomorphism between the two types related by a refinement.
+
 module Thesis.Refinement.Isomorphism where
 
 open import Thesis.Prelude.Equality

@@ -1,3 +1,5 @@
+-- A variant of the *Greedy Theorem* and its embedding into inductive families.
+
 open import Thesis.Description
 open import Thesis.Relation
 

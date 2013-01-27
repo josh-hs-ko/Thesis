@@ -1,3 +1,9 @@
+-- The category *Fam* of families of sets.
+-- An isomorphism between two families of sets in *Fam* can be broken into isomorphisms between corresponding sets in the two families.
+-- There is a canonical way of forming pullbacks in Fam,
+-- namely taking the set-theoretical pullbacks of the index set and corresponding sets in the families.
+-- The forgetful functor from *Fam* to *Fun* preserves this pullback, and is hence pullback-preserving.
+
 module Thesis.Prelude.Function.Fam where
 
 open import Thesis.Prelude.Equality

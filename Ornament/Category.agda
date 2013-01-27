@@ -1,3 +1,7 @@
+-- The category of descriptions and ornaments.
+-- The functor *Ind* (for "induction") takes the least fixed points of descriptions and
+-- extends ornaments to forgetful maps on those least fixed points.
+
 module Thesis.Ornament.Category where
 
 open import Thesis.Prelude.Category

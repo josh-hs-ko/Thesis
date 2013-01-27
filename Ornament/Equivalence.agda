@@ -1,3 +1,5 @@
+-- An extensional equivalence relation on ornaments, which extends to extensional equivalence on ornamental forgetful maps.
+
 module Thesis.Ornament.Equivalence where
 
 open import Thesis.Prelude.Equality

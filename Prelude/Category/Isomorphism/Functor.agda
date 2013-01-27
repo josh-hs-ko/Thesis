@@ -1,3 +1,5 @@
+-- Isomorphisms are preserved by functors.
+
 open import Thesis.Prelude.Category
 open import Level
 

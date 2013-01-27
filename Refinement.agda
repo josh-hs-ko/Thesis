@@ -1,3 +1,5 @@
+-- Definition of refinements, swaps, and upgrades.
+
 module Thesis.Refinement where
 
 open import Thesis.Prelude.Function

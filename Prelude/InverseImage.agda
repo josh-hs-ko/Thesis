@@ -1,3 +1,5 @@
+-- Definition of inverse images of a function, and definition of set-theoretic pullbacks in terms of inverse images.
+
 module Thesis.Prelude.InverseImage where
 
 open import Thesis.Prelude.Category

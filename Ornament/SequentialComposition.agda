@@ -1,3 +1,5 @@
+-- Sequential composition of ornaments.
+
 module Thesis.Ornament.SequentialComposition where
 
 open import Thesis.Prelude.Function

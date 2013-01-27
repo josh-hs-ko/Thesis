@@ -1,3 +1,6 @@
+-- Definition of datatype descriptions, i.e., a universe for functors on families of sets.
+-- Datatype-generic fold and induction are defined on top of descriptions.
+
 module Thesis.Description where
 
 open import Thesis.Prelude.Category.Isomorphism

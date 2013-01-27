@@ -1,3 +1,6 @@
+-- Parallel composition of ornaments, when mapped to *Fam* by the functor *Ind*, forms a pullback.
+-- This file can take a long time to typecheck.
+
 module Thesis.Ornament.ParallelComposition.Pullback where
 
 open import Thesis.Prelude.Category

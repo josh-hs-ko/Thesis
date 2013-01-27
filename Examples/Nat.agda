@@ -1,3 +1,5 @@
+-- Peano-style natural numbers.
+
 module Thesis.Examples.Nat where
 
 open import Thesis.Description

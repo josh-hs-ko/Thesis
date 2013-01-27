@@ -1,3 +1,5 @@
+-- Properties of relational folds.
+
 module Thesis.Relation.Fold where
 
 open import Thesis.Prelude.Category.Isomorphism

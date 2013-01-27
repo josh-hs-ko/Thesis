@@ -1,3 +1,5 @@
+-- Auxiliary operations for dependent pairs.
+
 module Thesis.Prelude.Product where
 
 open import Thesis.Prelude.Function

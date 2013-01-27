@@ -1,3 +1,7 @@
+-- This module defines pointwise equality of functions, which forms a setoid, and pointwise heterogeneous equality of functions.
+-- The category *Fun* of sets and functions is also defined here.
+-- The unit type is proved to be terminal in *Fun*.
+
 module Thesis.Prelude.Function where
 
 open import Thesis.Prelude.Category
@@ -89,23 +93,3 @@ Fun = record { Object   = Set
 
 ⊤-terminal : Terminal Fun ⊤
 ⊤-terminal = λ _ → (! , λ _ → frefl)
-
-IrrFun : Category
-IrrFun = record { Object   = Set
-                ; Morphism = λ X Y → record { Carrier = X → Y
-                                            ; _≈_ = const (const ⊤)
-                                            ; isEquivalence = record { refl = tt; sym = const tt; trans = const (const tt) } }
-                ; _·_ = λ f g → f ∘ g
-                ; id  = Function.id
-                ; id-l   = const tt
-                ; id-r   = const tt
-                ; assoc  = const (const (const tt))
-                ; cong-l = const (const tt)
-                ; cong-r = const (const tt) }
-
-Irr : Functor Fun IrrFun
-Irr = record { object   = Function.id
-             ; morphism = Function.id
-             ; ≈-respecting    = const tt
-             ; id-preserving   = tt
-             ; comp-preserving = const (const tt) }

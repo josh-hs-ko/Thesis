@@ -1,3 +1,7 @@
+-- Definition of (relational) algebraic ornaments and ornamental algebras
+-- (which are a different kind of algebras from McBride's ornamental algebras).
+-- The optimised predicate of an algebraic ornament can be swapped for a relational fold with the algebra of the ornament.
+
 module Thesis.Ornament.Algebraic where
 
 open import Thesis.Prelude.InverseImage

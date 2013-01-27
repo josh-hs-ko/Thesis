@@ -1,3 +1,6 @@
+-- The optimised predicate for the parallel composition of two ornaments can be swapped
+-- for the pointwise conjunction of the optimised predicates for the two component ornaments.
+
 open import Thesis.Ornament
 
 module Thesis.Ornament.ParallelComposition.Swap {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P : Orn f D F) where

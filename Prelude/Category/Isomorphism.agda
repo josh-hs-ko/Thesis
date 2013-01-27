@@ -1,3 +1,8 @@
+-- Categorical definition of isomorphisms, parametrised by an underlying category.
+-- Isomorphic objects form a setoid and are amenable to equational reasoning.
+-- It is proved here that terminal objects are isomorphic.
+-- A predicate saying that a morphism is part of an isomorphism is also provided.
+
 open import Thesis.Prelude.Category
 open import Level
 

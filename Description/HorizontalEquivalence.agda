@@ -1,3 +1,5 @@
+-- An inductively defined equivalence between description-based data that poses little restriction on their actual types.
+
 module Thesis.Description.HorizontalEquivalence where
 
 open import Thesis.Description

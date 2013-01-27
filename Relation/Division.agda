@@ -1,3 +1,5 @@
+-- Definition of right-division of relations.
+
 module Thesis.Relation.Division where
 
 open import Thesis.Relation

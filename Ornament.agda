@@ -1,3 +1,7 @@
+-- Definition of ornaments, i.e., a universe for simple, structural natural transformations between functors decoded from descriptions.
+-- Ornamental descriptions are provided for constructing new descriptions from old ones such that ornaments can be automatically derived.
+-- Singleton ornaments are also defined, which create as many singleton types as there are elements of the base type.
+
 module Thesis.Ornament where
 
 open import Thesis.Prelude.Equality

@@ -1,4 +1,6 @@
--- Basic definitions of subsets and relations.
+-- Basic definitions of subsets and relations, combinators for specifying nondeterministic computation,
+-- definition of relational fold, subset and relational inclusion wrapped up as preorder and setoid,
+-- combinators for reasoning with relations, and definition and properties of relators.
 
 module Thesis.Relation where
 
@@ -77,7 +79,7 @@ _º : ∀ {I} {X Y : I → Set} → (X ↝ Y) → Y ↝ X
 infixr 4 _•_
 
 _•_ : ∀ {I} {X Y Z : I → Set} → (Y ↝ Z) → (X ↝ Y) → X ↝ Z
-_•_ R S = wrap λ x → Λ S x >>= Λ R
+R • S = wrap λ x → Λ S x >>= Λ R
 
 
 --------

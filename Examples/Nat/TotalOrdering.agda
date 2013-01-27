@@ -1,3 +1,5 @@
+-- Decidable total ordering on natural numbers and minimum.
+
 module Thesis.Examples.Nat.TotalOrdering where
 
 open import Thesis.Description

@@ -1,3 +1,5 @@
+-- Definition of slice categories.
+
 module Thesis.Prelude.Category.Slice where
 
 open import Thesis.Prelude.Category

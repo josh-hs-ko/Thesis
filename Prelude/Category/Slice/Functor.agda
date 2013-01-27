@@ -1,3 +1,5 @@
+-- The forgetful functor from a slice category to its underlying category is pullback-preserving.
+
 module Thesis.Prelude.Category.Slice.Functor where
 
 open import Thesis.Prelude.Category

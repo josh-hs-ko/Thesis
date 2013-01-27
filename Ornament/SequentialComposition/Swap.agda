@@ -1,3 +1,5 @@
+-- The optimised predicate for an ornament refined by sequential composition can be swapped for the original optimised predicate.
+
 open import Thesis.Prelude.Category
 open import Thesis.Prelude.Category.Isomorphism
 open import Thesis.Prelude.Function.Fam

@@ -54,9 +54,9 @@ main = do
                      (not . or <$> sequence exclusion))
                   "."
   hs <- mapM readHeader ps
-  let fis = zip (map (concat . (prefix :) . intersperse ".") fs) hs
-  writeFile "Everything.agda" (generateEverything fis)
-  writeFile "README.md"       (generateReadme     fis)
+  let ms = map (concat . (prefix :) . intersperse ".") fs
+  writeFile "Everything.agda" (generateEverything ms)
+  writeFile "README.md"       (generateReadme (zip ms hs))
 
 preprocess :: [FilePath] -> ([FilePath], [[String]])
 preprocess =
@@ -70,14 +70,14 @@ preprocess =
 readHeader :: FilePath -> IO [String]
 readHeader path =
   map (dropWhile isSpace . dropWhile (== '-')) .
-  takeWhile (("--" ==) . take 2) . lines <$> readFile path
+  takeWhile ((== "--") . take 2) . lines <$> readFile path
 
-generateEverything :: [(String, [String])] -> String
+generateEverything :: [String] -> String
 generateEverything =
-  unlines . (everything_header ++) . map (("import " ++) . fst)
+  unlines . (everything_header ++) . map ("import " ++)
 
 generateReadme :: [(String, [String])] -> String
 generateReadme =
   unlines . (readme_header ++) . concat . intersperse [""] .
-  map (\(h, hs) -> ("#### " ++ h) : hs)
+  map (\(m, hs) -> ("#### " ++ m) : hs)
 

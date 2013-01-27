@@ -1,3 +1,7 @@
+-- Two fundamental theorems about algebraic ornaments and ornamental algebras.
+-- *The AOOA Theorem:* Algebraic ornamentation by an ornamental algebra produces an isomorphic datatype.
+-- *The OAAO Theorem:* An ornamental algebra derived from an algebraic ornament is isomorphic to the algebra of the ornament.
+
 module Thesis.Ornament.Algebraic.FundamentalTheorems where
 
 open import Thesis.Prelude.Equality
@@ -20,7 +24,7 @@ open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; cong
 
 
 --------
--- algebraic ornamentation with an ornamental algebra produces an isomorphic datatype
+-- algebraic ornamentation by an ornamental algebra produces an isomorphic datatype
 
 tweakOrn-aux :
   ∀ {I J} {e : J → I} {D' : RDesc I} {E' : RDesc J} →
@@ -77,7 +81,7 @@ AOOA-theorem {e = e} O =
 
 
 --------
--- ornamental algebra derived from an algebraic ornament is equivalent to the original algebra
+-- ornamental algebra derived from an algebraic ornament is isomorphic to the algebra of the ornament
 
 module OAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝ J) where
 

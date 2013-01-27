@@ -1,3 +1,6 @@
+-- Definition of an optimised predicate for an ornament as the parallel composition of the ornament and the singleton ornament.
+-- This construction gives a functor from *Orn* to *FRef* which produces more representation-efficient promotion predicates.
+
 module Thesis.Ornament.RefinementSemantics where
 
 open import Thesis.Prelude.Equality
