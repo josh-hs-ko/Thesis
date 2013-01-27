@@ -10,11 +10,25 @@ import System.FilePath
 import System.FilePath.Find
 
 
-output_file :: FilePath
-output_file = "Everything.agda"
+everything_header :: [String]
+everything_header =
+  [ "module Thesis.Everything where",
+    "" ]
 
-header :: [String]
-header = [ "module Thesis.Everything where", "" ]
+readme_header :: [String]
+readme_header =
+  [ "# Composable structures for dependently typed programming (TBD)",
+    "",
+    "This implements, in Agda, a framework of " ++
+    "composable datatype refinements based on " ++
+    "McBride's ornamentation.",
+    "",
+    "See [the author's homepage]" ++
+    "(http://www.cs.ox.ac.uk/people/hsiang-shang.ko/) " ++
+    "for more information, including published papers.",
+    "",
+    "## Module descriptions",
+    "" ]
 
 prefix :: String
 prefix = "Thesis."
@@ -34,18 +48,36 @@ exclusion =
 
 main :: IO ()
 main = do
-  files <- find always
-             (extension ==? ".agda" &&? (not . or <$> sequence exclusion))
-             "."
-  writeFile output_file (process files)
+  (ps, fs) <- preprocess <$>
+                find always
+                  (extension ==? ".agda" &&?
+                     (not . or <$> sequence exclusion))
+                  "."
+  hs <- mapM readHeader ps
+  let fis = zip (map (concat . (prefix :) . intersperse ".") fs) hs
+  writeFile "Everything.agda" (generateEverything fis)
+  writeFile "README.md"       (generateReadme     fis)
 
-process :: [FilePath] -> String
-process =
-  unlines .
-  (header ++) .
-  map (("import " ++) . (prefix ++) . concat . intersperse ".") .
-  sortBy (comparing
-    ((maybe maxBound id . flip findIndex ordering . (==) . head)
-     &&& tail)) .
-  map (map (takeWhile isAlpha) . tail . splitPath)
+preprocess :: [FilePath] -> ([FilePath], [[String]])
+preprocess =
+  unzip .
+  sortBy (comparing (((toIndex . head) &&& tail) . snd)) .
+  map (id &&& (map (takeWhile isAlpha) . tail . splitPath))
+  where
+    toIndex :: String -> Int
+    toIndex = maybe maxBound id . flip findIndex ordering . (==)    
+
+readHeader :: FilePath -> IO [String]
+readHeader path =
+  map (dropWhile isSpace . dropWhile (== '-')) .
+  takeWhile (("--" ==) . take 2) . lines <$> readFile path
+
+generateEverything :: [(String, [String])] -> String
+generateEverything =
+  unlines . (everything_header ++) . map (("import " ++) . fst)
+
+generateReadme :: [(String, [String])] -> String
+generateReadme =
+  unlines . (readme_header ++) . concat . intersperse [""] .
+  map (\(h, hs) -> ("#### " ++ h) : hs)
 

@@ -1,3 +1,5 @@
+-- Basic definitions of subsets and relations.
+
 module Thesis.Relation where
 
 open import Thesis.Prelude.Category.Isomorphism
