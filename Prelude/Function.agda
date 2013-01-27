@@ -1,6 +1,6 @@
 -- This module defines pointwise equality of functions, which forms a setoid, and pointwise heterogeneous equality of functions.
--- The category *Fun* of sets and functions is also defined here.
--- The unit type is proved to be terminal in *Fun*.
+-- The category `Fun` of sets and functions is also defined here.
+-- The unit type is proved to be terminal in `Fun`.
 
 module Thesis.Prelude.Function where
 

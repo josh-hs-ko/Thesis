@@ -24,7 +24,7 @@ Isomorphisms are preserved by functors.
 #### Thesis.Prelude.Category.Pullback
 A pullback is defined to be a terminal object in the category of spans over a slice category.
 Any two pullback objects are isomorphic.
-It is also defined here when a functor is pullback-preserving.
+Pullback preservation of functors is also defined.
 
 #### Thesis.Prelude.Category.Pullback.Midpoint
 *The Midpoint Lemma:*
@@ -46,18 +46,18 @@ and a predicate specifying when an element of a setoid is the unique inhabitant 
 
 #### Thesis.Prelude.Function
 This module defines pointwise equality of functions, which forms a setoid, and pointwise heterogeneous equality of functions.
-The category *Fun* of sets and functions is also defined here.
-The unit type is proved to be terminal in *Fun*.
+The category `Fun` of sets and functions is also defined here.
+The unit type is proved to be terminal in `Fun`.
 
 #### Thesis.Prelude.Function.Fam
-The category *Fam* of families of sets.
-An isomorphism between two families of sets in *Fam* can be broken into isomorphisms between corresponding sets in the two families.
-There is a canonical way of forming pullbacks in Fam,
+The category `Fam` of families of sets.
+An isomorphism between two families of sets in `Fam` can be broken into isomorphisms between corresponding sets in the two families.
+There is a canonical way of forming pullbacks in `Fam`,
 namely taking the set-theoretical pullbacks of the index set and corresponding sets in the families.
-The forgetful functor from *Fam* to *Fun* preserves this pullback, and is hence pullback-preserving.
+The forgetful functor from `Fam` to `Fun` preserves this pullback, and is hence pullback-preserving.
 
 #### Thesis.Prelude.Function.Isomorphism
-Various ways to construct isomorphisms in *Fun*.
+Various ways to construct isomorphisms in `Fun`.
 
 #### Thesis.Prelude.Implication
 Implication forms a preorder.
@@ -72,7 +72,7 @@ Auxiliary operations for dependent pairs.
 Definition of refinements, swaps, and upgrades.
 
 #### Thesis.Refinement.Category
-Families of refinements form a category *FRef*.
+Families of refinements form a category `FRef`.
 
 #### Thesis.Refinement.Isomorphism
 A sufficient condition for establishing an isomorphism between the two types related by a refinement.
@@ -104,7 +104,7 @@ Fold fusion theorems for algebraic ornamentation.
 
 #### Thesis.Ornament.Category
 The category of descriptions and ornaments.
-The functor *Ind* (for "induction") takes the least fixed points of descriptions and
+The functor `Ind` (for "induction") takes the least fixed points of descriptions and
 extends ornaments to forgetful maps on those least fixed points.
 
 #### Thesis.Ornament.Equivalence
@@ -117,7 +117,7 @@ A sufficient condition for establishing an isomorphism between the two types rel
 Parallel composition of ornaments.
 
 #### Thesis.Ornament.ParallelComposition.Pullback
-Parallel composition of ornaments, when mapped to *Fam* by the functor *Ind*, forms a pullback.
+Parallel composition of ornaments, when mapped to `Fam` by the functor `Ind`, forms a pullback.
 This file can take a long time to typecheck.
 
 #### Thesis.Ornament.ParallelComposition.Swap
@@ -126,7 +126,7 @@ for the pointwise conjunction of the optimised predicates for the two component 
 
 #### Thesis.Ornament.RefinementSemantics
 Definition of an optimised predicate for an ornament as the parallel composition of the ornament and the singleton ornament.
-This construction gives a functor from *Orn* to *FRef* which produces more representation-efficient promotion predicates.
+This construction gives a functor from `Orn` to `FRef` which produces more representation-efficient promotion predicates.
 
 #### Thesis.Ornament.SequentialComposition
 Sequential composition of ornaments.

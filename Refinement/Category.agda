@@ -1,4 +1,4 @@
--- Families of refinements form a category *FRef*.
+-- Families of refinements form a category `FRef`.
 
 module Thesis.Refinement.Category where
 
