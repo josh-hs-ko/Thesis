@@ -1,4 +1,4 @@
--- Cons-lists.
+-- Cons-lists as an ornamentation of natural numbers.
 
 module Thesis.Examples.List where
 
