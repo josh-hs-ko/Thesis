@@ -16,12 +16,12 @@ open import Data.Product using (Σ; _,_)
 --------
 -- lists
 
-ListO : Set → OrnDesc ⊤ ! NatD
-ListO A = wrap λ _ → σ Bool λ { false → ∎
+ListOD : Set → OrnDesc ⊤ ! NatD
+ListOD A = wrap λ _ → σ Bool λ { false → ∎
                               ; true  → Δ[ _ ∶ A ] ṿ (ok tt) }
 
 List : Set → Set
-List A = μ ⌊ ListO A ⌋ tt
+List A = μ ⌊ ListOD A ⌋ tt
 
 [] : ∀ {A} → List A
 [] = con (false , tt)
@@ -32,7 +32,7 @@ x ∷ xs = con (true , x , xs)
 infixr 5 _∷_
 
 length : ∀ {A} → List A → Nat
-length {A} = forget ⌈ ListO A ⌉
+length {A} = forget ⌈ ListOD A ⌉
 
 _++_ : ∀ {A} → List A → List A → List A
 con (false , _) ++ ys      = ys

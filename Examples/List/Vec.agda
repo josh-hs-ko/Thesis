@@ -20,13 +20,13 @@ open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; proo
 
 
 VecD : (A : Set) → Desc (! ⋈ proj₁)
-VecD A = OptPD ⌈ ListO A ⌉
+VecD A = OptPD ⌈ ListOD A ⌉
 
 Vec : Set → Nat → Set
 Vec A n = μ (VecD A) (ok tt , ok (tt , n))
 
-VecO : (A : Set) → Orn π₁ ⌊ ListO A ⌋ (VecD A)
-VecO A = OptPO ⌈ ListO A ⌉
+VecO : (A : Set) → Orn π₁ ⌊ ListOD A ⌋ (VecD A)
+VecO A = OptPO ⌈ ListOD A ⌉
 
 vnil : ∀ {A} → Vec A zero
 vnil = con tt

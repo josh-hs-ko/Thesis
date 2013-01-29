@@ -68,6 +68,9 @@ fun f = wrap (return ∘ f)
 idR : ∀ {I} {X : I → Set} → X ↝ X
 idR = fun id
 
+_¿ : ∀ {I} {X : I → Set} → (∀ i → ℘ (X i)) → X ↝ X
+ps ¿ = wrap λ x x' → x ≡ x' × ps _ x
+
 α : ∀ {I} {D : Desc I} → Ḟ D (μ D) ↝ μ D
 α = fun con
 
@@ -183,14 +186,20 @@ R ⊇ S = S ⊆ R
                     ; reflexive     = λ { {._} refl → ⊆-refl }
                     ; trans         = flip ⊆-trans } }
 
+coreflexive : ∀ {I} {X : I → Set} (ps : ∀ i → ℘ (X i)) → ps ¿ ⊆ idR
+coreflexive ps = wrap λ x → wrap λ { x' (eq , _) → eq }
+
 º-monotonic : {I : Set} {X Y : I → Set} {R S : X ↝ Y} → R ⊆ S → R º ⊆ S º
 º-monotonic R⊆S = wrap λ y → wrap λ x r → modus-ponens-⊆ R⊆S x y r
 
+•-monotonic : {I : Set} {X Y Z : I → Set} {R S : Y ↝ Z} {T U : X ↝ Y} → R ⊆ S → T ⊆ U → R • T ⊆ S • U
+•-monotonic R⊆S T⊆U = wrap λ x → wrap λ { z (y , t , r) → y , modus-ponens-⊆ T⊆U x y t , modus-ponens-⊆ R⊆S y z r }
+
 •-monotonic-l : {I : Set} {X Y Z : I → Set} {R S : X ↝ Y} (T : Y ↝ Z) → R ⊆ S → T • R ⊆ T • S
-•-monotonic-l T R⊆S = wrap λ x → wrap λ { z (y , r , t) → y , modus-ponens-⊆ R⊆S x y r , t }
+•-monotonic-l T = •-monotonic ⊆-refl
 
 •-monotonic-r : {I : Set} {X Y Z : I → Set} {R S : X ↝ Y} (T : Z ↝ X) → R ⊆ S → R • T ⊆ S • T
-•-monotonic-r T R⊆S = wrap λ z → wrap λ { y (x , t , r) → x , t , modus-ponens-⊆ R⊆S x y r }
+•-monotonic-r T = flip •-monotonic ⊆-refl
 
 
 --------

@@ -1,9 +1,6 @@
 -- Sorted lists indexed by a lower bound as an ornamentation of lists.
 
-module Thesis.Examples.List.Sorted
-  (Val : Set) (_≤_ : Val → Val → Set)
-    (≤-refl : ∀ {x} → x ≤ x)
-    (≤-trans : ∀ {x y z} → x ≤ y → y ≤ z → x ≤ z) where
+module Thesis.Examples.List.Sorted (Val : Set) (_≤_ : Val → Val → Set) (≤-trans : ∀ {x y z} → x ≤ y → y ≤ z → x ≤ z) where
 
 open import Thesis.Prelude.Function
 open import Thesis.Prelude.InverseImage
@@ -17,12 +14,12 @@ open import Data.Bool using (Bool; false; true)
 open import Data.Product using (Σ; _,_; proj₁; proj₂)
 
 
-SListO : OrnDesc Val ! ⌊ ListO Val ⌋
-SListO = wrap λ { (ok b) → σ Bool λ { false → ∎
-                                    ; true  → σ[ x ∶ Val ] Δ[ _ ∶ b ≤ x ] ṿ (ok x) } }
+SListOD : OrnDesc Val ! ⌊ ListOD Val ⌋
+SListOD = wrap λ { (ok b) → σ Bool λ { false → ∎
+                                     ; true  → σ[ x ∶ Val ] Δ[ _ ∶ b ≤ x ] ṿ (ok x) } }
 
 SList : Val → Set
-SList = μ ⌊ SListO ⌋
+SList = μ ⌊ SListOD ⌋
 
 snil : ∀ {b} → SList b
 snil = con (false , tt)
@@ -31,7 +28,7 @@ scons : (x : Val) → ∀ {b} → b ≤ x → SList x → SList b
 scons x b≤x xs = con (true , x , b≤x , xs)
 
 Sorted : Val → List Val → Set
-Sorted b xs = OptP ⌈ SListO ⌉ (ok b) xs
+Sorted b xs = OptP ⌈ SListOD ⌉ (ok b) xs
 
 sorted-nil : ∀ {b} → Sorted b []
 sorted-nil = con tt

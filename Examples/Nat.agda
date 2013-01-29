@@ -6,6 +6,7 @@ open import Thesis.Description
 
 open import Data.Unit using (⊤; tt)
 open import Data.Bool using (Bool; false; true)
+open import Data.Nat using (ℕ) renaming (zero to zeroℕ; suc to sucℕ)
 open import Data.Product using (Σ; _,_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; _≢_; cong; sym; trans)
 
@@ -25,6 +26,10 @@ zero = con (false , tt)
 
 suc : Nat → Nat
 suc n = con (true , n)
+
+toℕ : Nat → ℕ
+toℕ (con (false , _)) = zeroℕ
+toℕ (con (true  , n)) = sucℕ (toℕ n)
 
 suc≢zero : ∀ {n} → suc n ≢ zero
 suc≢zero ()

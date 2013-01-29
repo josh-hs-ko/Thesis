@@ -25,7 +25,7 @@ open import Thesis.Ornament.ParallelComposition.Swap
 open import Thesis.Examples.Nat
 open import Thesis.Examples.List
 open import Thesis.Examples.List.Vec
-import Thesis.Examples.List.Sorted as Sorted; open Sorted Val _≤_ ≤-refl ≤-trans
+import Thesis.Examples.List.Sorted as Sorted; open Sorted Val _≤_ ≤-trans
 
 open import Function using (_∘_)
 open import Data.Empty using (⊥; ⊥-elim)
@@ -37,11 +37,11 @@ open import Relation.Binary.PropositionalEquality using (_≡_; refl; _≢_; con
 --------
 -- sorted vectors indexed by lower bound
 
-SVecO : OrnDesc (! ⋈ π₁) pull ⌊ ListO Val ⌋
-SVecO = ⌈ SListO ⌉ ⊗ VecO Val
+SVecOD : OrnDesc (! ⋈ π₁) pull ⌊ ListOD Val ⌋
+SVecOD = ⌈ SListOD ⌉ ⊗ VecO Val
 
 SVec : Val → Nat → Set
-SVec b n = μ ⌊ SVecO ⌋ (ok b , ok (ok tt , ok (tt , n)))
+SVec b n = μ ⌊ SVecOD ⌋ (ok b , ok (ok tt , ok (tt , n)))
 
 svnil : ∀ {b} → SVec b zero
 svnil = con tt
@@ -93,10 +93,11 @@ mutual
 
 sinsert : (y : Val) → ∀ {b} → SList b → SList (b ⊓ y)
 sinsert = Upgrade.u u insert insert-sorted
-  where r = λ b → FRefinement.comp (RSem' ⌈ SListO ⌉) (ok b)
+  where r = λ b → FRefinement.comp (RSem' ⌈ SListOD ⌉) (ok b)
         u = ∀[ y ∶ Val ] ∀⁺[[ b ∶ _ ]] r b ⇀ toUpgrade (r (b ⊓ y))
 
 svinsert : (y : Val) → ∀ {b n} → SVec b n → SVec (b ⊓ y) (suc n)
 svinsert = Upgrade.u u insert (λ y xs → insert-sorted y xs ** insert-length y xs)
-  where r = λ b n → FRefinement.comp (toFRefinement (⊗-FSwap ⌈ SListO ⌉ (VecO Val) idFSwap (LengthFSwap Val))) (ok (ok b , ok (ok tt , ok (tt , n))))
-        u = ∀[ y ∶ Val ] ∀⁺[[ b ∶ _ ]] ∀⁺[[ n ∶ _ ]] r b n ⇀ toUpgrade (r (b ⊓ y) (suc n))
+  where
+    r = λ b n → FRefinement.comp (toFRefinement (⊗-FSwap ⌈ SListOD ⌉ (VecO Val) idFSwap (LengthFSwap Val))) (ok (ok b , ok (ok tt , ok (tt , n))))
+    u = ∀[ y ∶ Val ] ∀⁺[[ b ∶ _ ]] ∀⁺[[ n ∶ _ ]] r b n ⇀ toUpgrade (r (b ⊓ y) (suc n))
