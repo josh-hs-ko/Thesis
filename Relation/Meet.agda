@@ -1,3 +1,5 @@
+-- Definition of meet.
+
 module Thesis.Relation.Meet where
 
 open import Thesis.Relation

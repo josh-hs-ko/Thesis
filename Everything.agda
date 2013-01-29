@@ -38,11 +38,13 @@ import Thesis.Relation.Division
 import Thesis.Relation.Fold
 import Thesis.Relation.GreedyTheorem
 import Thesis.Relation.Hylomorphism
+import Thesis.Relation.Meet
 import Thesis.Relation.Minimum
 import Thesis.Examples.Insertion
 import Thesis.Examples.LeftistHeap
 import Thesis.Examples.List
 import Thesis.Examples.List.Sorted
 import Thesis.Examples.List.Vec
+import Thesis.Examples.MinCoinChange
 import Thesis.Examples.Nat
 import Thesis.Examples.Nat.TotalOrdering
