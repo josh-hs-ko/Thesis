@@ -1,7 +1,6 @@
 -- Basic definitions of subsets and relations, combinators for specifying nondeterministic computation,
--- subset and relational inclusion wrapped up as preorder and setoid, combinators for reasoning with relations,
--- componentwise relations between families of sets, definition of join of componentwise relations,
--- and definition and properties of relators.
+-- relational inclusion wrapped up as preorder and setoid, combinators for reasoning with relations,
+-- componentwise relations between families of sets, and definition and properties of relators.
 
 module Thesis.Relation where
 
@@ -73,45 +72,6 @@ infixr 4 _•_
 
 _•_ : {X Y Z : Set} → (Y ↝ Z) → (X ↝ Y) → X ↝ Z
 R • S = λ x → S x >>= R
-
-
---------
--- subset inclusion
-
-infix 1 _⊑_
-
-record _⊑_ {A : Set} (s t : ℘ A) : Set where
-  constructor wrap
-  field
-    comp : ∀ x → s x → t x
-
-modus-ponens-⊑ : {A : Set} {s t : ℘ A} → s ⊑ t → ∀ x → s x → t x
-modus-ponens-⊑ = _⊑_.comp
-
-_⊒_ : {A : Set} → ℘ A → ℘ A → Set
-s ⊒ t = t ⊑ s
-
-⊑-refl : {A : Set} {s : ℘ A} → s ⊑ s
-⊑-refl = wrap λ _ → id
-
-⊑-trans : {A : Set} {s t u : ℘ A} → s ⊑ t → t ⊑ u → s ⊑ u
-⊑-trans (wrap s⊑t) (wrap t⊑u) = wrap λ a → t⊑u a ∘ s⊑t a
-
-map℘-monotonic : {A B : Set} {s t : ℘ A} (f : A → B) → s ⊑ t → map℘ f s ⊑ map℘ f t
-map℘-monotonic f (wrap s⊑t) = wrap λ { b (a , sa , eq) → a , s⊑t a sa , eq }
-
-map℘₂-monotonic : {A B C : Set} {s t : ℘ A} {u v : ℘ B} (f : A → B → C) → s ⊑ t → u ⊑ v → map℘₂ f s u ⊑ map℘₂ f t v
-map℘₂-monotonic f (wrap s⊑t) (wrap u⊑v) = wrap λ { c (a , sa , b , ub , eq) → a , s⊑t a sa , b , u⊑v b ub , eq }
-
-⊑-Preorder : (A : Set) → Preorder _ _ _
-⊑-Preorder A =
-  record { Carrier = ℘ A
-         ; _≈_ = _≡_
-         ; _∼_ = _⊑_
-         ; isPreorder =
-             record { isEquivalence = Setoid.isEquivalence (≡-Setoid _)
-                    ; reflexive     = λ { {._} refl → ⊑-refl }
-                    ; trans         = ⊑-trans } }
 
 
 --------
@@ -249,31 +209,44 @@ iso-idR {Y = Y} iso =
 --------
 -- componentwise relations between families of sets
 
-_↝⁺_ : {I : Set} → (I → Set) → (I → Set) → Set₁
-X ↝⁺ Y = ∀ i → X i ↝ Y i
+record _↝⁺_ {I : Set} (X Y : I → Set) : Set₁ where
+  constructor wrap
+  field
+    comp : ∀ i → X i ↝ Y i
+
+_!! : {I : Set} {X Y : I → Set} → (X ↝⁺ Y) → ∀ i → X i ↝ Y i
+_!! = _↝⁺_.comp
 
 fun⁺ : {I : Set} {X Y : I → Set} → (X ⇒ Y) → X ↝⁺ Y
-fun⁺ f i = fun (f {i})
+fun⁺ f = wrap λ i → fun (f {i})
+
+idR⁺ : {I : Set} {X : I → Set} → X ↝⁺ X
+idR⁺ = fun⁺ id
 
 α : {I : Set} {D : Desc I} → Ḟ D (μ D) ↝⁺ μ D
 α = fun⁺ con
 
 _º⁺ : {I : Set} {X Y : I → Set} → X ↝⁺ Y → Y ↝⁺ X
-(R º⁺) i = R i º
+(R º⁺) = wrap λ i → ((R !!) i º)
 
 _•⁺_ : {I : Set} {X Y Z : I → Set} → Y ↝⁺ Z → X ↝⁺ Y → X ↝⁺ Z
-(R •⁺ S) i = R i • S i
+(R •⁺ S) = wrap λ i → (R !!) i • (S !!) i
 
 infix 3 _⊆⁺_
 
-_⊆⁺_ : {I : Set} {X Y : I → Set} → (X ↝⁺ Y) → (X ↝⁺ Y) → Set
-R ⊆⁺ S = ∀ i → R i ⊆ S i
+record _⊆⁺_ {I : Set} {X Y : I → Set} (R S : X ↝⁺ Y) : Set where
+  constructor wrap
+  field
+    comp : ∀ i → (R !!) i ⊆ (S !!) i
+
+modus-ponens-⊆⁺ : {I : Set} {X Y : I → Set} {R S : X ↝⁺ Y} → R ⊆⁺ S → ∀ i (x : X i) (y : Y i) → (R !!) i x y → (S !!) i x y
+modus-ponens-⊆⁺ (wrap R⊆⁺S) i x y r = modus-ponens-⊆ (R⊆⁺S i) x y r
 
 ⊆⁺-refl : {I : Set} {X Y : I → Set} {R : X ↝⁺ Y} → R ⊆⁺ R
-⊆⁺-refl i = ⊆-refl
+⊆⁺-refl = wrap λ i → ⊆-refl
 
 ⊆⁺-trans : {I : Set} {X Y : I → Set} {R S T : X ↝⁺ Y} → R ⊆⁺ S → S ⊆⁺ T → R ⊆⁺ T
-⊆⁺-trans R⊆⁺S S⊆⁺T i = ⊆-trans (R⊆⁺S i) (S⊆⁺T i)
+⊆⁺-trans (wrap R⊆⁺S) (wrap S⊆⁺T) = wrap λ i → ⊆-trans (R⊆⁺S i) (S⊆⁺T i)
 
 ⊆⁺-Preorder : {I : Set} (X Y : I → Set) → Preorder _ _ _
 ⊆⁺-Preorder X Y =
@@ -285,18 +258,34 @@ R ⊆⁺ S = ∀ i → R i ⊆ S i
                     ; reflexive     = λ { {._} refl → ⊆⁺-refl }
                     ; trans         = ⊆⁺-trans } }
 
+_⊇⁺_ : {I : Set} {X Y : I → Set} → (X ↝⁺ Y) → (X ↝⁺ Y) → Set
+R ⊇⁺ S = S ⊆⁺ R
+
+º⁺-monotonic : {I : Set} {X Y : I → Set} {R S : X ↝⁺ Y} → R ⊆⁺ S → R º⁺ ⊆⁺ S º⁺
+º⁺-monotonic (wrap R⊆⁺S) = wrap (º-monotonic ∘ R⊆⁺S)
+
+•⁺-monotonic : {I : Set} {X Y Z : I → Set} {R S : Y ↝⁺ Z} {T U : X ↝⁺ Y} → R ⊆⁺ S → T ⊆⁺ U → R •⁺ T ⊆⁺ S •⁺ U
+•⁺-monotonic (wrap R⊆⁺S) (wrap T⊆⁺U) = wrap λ i → •-monotonic (R⊆⁺S i) (T⊆⁺U i)
+
+•⁺-monotonic-l : {I : Set} {X Y Z : I → Set} {R S : X ↝⁺ Y} (T : Y ↝⁺ Z) → R ⊆⁺ S → T •⁺ R ⊆⁺ T •⁺ S
+•⁺-monotonic-l T = •⁺-monotonic ⊆⁺-refl
+
+•⁺-monotonic-r : {I : Set} {X Y Z : I → Set} {R S : X ↝⁺ Y} (T : Z ↝⁺ X) → R ⊆⁺ S → R •⁺ T ⊆⁺ S •⁺ T
+•⁺-monotonic-r T = flip •⁺-monotonic ⊆⁺-refl
+
 infix 3 _≃⁺_
+
 _≃⁺_ : {I : Set} {X Y : I → Set} → (X ↝⁺ Y) → (X ↝⁺ Y) → Set
-R ≃⁺ S = ∀ i → R i ≃ S i
+R ≃⁺ S = (R ⊆⁺ S) × (R ⊇⁺ S)
 
 ≃⁺-refl : {I : Set} {X Y : I → Set} {R : X ↝⁺ Y} → R ≃⁺ R
-≃⁺-refl i = ⊆-refl , ⊆-refl
+≃⁺-refl = ⊆⁺-refl , ⊆⁺-refl
 
 ≃⁺-sym : {I : Set} {X Y : I → Set} {R S : X ↝⁺ Y} → R ≃⁺ S → S ≃⁺ R
-≃⁺-sym R≃⁺S i = proj₂ (R≃⁺S i) , proj₁ (R≃⁺S i)
+≃⁺-sym (R⊆⁺S , R⊇⁺S) = R⊇⁺S , R⊆⁺S
 
 ≃⁺-trans : {I : Set} {X Y : I → Set} {R S T : X ↝⁺ Y} → R ≃⁺ S → S ≃⁺ T → R ≃⁺ T
-≃⁺-trans R≃⁺S S≃⁺T i = ⊆-trans (proj₁ (R≃⁺S i)) (proj₁ (S≃⁺T i)) , ⊆-trans (proj₂ (S≃⁺T i)) (proj₂ (R≃⁺S i))
+≃⁺-trans (R⊆⁺S , R⊇⁺S) (S⊆⁺T , S⊇⁺T) = ⊆⁺-trans R⊆⁺S S⊆⁺T , ⊆⁺-trans S⊇⁺T R⊇⁺S
 
 ≃⁺-Setoid : {I : Set} (X Y : I → Set) → Setoid _ _
 ≃⁺-Setoid X Y =
@@ -304,24 +293,35 @@ R ≃⁺ S = ∀ i → R i ≃ S i
          ; _≈_ = _≃⁺_
          ; isEquivalence = record { refl = ≃⁺-refl; sym = ≃⁺-sym; trans = ≃⁺-trans } }
 
+fun⁺-preserves-comp : {I : Set} {X Y Z : I → Set} (f : Y ⇒ Z) (g : X ⇒ Y) → fun⁺ (λ {i} → f {i} ∘ g {i}) ≃⁺ fun⁺ f •⁺ fun⁺ g
+fun⁺-preserves-comp f g = wrap (λ i → proj₁ (fun-preserves-comp (f {i}) (g {i}))) , wrap (λ i → proj₂ (fun-preserves-comp (f {i}) (g {i})))
 
---------
--- componentwise join
+º⁺-preserves-comp : {I : Set} {X Y Z : I → Set} (R : Y ↝⁺ Z) (S : X ↝⁺ Y) → (R •⁺ S) º⁺ ≃⁺ S º⁺ •⁺ R º⁺
+º⁺-preserves-comp R S = wrap (λ i → proj₁ (º-preserves-comp ((R !!) i) ((S !!) i))) , wrap (λ i → proj₂ (º-preserves-comp ((R !!) i) ((S !!) i)))
 
-⋃ : {I : Set} {X Y : I → Set} (R : X ↝⁺ Y) → Σ I X ↝ Σ I Y
-⋃ R (i , x) = map℘ (_,_ i) (R i x)
+fun⁺-cong : {I : Set} {X Y : I → Set} {f g : X ⇒ Y} → (∀ i → f {i} ≐ g {i}) → fun⁺ f ≃⁺ fun⁺ g
+fun⁺-cong f≐g = wrap (λ i → proj₁ (fun-cong (f≐g i))) , wrap (λ i → proj₂ (fun-cong (f≐g i)))
 
-infix 7 _!!
+º⁺-cong : {I : Set} {X Y : I → Set} {R S : X ↝⁺ Y} → R ≃⁺ S → R º⁺ ≃⁺ S º⁺
+º⁺-cong (R⊆⁺S , R⊇⁺S) = º⁺-monotonic R⊆⁺S , º⁺-monotonic R⊇⁺S
 
-_!! : {I : Set} {X Y : I → Set} → (R : Σ I X ↝ Σ I Y) → X ↝⁺ Y
-(R !!) i x y = R (i , x) (i , y)
+idR⁺-l : {I : Set} {X Y : I → Set} (R : X ↝⁺ Y) → idR⁺ •⁺ R ≃⁺ R
+idR⁺-l R = wrap (λ i → proj₁ (idR-l ((R !!) i))) , wrap (λ i → proj₂ (idR-l ((R !!) i)))
 
+idR⁺-r : {I : Set} {X Y : I → Set} (R : X ↝⁺ Y) → R •⁺ idR⁺ ≃⁺ R
+idR⁺-r R = wrap (λ i → proj₁ (idR-r ((R !!) i))) , wrap (λ i → proj₂ (idR-r ((R !!) i)))
 
-⋃-universal-⇒ : {I : Set} {X Y : I → Set} (R : X ↝⁺ Y) (S : Σ I X ↝ Σ I Y) → ⋃ R ⊆ S → R ⊆⁺ S !!
-⋃-universal-⇒ R S (wrap ⋃R⊆S) i = wrap λ x y r → ⋃R⊆S (i , x) (i , y) (y , r , refl)
+•⁺-cong : {I : Set} {X Y Z : I → Set} {R S : Y ↝⁺ Z} {T U : X ↝⁺ Y} → R ≃⁺ S → T ≃⁺ U → R •⁺ T ≃⁺ S •⁺ U
+•⁺-cong (R⊆⁺S , R⊇⁺S) (T⊆⁺U , T⊇⁺U) = •⁺-monotonic R⊆⁺S T⊆⁺U , •⁺-monotonic R⊇⁺S T⊇⁺U
 
-⋃-universal-⇐ : {I : Set} {X Y : I → Set} (R : X ↝⁺ Y) (S : Σ I X ↝ Σ I Y) → R ⊆⁺ S !! → ⋃ R ⊆ S
-⋃-universal-⇐ R S R⊆⁺S!! = wrap λ { (i , x) ._ (y , r , refl) → modus-ponens-⊆ (R⊆⁺S!! i) x y r }
+•⁺-cong-l : {I : Set} {X Y Z : I → Set} {R S : X ↝⁺ Y} (T : Y ↝⁺ Z) → R ≃⁺ S → T •⁺ R ≃⁺ T •⁺ S
+•⁺-cong-l T = •⁺-cong ≃⁺-refl
+
+•⁺-cong-r : {I : Set} {X Y Z : I → Set} {R S : X ↝⁺ Y} (T : Z ↝⁺ X) → R ≃⁺ S → R •⁺ T ≃⁺ S •⁺ T
+•⁺-cong-r T = flip •⁺-cong ≃⁺-refl
+
+•⁺-assoc : {I : Set} {X Y Z W : I → Set} (R : Z ↝⁺ W) (S : Y ↝⁺ Z) (T : X ↝⁺ Y) → (R •⁺ S) •⁺ T ≃⁺ R •⁺ (S •⁺ T)
+•⁺-assoc R S T = wrap (λ i → proj₁ (•-assoc ((R !!) i) ((S !!) i) ((T !!) i))) , wrap (λ i → proj₂ (•-assoc ((R !!) i) ((S !!) i) ((T !!) i)))
 
 
 --------
@@ -329,15 +329,15 @@ _!! : {I : Set} {X Y : I → Set} → (R : Σ I X ↝ Σ I Y) → X ↝⁺ Y
 
 mapR : {I : Set} (D : RDesc I) {X Y : I → Set} → (X ↝⁺ Y) → ⟦ D ⟧ X ↝ ⟦ D ⟧ Y
 mapR ∎       R xs         = any
-mapR (ṿ i)   R x          = R i x
+mapR (ṿ i)   R x          = (R !!) i x
 mapR (σ S D) R (s , xs)   = map℘ (_,_ s) (mapR (D s) R xs)
 mapR (D * E) R (xs , xs') = map℘₂ _,_ (mapR D R xs) (mapR E R xs')
 
 mapR-monotonic : {I : Set} (D : RDesc I) {X Y : I → Set} {R S : X ↝⁺ Y} → R ⊆⁺ S → mapR D R ⊆ mapR D S
-mapR-monotonic ∎       R⊆⁺S = ⊆-refl
-mapR-monotonic (ṿ i)   R⊆⁺S = R⊆⁺S i
-mapR-monotonic (σ S D) R⊆⁺S = wrap λ { (s , xs) ._ (ys , rs , refl) → ys , modus-ponens-⊆ (mapR-monotonic (D s) R⊆⁺S) xs ys rs , refl }
-mapR-monotonic (D * E) R⊆⁺S =
+mapR-monotonic ∎       R⊆⁺S        = ⊆-refl
+mapR-monotonic (ṿ i)   (wrap R⊆⁺S) = R⊆⁺S i
+mapR-monotonic (σ S D) R⊆⁺S        = wrap λ { (s , xs) ._ (ys , rs , refl) → ys , modus-ponens-⊆ (mapR-monotonic (D s) R⊆⁺S) xs ys rs , refl }
+mapR-monotonic (D * E) R⊆⁺S        =
   wrap λ { (xs , xs') ._ (ys , rs , ys' , rs' , refl) →
            ys , modus-ponens-⊆ (mapR-monotonic D R⊆⁺S) xs ys rs , ys' , modus-ponens-⊆ (mapR-monotonic E R⊆⁺S) xs' ys' rs' , refl }
 
@@ -389,21 +389,21 @@ mapR-fun-unique (D * E) f (xs , xs') (ys , ys') (.ys , r , .ys' , r' , refl) = c
 -- relators
 
 Ṙ : {I : Set} (D : Desc I) {X Y : I → Set} → (X ↝⁺ Y) → Ḟ D X ↝⁺ Ḟ D Y
-Ṙ D R i = mapR (D at i) R
+Ṙ D R = wrap λ i → mapR (D at i) R
 
 Ṙ-monotonic : {I : Set} (D : Desc I) {X Y : I → Set} {R S : X ↝⁺ Y} → R ⊆⁺ S → Ṙ D R ⊆⁺ Ṙ D S
-Ṙ-monotonic D R⊆⁺S i = mapR-monotonic (D at i) R⊆⁺S
+Ṙ-monotonic D R⊆⁺S = wrap λ i → mapR-monotonic (D at i) R⊆⁺S
 
 Ṙ-cong : {I : Set} (D : Desc I) {X Y : I → Set} {R S : X ↝⁺ Y} → R ≃⁺ S → Ṙ D R ≃⁺ Ṙ D S
-Ṙ-cong D R≃⁺S i = Ṙ-monotonic D (proj₁ ∘ R≃⁺S) i , Ṙ-monotonic D (proj₂ ∘ R≃⁺S) i
+Ṙ-cong D (R⊆⁺S , R⊇⁺S) = Ṙ-monotonic D R⊆⁺S , Ṙ-monotonic D R⊇⁺S
 
 Ṙ-preserves-comp : {I : Set} (D : Desc I) {X Y Z : I → Set} (R : Y ↝⁺ Z) (S : X ↝⁺ Y) → Ṙ D (R •⁺ S) ≃⁺ Ṙ D R •⁺ Ṙ D S
-Ṙ-preserves-comp D R S i = mapR-preserves-comp-⊆ (D at i) R S , mapR-preserves-comp-⊇ (D at i) R S
+Ṙ-preserves-comp D R S = wrap (λ i → mapR-preserves-comp-⊆ (D at i) R S) , wrap (λ i → mapR-preserves-comp-⊇ (D at i) R S)
 
 Ṙ-preserves-conv : {I : Set} (D : Desc I) {X Y : I → Set} (R : X ↝⁺ Y) → Ṙ D (R º⁺) ≃⁺ Ṙ D R º⁺
-Ṙ-preserves-conv D R i = wrap (λ ys xs → mapR-preserves-conv (D at i) (R º⁺) ys xs) ,
-                         wrap (λ ys xs → mapR-preserves-conv (D at i)  R     xs ys)
+Ṙ-preserves-conv D R = wrap (λ i → wrap λ ys xs → mapR-preserves-conv (D at i) (R º⁺) ys xs) ,
+                       wrap (λ i → wrap λ ys xs → mapR-preserves-conv (D at i)  R     xs ys)
 
 fun-preserves-map : {I : Set} (D : Desc I) {X Y : I → Set} (f : X ⇒ Y) → fun⁺ (Ḟ-map D (λ {i} → f {i})) ≃⁺ Ṙ D (fun⁺ f)
-fun-preserves-map D f i = wrap (λ { xs ._ refl → mapR-fun-computation (D at i) f xs }) ,
-                          wrap (λ xs → mapR-fun-unique (D at i) f xs)
+fun-preserves-map D f = wrap (λ i → wrap λ { xs ._ refl → mapR-fun-computation (D at i) f xs }) ,
+                        wrap (λ i → wrap λ xs → mapR-fun-unique (D at i) f xs)
