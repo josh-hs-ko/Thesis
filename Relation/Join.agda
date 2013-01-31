@@ -6,51 +6,49 @@ open import Thesis.Prelude.Preorder
 open import Thesis.Relation
 
 open import Function using (id; _∘_)
-open import Data.Product using (Σ; _,_)
+open import Data.Product using (Σ; _,_; _×_)
 import Relation.Binary.PreorderReasoning as PreorderReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
 
-⋃ : {I J : Set} {X : I → Set} (Y : J → Set) (e : I → J) (R : X ↝⁺ (Y ∘ e)) → Σ I X ↝ Σ J Y
-⋃ Y e (wrap R) (i , x) = map℘ (_,_ (e i)) (R i x)
+⋃ : {I : Set} {X Y : I → Set} → X ↝⁺ Y → Σ I X ↝ Σ I Y
+⋃ R (i , x) = map℘ (_,_ i) ((R !!) i x)
 
-⋃-monotonic : {I J : Set} {X : I → Set} (Y : J → Set) (e : I → J) {R S : X ↝⁺ (Y ∘ e)} → R ⊆⁺ S → ⋃ Y e R ⊆ ⋃ Y e S
-⋃-monotonic Y e R⊆⁺S = wrap λ { (i , x) ._ (y , r , refl) → y , modus-ponens-⊆⁺ R⊆⁺S i x y r , refl }
+⋃-preserves-comp : {I : Set} {X Y Z : I → Set} (R : Y ↝⁺ Z) (S : X ↝⁺ Y) → ⋃ (R •⁺ S) ≃ ⋃ R • ⋃ S
+⋃-preserves-comp R S = wrap (λ { (i , x) ._ (z , (y , s , r) , refl) → (i , y) , (y , s , refl) , (z , r , refl) }) ,
+                       wrap (λ { (i , x) ._ (._ , (y , s , refl) , (z , r , refl)) → z , (y , s , r) , refl })
 
-⋃-cancellation : {I J : Set} {X : I → Set} (Y : J → Set) (e : I → J) {R S : X ↝⁺ (Y ∘ e)} → ⋃ Y e R ⊆ ⋃ Y e S → R ⊆⁺ S
-⋃-cancellation {I} {J} {X} Y e {R} {S} ⋃R⊆⋃S = wrap λ i → wrap (aux i)
-  where aux : (i : I) (x : X i) (y : Y (e i)) → (R !!) i x y → (S !!) i x y
-        aux i x y r with modus-ponens-⊆ ⋃R⊆⋃S (i , x) (e i , y) (y , r , refl)
+⋃-monotonic : {I : Set} {X Y : I → Set} {R S : X ↝⁺ Y} → R ⊆⁺ S → ⋃ R ⊆ ⋃ S
+⋃-monotonic R⊆⁺S = wrap λ { (i , x) ._ (y , r , refl) → y , modus-ponens-⊆⁺ R⊆⁺S i x y r , refl }
+
+⋃-cancellation : {I : Set} {X Y : I → Set} {R S : X ↝⁺ Y} → ⋃ R ⊆ ⋃ S → R ⊆⁺ S
+⋃-cancellation {I} {X} {Y} {R} {S} ⋃R⊆⋃S = wrap λ i → wrap (aux i)
+  where aux : (i : I) (x : X i) (y : Y i) → (R !!) i x y → (S !!) i x y
+        aux i x y r with modus-ponens-⊆ ⋃R⊆⋃S (i , x) (i , y) (y , r , refl)
         aux i x y r | .y , s , refl = s
 
-⋃-preserves-conv-comp :
-  {I J K : Set} {X : I → Set} (Y : J → Set) (e : I → J) → (R S : X ↝⁺ (Y ∘ e)) → ⋃ X id (R º⁺ •⁺ S) ≃ ⋃ Y e R º • ⋃ Y e S
-⋃-preserves-conv-comp Y e R S =
-  wrap (λ { (i , x) ._ (x' , (y , s , r) , refl) → (e i , y) , (y , s , refl) , (y , r , refl) }) ,
-  wrap (λ { (i , x) (i' , x') (._ , (y , s , refl) , (y' , r , eq)) → {!!} , ({!!} , {!!} , {!!}) , {!!} })
+infix 7 _//
 
-infix 7 _//_
+_// : {I : Set} {X Y : I → Set} (R : Σ I X ↝ Σ I Y) → X ↝⁺ Y
+R // = wrap λ i x y → R (i , x) (i , y)
 
-_//_ : {I J : Set} {X : I → Set} {Y : J → Set} (R : Σ I X ↝ Σ J Y) (e : I → J) → X ↝⁺ (Y ∘ e)
-R // e = wrap λ i x y → R (i , x) (e i , y)
+//-monotonic : {I : Set} {X Y : I → Set} {R S : Σ I X ↝ Σ I Y} → R ⊆ S → R // ⊆⁺ S //
+//-monotonic R⊆S = wrap λ i → wrap λ x y r → modus-ponens-⊆ R⊆S (i , x) (i , y) r
 
-//-monotonic : {I J : Set} {X : I → Set} {Y : J → Set} (e : I → J) {R S : Σ I X ↝ Σ J Y} → R ⊆ S → R // e ⊆⁺ S // e
-//-monotonic e R⊆S = wrap λ i → wrap λ x y r → modus-ponens-⊆ R⊆S (i , x) (e i , y) r
+⋃-universal-⇒ : {I : Set} {X Y : I → Set} (R : X ↝⁺ Y) (S : Σ I X ↝ Σ I Y) → ⋃ R ⊆ S → R ⊆⁺ S //
+⋃-universal-⇒ R S (wrap ⋃R⊆S) = wrap λ i → wrap λ x y r → ⋃R⊆S (i , x) (i , y) (y , r , refl)
 
-⋃-universal-⇒ : {I J : Set} {X : I → Set} (Y : J → Set) (e : I → J) (R : X ↝⁺ (Y ∘ e)) (S : Σ I X ↝ Σ J Y) → ⋃ Y e R ⊆ S → R ⊆⁺ S // e
-⋃-universal-⇒ Y e R S (wrap ⋃R⊆S) = wrap λ i → wrap λ x y r → ⋃R⊆S (i , x) (e i , y) (y , r , refl)
+⋃-universal-⇐ : {I : Set} {X Y : I → Set} (R : X ↝⁺ Y) (S : Σ I X ↝ Σ I Y) → R ⊆⁺ S // → ⋃ R ⊆ S
+⋃-universal-⇐ R S R⊆⁺S// = wrap λ { (i , x) ._ (y , r , refl) → modus-ponens-⊆⁺ R⊆⁺S// i x y r }
 
-⋃-universal-⇐ : {I J : Set} {X : I → Set} (Y : J → Set) (e : I → J) (R : X ↝⁺ (Y ∘ e)) (S : Σ I X ↝ Σ J Y) → R ⊆⁺ S // e → ⋃ Y e R ⊆ S
-⋃-universal-⇐ Y e R S R⊆⁺S// = wrap λ { (i , x) ._ (y , r , refl) → modus-ponens-⊆⁺ R⊆⁺S// i x y r }
-
-//-⋃-inverse : {I J : Set} {X : I → Set} (Y : J → Set) (e : I → J) (R : X ↝⁺ (Y ∘ e)) → (⋃ Y e R) // e ≃⁺ R
-//-⋃-inverse Y e R =
+//-⋃-inverse : {I : Set} {X Y : I → Set} (R : X ↝⁺ Y) → (⋃ R) // ≃⁺ R
+//-⋃-inverse R =
   (begin
-     (⋃ Y e R) // e ⊆⁺ R
-       ⇐⟨ ⋃-cancellation Y e ⟩
-     ⋃ Y e ((⋃ Y e R) // e) ⊆ ⋃ Y e R
-       ⇐⟨ ⋃-universal-⇐ Y e (⋃ Y e R // e) (⋃ Y e R) ⟩
-     (⋃ Y e R) // e ⊆⁺ (⋃ Y e R) // e
+     (⋃ R) // ⊆⁺ R
+       ⇐⟨ ⋃-cancellation ⟩
+     ⋃ ((⋃ R) //) ⊆ ⋃ R
+       ⇐⟨ ⋃-universal-⇐ ((⋃ R) //) (⋃ R) ⟩
+     (⋃ R) // ⊆⁺ (⋃ R) //
    □) ⊆⁺-refl ,
-  ⋃-universal-⇒ Y e R (⋃ Y e R) ⊆-refl
+  ⋃-universal-⇒ R (⋃ R) ⊆-refl
   where open PreorderReasoning ⇐-Preorder renaming (_∼⟨_⟩_ to _⇐⟨_⟩_; _∎ to _□)
