@@ -7,6 +7,7 @@ module Thesis.Relation where
 open import Thesis.Prelude.Category.Isomorphism
 open import Thesis.Prelude.Function
 open import Thesis.Prelude.Function.Fam
+open import Thesis.Prelude.Preorder
 open import Thesis.Description
 
 open import Function using (id; _∘_; flip; type-signature)
@@ -109,14 +110,7 @@ R ⊇ S = S ⊆ R
                     ; trans         = ⊆-trans } }
 
 ⊇-Preorder : (X Y : Set) → Preorder _ _ _
-⊇-Preorder X Y =
-  record { Carrier = X ↝ Y
-         ; _≈_ = _≡_
-         ; _∼_ = _⊇_
-         ; isPreorder =
-             record { isEquivalence = Setoid.isEquivalence (≡-Setoid _)
-                    ; reflexive     = λ { {._} refl → ⊆-refl }
-                    ; trans         = flip ⊆-trans } }
+⊇-Preorder X Y = ConversePreorder (⊆-Preorder X Y)
 
 º-monotonic : {X Y : Set} {R S : X ↝ Y} → R ⊆ S → R º ⊆ S º
 º-monotonic (wrap R⊆S) = wrap λ y x r → R⊆S x y r
@@ -134,25 +128,22 @@ R ⊇ S = S ⊆ R
 --------
 -- relational bi-inclusion
 
+≃-Setoid : (X Y : Set) → Setoid _ _
+≃-Setoid X Y = PreorderSetoid (⊆-Preorder X Y)
+
 infix 3 _≃_
 
 _≃_ : {X Y : Set} → (X ↝ Y) → (X ↝ Y) → Set
-R ≃ S = (R ⊆ S) × (R ⊇ S)
+_≃_ {X} {Y} = Setoid._≈_ (≃-Setoid X Y)
 
 ≃-refl : {X Y : Set} {R : X ↝ Y} → R ≃ R
-≃-refl = ⊆-refl , ⊆-refl
+≃-refl {X} {Y} = Setoid.refl (≃-Setoid X Y)
 
 ≃-sym : {X Y : Set} {R S : X ↝ Y} → R ≃ S → S ≃ R
-≃-sym (R⊆S , R⊇S) = R⊇S , R⊆S
+≃-sym {X} {Y} = Setoid.sym (≃-Setoid X Y)
 
 ≃-trans : {X Y : Set} {R S T : X ↝ Y} → R ≃ S → S ≃ T → R ≃ T
-≃-trans (R⊆S , R⊇S) (S⊆T , S⊇T) = ⊆-trans R⊆S S⊆T , ⊆-trans S⊇T R⊇S
-
-≃-Setoid : (X Y : Set) → Setoid _ _
-≃-Setoid X Y =
-  record { Carrier = X ↝ Y
-         ; _≈_ = _≃_
-         ; isEquivalence = record { refl = ≃-refl; sym = ≃-sym; trans = ≃-trans } }
+≃-trans {X} {Y} = Setoid.trans (≃-Setoid X Y)
 
 fun-preserves-comp : {X Y Z : Set} (f : Y → Z) (g : X → Y) → fun (f ∘ g) ≃ fun f • fun g
 fun-preserves-comp f g = wrap (λ { x ._ refl → g x , refl , refl }) , wrap (λ { x ._ (._ , refl , refl) → refl })
@@ -267,6 +258,9 @@ infix 3 _⊇⁺_
 _⊇⁺_ : {I : Set} {X Y : I → Set} → (X ↝⁺ Y) → (X ↝⁺ Y) → Set
 R ⊇⁺ S = S ⊆⁺ R
 
+⊇⁺-Preorder : {I : Set} (X Y : I → Set) → Preorder _ _ _
+⊇⁺-Preorder X Y = ConversePreorder (⊆⁺-Preorder X Y)
+
 º⁺-monotonic : {I : Set} {X Y : I → Set} {R S : X ↝⁺ Y} → R ⊆⁺ S → R º⁺ ⊆⁺ S º⁺
 º⁺-monotonic (wrap R⊆⁺S) = wrap (º-monotonic ∘ R⊆⁺S)
 
@@ -279,25 +273,22 @@ R ⊇⁺ S = S ⊆⁺ R
 •⁺-monotonic-r : {I : Set} {X Y Z : I → Set} {R S : X ↝⁺ Y} (T : Z ↝⁺ X) → R ⊆⁺ S → R •⁺ T ⊆⁺ S •⁺ T
 •⁺-monotonic-r T = flip •⁺-monotonic ⊆⁺-refl
 
+≃⁺-Setoid : {I : Set} (X Y : I → Set) → Setoid _ _
+≃⁺-Setoid X Y = PreorderSetoid (⊆⁺-Preorder X Y)
+
 infix 3 _≃⁺_
 
 _≃⁺_ : {I : Set} {X Y : I → Set} → (X ↝⁺ Y) → (X ↝⁺ Y) → Set
-R ≃⁺ S = (R ⊆⁺ S) × (R ⊇⁺ S)
+_≃⁺_ {I} {X} {Y} = Setoid._≈_ (≃⁺-Setoid X Y)
 
 ≃⁺-refl : {I : Set} {X Y : I → Set} {R : X ↝⁺ Y} → R ≃⁺ R
-≃⁺-refl = ⊆⁺-refl , ⊆⁺-refl
+≃⁺-refl {I} {X} {Y} = Setoid.refl (≃⁺-Setoid X Y)
 
 ≃⁺-sym : {I : Set} {X Y : I → Set} {R S : X ↝⁺ Y} → R ≃⁺ S → S ≃⁺ R
-≃⁺-sym (R⊆⁺S , R⊇⁺S) = R⊇⁺S , R⊆⁺S
+≃⁺-sym {I} {X} {Y} = Setoid.sym (≃⁺-Setoid X Y)
 
 ≃⁺-trans : {I : Set} {X Y : I → Set} {R S T : X ↝⁺ Y} → R ≃⁺ S → S ≃⁺ T → R ≃⁺ T
-≃⁺-trans (R⊆⁺S , R⊇⁺S) (S⊆⁺T , S⊇⁺T) = ⊆⁺-trans R⊆⁺S S⊆⁺T , ⊆⁺-trans S⊇⁺T R⊇⁺S
-
-≃⁺-Setoid : {I : Set} (X Y : I → Set) → Setoid _ _
-≃⁺-Setoid X Y =
-  record { Carrier = X ↝⁺ Y
-         ; _≈_ = _≃⁺_
-         ; isEquivalence = record { refl = ≃⁺-refl; sym = ≃⁺-sym; trans = ≃⁺-trans } }
+≃⁺-trans {I} {X} {Y} = Setoid.trans (≃⁺-Setoid X Y)
 
 fun⁺-preserves-comp : {I : Set} {X Y Z : I → Set} (f : Y ⇒ Z) (g : X ⇒ Y) → fun⁺ (λ {i} → f {i} ∘ g {i}) ≃⁺ fun⁺ f •⁺ fun⁺ g
 fun⁺-preserves-comp f g = wrap (λ i → proj₁ (fun-preserves-comp (f {i}) (g {i}))) , wrap (λ i → proj₂ (fun-preserves-comp (f {i}) (g {i})))
