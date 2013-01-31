@@ -14,12 +14,12 @@ open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 ⋃ : {I : Set} {X Y : I → Set} → X ↝⁺ Y → Σ I X ↝ Σ I Y
 ⋃ R (i , x) = map℘ (_,_ i) ((R !!) i x)
 
+⋃-monotonic : {I : Set} {X Y : I → Set} {R S : X ↝⁺ Y} → R ⊆⁺ S → ⋃ R ⊆ ⋃ S
+⋃-monotonic R⊆⁺S = wrap λ { (i , x) ._ (y , r , refl) → y , modus-ponens-⊆⁺ R⊆⁺S i x y r , refl }
+
 ⋃-preserves-comp : {I : Set} {X Y Z : I → Set} (R : Y ↝⁺ Z) (S : X ↝⁺ Y) → ⋃ (R •⁺ S) ≃ ⋃ R • ⋃ S
 ⋃-preserves-comp R S = wrap (λ { (i , x) ._ (z , (y , s , r) , refl) → (i , y) , (y , s , refl) , (z , r , refl) }) ,
                        wrap (λ { (i , x) ._ (._ , (y , s , refl) , (z , r , refl)) → z , (y , s , r) , refl })
-
-⋃-monotonic : {I : Set} {X Y : I → Set} {R S : X ↝⁺ Y} → R ⊆⁺ S → ⋃ R ⊆ ⋃ S
-⋃-monotonic R⊆⁺S = wrap λ { (i , x) ._ (y , r , refl) → y , modus-ponens-⊆⁺ R⊆⁺S i x y r , refl }
 
 ⋃-cancellation : {I : Set} {X Y : I → Set} {R S : X ↝⁺ Y} → ⋃ R ⊆ ⋃ S → R ⊆⁺ S
 ⋃-cancellation {I} {X} {Y} {R} {S} ⋃R⊆⋃S = wrap λ i → wrap (aux i)
@@ -34,6 +34,10 @@ R // = wrap λ i x y → R (i , x) (i , y)
 
 //-monotonic : {I : Set} {X Y : I → Set} {R S : Σ I X ↝ Σ I Y} → R ⊆ S → R // ⊆⁺ S //
 //-monotonic R⊆S = wrap λ i → wrap λ x y r → modus-ponens-⊆ R⊆S (i , x) (i , y) r
+
+//-preserves-comp : {I : Set} {X Y Z : I → Set} (R : Y ↝⁺ Z) (S : Σ I X ↝ Σ I Y) → (⋃ R • S) // ≃⁺ R •⁺ S //
+//-preserves-comp R S = wrap (λ i → wrap λ { x .z ((.i , y) , s , (z , r , refl)) → y , s , r }) ,
+                        wrap (λ i → wrap λ { x z (y , s , r) → (i , y) , (s , z , r , refl) })
 
 ⋃-universal-⇒ : {I : Set} {X Y : I → Set} (R : X ↝⁺ Y) (S : Σ I X ↝ Σ I Y) → ⋃ R ⊆ S → R ⊆⁺ S //
 ⋃-universal-⇒ R S (wrap ⋃R⊆S) = wrap λ i → wrap λ x y r → ⋃R⊆S (i , x) (i , y) (y , r , refl)
@@ -52,3 +56,9 @@ R // = wrap λ i x y → R (i , x) (i , y)
    □) ⊆⁺-refl ,
   ⋃-universal-⇒ R (⋃ R) ⊆-refl
   where open PreorderReasoning ⇐-Preorder renaming (_∼⟨_⟩_ to _⇐⟨_⟩_; _∎ to _□)
+
+ω : {I J : Set} (X : J → Set) (e : I → J) → Σ I (X ∘ e) → Σ J X
+ω X e (i , x) = (e i , x)
+
+ωº-ω-//-lemma : {I J : Set} (X : J → Set) (e : I → J) → (fun (ω X e) º • fun (ω X e)) // ≃⁺ idR⁺
+ωº-ω-//-lemma X e = wrap (λ i → wrap λ { x .x (._ , refl , refl) → refl }) , wrap (λ i → wrap λ { x .x refl → (e i , x) , refl , refl })
