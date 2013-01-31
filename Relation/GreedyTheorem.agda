@@ -4,29 +4,32 @@ open import Thesis.Description
 open import Thesis.Relation
 open import Thesis.Relation.Fold
 
+open import Function using (id; _∘_)
 open import Data.Product using (Σ; _,_; proj₁; proj₂)
 
 module Thesis.Relation.GreedyTheorem
-  {I : Set} (D : Desc I) {X : I → Set} (R : Σ I (μ D) ↝ Σ I (μ D)) (S : Ḟ D X ↝⁺ X)
+  {I : Set} (D : Desc I) (R : Σ I (μ D) ↝ Σ I (μ D))
   (R-transitive : R • R ⊆ R) -- (monotonicity : α • Ṙ D R • α º ⊆ R)
-  (Q : Ḟ D X ↝⁺ Ḟ D X) where -- (greedy-condition : (α •⁺ Ṙ D (foldR S º⁺)) •⁺ Q º⁺ ⊆⁺ R º⁺ •⁺ (α •⁺ Ṙ D (foldR S º⁺))) where
+  {J : Set} (X : J → Set) (e : I → J) (S : Ḟ D (X ∘ e) ↝⁺ (X ∘ e))
+  (Q : Ḟ D (X ∘ e) ↝⁺ Ḟ D (X ∘ e)) where -- (greedy-condition : (α •⁺ Ṙ D (foldR S º⁺)) •⁺ Q º⁺ ⊆⁺ R º⁺ •⁺ (α •⁺ Ṙ D (foldR S º⁺))) where
 
-{- [To be revised.]
 
 open import Thesis.Prelude.InverseImage
 open import Thesis.Prelude.Category.Isomorphism
 open import Thesis.Prelude.Function
 open import Thesis.Relation.Hylomorphism
 open import Thesis.Relation.Minimum
+open import Thesis.Relation.Join
 open import Thesis.Ornament
 open import Thesis.Ornament.Algebraic
 open import Thesis.Refinement
 
-open import Function using (id)
 open import Relation.Binary using (module Setoid)
 import Relation.Binary.PreorderReasoning as PreorderReasoning
 import Relation.Binary.EqReasoning as EqReasoning
 
+
+{-
 
 H : X ↝ μ D
 H = foldR {D = D} α • foldR S º
@@ -111,8 +114,13 @@ second-obligation =
 M-prefix-point : α • Ṙ D M • min Q •Λ (S º) ⊆ M
 M-prefix-point = min-universal-⇐ first-obligation second-obligation
 
-greedy-theorem : foldR ((min Q •Λ (S º))º) º ⊆ min R •Λ (foldR S º)
-greedy-theorem =
+-}
+
+greedy-theorem : (⋃ X e (foldR ((min⁺ Q •⁺Λ (S º⁺)) º⁺))) º ⊆ min R •Λ ((⋃ X e (foldR S)) º)
+greedy-theorem = {!!}
+
+{-
+
   begin
     foldR ((min Q •Λ (S º))º) º
       ⊆⟨ proj₂ (foldR-α-lemma (foldR ((min Q •Λ (S º))º) º)) ⟩

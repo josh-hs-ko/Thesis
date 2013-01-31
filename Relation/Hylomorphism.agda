@@ -5,7 +5,7 @@ open import Thesis.Relation
 
 module Thesis.Relation.Hylomorphism {I : Set} (D : Desc I) {X Y : I → Set} (R : Ḟ D Y ↝⁺ Y) (S : Ḟ D X ↝⁺ X) where
 
-open import Thesis.Prelude.Implication
+open import Thesis.Prelude.Preorder
 open import Thesis.Prelude.Category.Isomorphism
 open import Thesis.Prelude.Function
 open import Thesis.Description
