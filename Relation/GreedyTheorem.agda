@@ -1,17 +1,21 @@
--- A variant of the *Greedy Theorem* and its embedding into inductive families.
+-- A variant of the Greedy Theorem and its embedding into inductive families.
 
 open import Thesis.Description
 open import Thesis.Relation
+open import Thesis.Relation.Fold
+
+open import Data.Product using (Σ; _,_; proj₁; proj₂)
 
 module Thesis.Relation.GreedyTheorem
-  {I : Set} (D : Desc I) {X : I → Set} (R : μ D ↝ μ D) (S : Ḟ D X ↝ X)
-  (R-transitive : R • R ⊆ R) (monotonicity : α • Ṙ D R • α º ⊆ R)
-  (Q : Ḟ D X ↝ Ḟ D X) (greedy-condition : (α • Ṙ D (foldR S º)) • Q º ⊆ R º • (α • Ṙ D (foldR S º))) where
+  {I : Set} (D : Desc I) {X : I → Set} (R : Σ I (μ D) ↝ Σ I (μ D)) (S : Ḟ D X ↝⁺ X)
+  (R-transitive : R • R ⊆ R) -- (monotonicity : α • Ṙ D R • α º ⊆ R)
+  (Q : Ḟ D X ↝⁺ Ḟ D X) where -- (greedy-condition : (α •⁺ Ṙ D (foldR S º⁺)) •⁺ Q º⁺ ⊆⁺ R º⁺ •⁺ (α •⁺ Ṙ D (foldR S º⁺))) where
+
+{- [To be revised.]
 
 open import Thesis.Prelude.InverseImage
 open import Thesis.Prelude.Category.Isomorphism
 open import Thesis.Prelude.Function
-open import Thesis.Relation.Fold
 open import Thesis.Relation.Hylomorphism
 open import Thesis.Relation.Minimum
 open import Thesis.Ornament
@@ -19,7 +23,6 @@ open import Thesis.Ornament.Algebraic
 open import Thesis.Refinement
 
 open import Function using (id)
-open import Data.Product using (Σ; _,_; proj₁; proj₂)
 open import Relation.Binary using (module Setoid)
 import Relation.Binary.PreorderReasoning as PreorderReasoning
 import Relation.Binary.EqReasoning as EqReasoning
@@ -131,3 +134,5 @@ optimisation-proof : ∀ {i} (x : X i) (sol : GreedySolution x) → Λ (min R �
 optimisation-proof x sol =
   modus-ponens-⊆ greedy-theorem x (forget ⌈ GreedySolutionOD ⌉ sol)
     (proj₂ (Iso.to Fun (Refinement.i (FRefinement.comp (toFRefinement (algOrn-FSwap D ((min Q •Λ (S º))º))) (ok (_ , x)))) sol))
+
+-}

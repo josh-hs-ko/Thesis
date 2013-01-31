@@ -38,6 +38,7 @@ import Thesis.Relation.Division
 import Thesis.Relation.Fold
 import Thesis.Relation.GreedyTheorem
 import Thesis.Relation.Hylomorphism
+import Thesis.Relation.Join
 import Thesis.Relation.Minimum
 import Thesis.Examples.Insertion
 import Thesis.Examples.LeftistHeap

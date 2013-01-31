@@ -1,5 +1,5 @@
--- Definition of (relational) algebraic ornaments and ornamental algebras
--- (which are a different kind of algebras from McBride's ornamental algebras).
+-- Definition of (relational) algebraic ornaments and ornamental algebras (which
+-- are a different kind of algebras from McBride's ornamental algebras).
 -- The optimised predicate of an algebraic ornament can be swapped for a relational fold with the algebra of the ornament.
 
 module Thesis.Ornament.Algebraic where
@@ -16,6 +16,7 @@ open import Thesis.Ornament
 open import Thesis.Ornament.ParallelComposition
 open import Thesis.Ornament.RefinementSemantics
 open import Thesis.Relation
+open import Thesis.Relation.Fold
 
 open import Function using (id; type-signature)
 open import Data.Unit using (⊤; tt)
@@ -28,13 +29,13 @@ open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅) rena
 --------
 -- algebraic ornaments
 
-algOrn : ∀ {I} (D : Desc I) → ∀ {J} → (Ḟ D J ↝ J) → OrnDesc (Σ I J) proj₁ D
-algOrn D {J} R = wrap λ { {._} (ok (i , j)) → Δ[ js ∶ Ḟ D J i ] Δ[ r ∶ Λ R js j ] erode (D at i) js }
+algOrn : ∀ {I} (D : Desc I) → ∀ {J} → (Ḟ D J ↝⁺ J) → OrnDesc (Σ I J) proj₁ D
+algOrn D {J} R = wrap λ { {._} (ok (i , j)) → Δ[ js ∶ Ḟ D J i ] Δ[ r ∶ (R !!) i js j ] erode (D at i) js }
 
-algOrn-iso : ∀ {I} (D : Desc I) → ∀ {J} (R : Ḟ D J ↝ J) →
-             ∀ {i} (x : μ D i) → ∀ {j} → Iso Fun (OptP ⌈ algOrn D R ⌉ (ok (i , j)) x) (Λ (foldR R) x j)
+algOrn-iso : ∀ {I} (D : Desc I) → ∀ {J} (R : Ḟ D J ↝⁺ J) →
+             ∀ {i} (x : μ D i) → ∀ {j} → Iso Fun (OptP ⌈ algOrn D R ⌉ (ok (i , j)) x) (foldR' R i x j)
 algOrn-iso {I} D {J} R =
-  induction D (λ {i} x → ∀ {j} → Iso Fun (OptP ⌈ algOrn D R ⌉ (ok (i , j)) x) (Λ (foldR R) x j))
+  induction D (λ {i} x → ∀ {j} → Iso Fun (OptP ⌈ algOrn D R ⌉ (ok (i , j)) x) (foldR' R i x j))
     (λ {i} xs all {j} →
        Setoid.trans (IsoSetoid Fun)
          (μ-iso (OptPD ⌈ algOrn D R ⌉) (ok (i , j) , ok (i , con xs)))
@@ -78,7 +79,7 @@ algOrn-iso {I} D {J} R =
         ≡ (a , x , b , y , eq)
     aux-*-inv a x b y refl = refl
     aux : (D' : RDesc I) (xs : ⟦ D' ⟧ (μ D))
-          (all : All D' (λ {i} x → ∀ {j} → Iso Fun (OptP ⌈ algOrn D R ⌉ (ok (i , j)) x) (Λ (foldR R) x j)) xs) (js : ⟦ D' ⟧ J) →
+          (all : All D' (λ {i} x → ∀ {j} → Iso Fun (OptP ⌈ algOrn D R ⌉ (ok (i , j)) x) (foldR' R i x j)) xs) (js : ⟦ D' ⟧ J) →
           Iso Fun (⟦ OptPRD (toROrn (erode D' js)) xs ⟧ (μ (OptPD ⌈ algOrn D R ⌉))) (mapFoldR D D' R xs js)
     aux ∎ xs all js = Setoid.refl (IsoSetoid Fun)
     aux (ṿ i) x all j = all
@@ -97,8 +98,8 @@ algOrn-iso {I} D {J} R =
                                                     (proj₁ (proj₂ (proj₂ (proj₂ p)))) (proj₂ (proj₂ (proj₂ (proj₂ p))))
                 ; from-to-inverse = frefl })
    
-algOrn-FSwap : ∀ {I} (D : Desc I) → ∀ {J} (R : Ḟ D J ↝ J) → FSwap (RSem' ⌈ algOrn D R ⌉)
-algOrn-FSwap D R = wrap λ { {._} (ok (i , j)) → record { Q = λ x → Λ (foldR R) x j; s = λ x → algOrn-iso D R x } }
+algOrn-FSwap : ∀ {I} (D : Desc I) → ∀ {J} (R : Ḟ D J ↝⁺ J) → FSwap (RSem' ⌈ algOrn D R ⌉)
+algOrn-FSwap D R = wrap λ { {._} (ok (i , j)) → record { Q = λ x → foldR' R i x j; s = λ x → algOrn-iso D R x } }
 
 
 --------
@@ -118,5 +119,6 @@ mutual
               ∀ {s} → ROrn e (D s) E → ∀ {s'} → ⟦ D s' ⟧ (_⁻¹_ e) → s ≡ s' → Set
   ornProp-∇ {s} O js refl = ornProp O js
 
-ornAlg : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → Ḟ D (_⁻¹_ e) ↝ (_⁻¹_ e)
-ornAlg (wrap O) = wrap λ js j → ornProp (O j) js
+ornAlg : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → Ḟ D (_⁻¹_ e) ↝⁺ (_⁻¹_ e)
+ornAlg (wrap O) = wrap λ i js j → ornProp (O j) js
+

@@ -4,6 +4,8 @@
 
 module Thesis.Ornament.Algebraic.FundamentalTheorems where
 
+{- [To be updated.]
+
 open import Thesis.Prelude.Equality
 open import Thesis.Prelude.Category.Isomorphism
 open import Thesis.Prelude.Function
@@ -120,3 +122,5 @@ module OAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝ J) where
 
   hg-iso : ∀ i → Iso Fun (J i) (proj₁ {B = J} ⁻¹ i)
   hg-iso i = record { to = h; from = g; to-from-inverse = hg-inverse; from-to-inverse = frefl }
+
+-}

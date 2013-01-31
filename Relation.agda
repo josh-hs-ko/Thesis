@@ -226,8 +226,12 @@ idR⁺ = fun⁺ id
 α : {I : Set} {D : Desc I} → Ḟ D (μ D) ↝⁺ μ D
 α = fun⁺ con
 
+infix 6 _º⁺
+
 _º⁺ : {I : Set} {X Y : I → Set} → X ↝⁺ Y → Y ↝⁺ X
 (R º⁺) = wrap λ i → ((R !!) i º)
+
+infixr 4 _•⁺_
 
 _•⁺_ : {I : Set} {X Y Z : I → Set} → Y ↝⁺ Z → X ↝⁺ Y → X ↝⁺ Z
 (R •⁺ S) = wrap λ i → (R !!) i • (S !!) i
@@ -257,6 +261,8 @@ modus-ponens-⊆⁺ (wrap R⊆⁺S) i x y r = modus-ponens-⊆ (R⊆⁺S i) x y 
              record { isEquivalence = Setoid.isEquivalence (≡-Setoid _)
                     ; reflexive     = λ { {._} refl → ⊆⁺-refl }
                     ; trans         = ⊆⁺-trans } }
+
+infix 3 _⊇⁺_
 
 _⊇⁺_ : {I : Set} {X Y : I → Set} → (X ↝⁺ Y) → (X ↝⁺ Y) → Set
 R ⊇⁺ S = S ⊆⁺ R
@@ -322,6 +328,14 @@ idR⁺-r R = wrap (λ i → proj₁ (idR-r ((R !!) i))) , wrap (λ i → proj₂
 
 •⁺-assoc : {I : Set} {X Y Z W : I → Set} (R : Z ↝⁺ W) (S : Y ↝⁺ Z) (T : X ↝⁺ Y) → (R •⁺ S) •⁺ T ≃⁺ R •⁺ (S •⁺ T)
 •⁺-assoc R S T = wrap (λ i → proj₁ (•-assoc ((R !!) i) ((S !!) i) ((T !!) i))) , wrap (λ i → proj₂ (•-assoc ((R !!) i) ((S !!) i) ((T !!) i)))
+
+iso⁺-conv : {I : Set} {X Y : I → Set} → (isos : ∀ i → Iso Fun (X i) (Y i)) →
+            fun⁺ (λ {i} → Iso.to Fun (isos i)) º⁺ ≃⁺ fun⁺ (λ {i} → Iso.from Fun (isos i))
+iso⁺-conv isos = wrap (λ i → proj₁ (iso-conv (isos i))) , wrap (λ i → proj₂ (iso-conv (isos i)))
+
+iso⁺-idR⁺ : {I : Set} {X Y : I → Set} → (isos : ∀ i → Iso Fun (X i) (Y i)) →
+           fun⁺ (λ {i} → Iso.to Fun (isos i)) •⁺ fun⁺ (λ {i} → Iso.to Fun (isos i)) º⁺ ≃⁺ idR⁺
+iso⁺-idR⁺ {Y = Y} isos = wrap (λ i → proj₁ (iso-idR (isos i))) , wrap (λ i → proj₂ (iso-idR (isos i)))
 
 
 --------

@@ -2,6 +2,8 @@
 
 module Thesis.Ornament.Algebraic.Fusion where
 
+{- [To be updated.]
+
 open import Thesis.Prelude.Function
 import Thesis.Prelude.Category.Isomorphism as Isomorphism; open Isomorphism Fun
 open import Thesis.Prelude.InverseImage
@@ -34,3 +36,5 @@ algOrn-fusion-⊇ D R S T fusion-condition {i} {y} d
 algOrn-fusion-⊇ D R S T fusion-condition {i} {y} d
   | x , s , r = x , Iso.from (Refinement.i rS) (forget ⌈ algOrn D T ⌉ d , s) , r
   where rS = FRefinement.comp (toFRefinement (algOrn-FSwap D S)) (ok (i , x))
+
+-}
