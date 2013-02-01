@@ -165,9 +165,6 @@ toUpgrade r = record { P = Refinement.P r
                      ; u = λ x → proj₁ ∘ Iso.to (coherence r x)
                      ; c = λ x → proj₂ ∘ Iso.to (coherence r x) }
 
-Π : (A : Set) (B : A → Set) → Set
-Π A B = (x : A) → B x
-
 _⇀_ : {X Y Z W : Set} → Refinement X Y → Upgrade Z W → Upgrade (X → Z) (Y → W)
 r ⇀ s = record { P = λ f → ∀ x → (p : Refinement.P r x) → Upgrade.P s (f x)
                ; C = λ f g → ∀ x y → Upgrade.C (toUpgrade r) x y → Upgrade.C s (f x) (g y)
@@ -177,7 +174,7 @@ r ⇀ s = record { P = λ f → ∀ x → (p : Refinement.P r x) → Upgrade.P s
 
 infixr 2 _⇀_
 
-new : {X : Set} (I : Set) {Y : I → Set} → (∀ i → Upgrade X (Y i)) → Upgrade X (Π I Y)
+new : {X : Set} (I : Set) {Y : I → Set} → (∀ i → Upgrade X (Y i)) → Upgrade X ((i : I) → Y i)
 new I r = record { P = λ x → ∀ i → Upgrade.P (r i) x
                  ; C = λ x y → ∀ i → Upgrade.C (r i) x (y i)
                  ; u = λ x p i → Upgrade.u (r i) x (p i)
@@ -193,7 +190,7 @@ new' I r = record { P = λ x → ∀ {i} → Upgrade.P (r i) x
 
 syntax new' I (λ i → r) = ∀⁺[[ i ∶ I ]] r
 
-fixed : (I : Set) {X : I → Set} {Y : I → Set} → (∀ i → Upgrade (X i) (Y i)) → Upgrade (Π I X) (Π I Y)
+fixed : (I : Set) {X : I → Set} {Y : I → Set} → (∀ i → Upgrade (X i) (Y i)) → Upgrade ((i : I) → X i) ((i : I) → Y i)
 fixed I u = record { P = λ f → ∀ i → Upgrade.P (u i) (f i)
                    ; C = λ f g → ∀ i → Upgrade.C (u i) (f i) (g i)
                    ; u = λ f h i → Upgrade.u (u i) (f i) (h i)
@@ -210,7 +207,7 @@ fixed' I u = record { P = λ f → ∀ {i} → Upgrade.P (u i) (f {i})
 syntax fixed' I (λ i → u) = ∀[[ i ∶ I ]] u
 
 _′⇀_ : {I J : Set} {X : I → Set} {Y : J → Set} →
-     (r : Refinement I J) → (∀ i j → Upgrade.C (toUpgrade r) i j → Upgrade (X i) (Y j)) → Upgrade (Π I X) (Π J Y)
+     (r : Refinement I J) → (∀ i j → Upgrade.C (toUpgrade r) i j → Upgrade (X i) (Y j)) → Upgrade ((i : I) → X i) ((j : J) → Y j)
 r ′⇀ s = record { P = λ f → ∀ i j → (c : Upgrade.C (toUpgrade r) i j) → Upgrade.P (s i j c) (f i)
                 ; C = λ f g → ∀ i j → (c : Upgrade.C (toUpgrade r) i j) → Upgrade.C (s i j c) (f i) (g j)
                 ; u = λ f h j → let i = proj₁ (Iso.to (Refinement.i r) j)
