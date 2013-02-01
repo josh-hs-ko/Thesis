@@ -126,10 +126,10 @@ greedy-theorem =
 GreedySolutionOD : OrnDesc (Σ I X) proj₁ D
 GreedySolutionOD = algOrn D ((min⁺ Q •⁺Λ (S º⁺))º⁺)
 
-GreedySolution : ∀ {i} → X i → Set
-GreedySolution x = μ ⌊ GreedySolutionOD ⌋ (_ , x)
+GreedySolution : (i : I) → X i → Set
+GreedySolution i x = μ ⌊ GreedySolutionOD ⌋ (i , x)
 
-optimisation-proof : ∀ {i} (x : X i) (sol : GreedySolution x) → ((min⁺ R •⁺Λ (foldR S º⁺)) !!) i x (forget ⌈ GreedySolutionOD ⌉ sol)
-optimisation-proof {i} x sol =
+optimisation-proof : (i : I) (x : X i) (sol : GreedySolution i x) → ((min⁺ R •⁺Λ (foldR S º⁺)) !!) i x (forget ⌈ GreedySolutionOD ⌉ sol)
+optimisation-proof i x sol =
   modus-ponens-⊆⁺ greedy-theorem i x (forget ⌈ GreedySolutionOD ⌉ sol)
     (proj₂ (Iso.to Fun (Refinement.i (FRefinement.comp (toFRefinement (algOrn-FSwap D ((min⁺ Q •⁺Λ (S º⁺))º⁺))) (ok (_ , x)))) sol))

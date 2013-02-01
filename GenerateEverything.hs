@@ -40,8 +40,7 @@ ordering =
 
 exclusion :: [FindClause Bool]
 exclusion =
-  [ liftOp (flip isPrefixOf) directory "./Old",
-    liftOp (flip isPrefixOf) directory "./Notes",
+  [ liftOp (flip isPrefixOf) directory "./Notes",
     fileName ==? "Everything.agda",
     fileName ==? "Playground.agda",
     fileName ==? "Scribble.agda" ]
