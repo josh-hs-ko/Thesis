@@ -4,8 +4,6 @@
 
 module Thesis.Ornament.Algebraic.FundamentalTheorems where
 
-{- [To be updated.]
-
 open import Thesis.Prelude.Equality
 open import Thesis.Prelude.Category.Isomorphism
 open import Thesis.Prelude.Function
@@ -18,6 +16,7 @@ open import Thesis.Ornament.RefinementSemantics
 open import Thesis.Ornament.Isomorphism
 open import Thesis.Ornament.Algebraic
 open import Thesis.Relation
+open import Thesis.Relation.Fold
 
 open import Function using (const; _∘_)
 open import Data.Unit using (⊤; tt)
@@ -85,34 +84,35 @@ AOOA-theorem {e = e} O =
 --------
 -- ornamental algebra derived from an algebraic ornament is isomorphic to the algebra of the ornament
 
-module OAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝ J) where
+module OAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝⁺ J) where
 
   h : J ⇉ _⁻¹_ proj₁
   h {i} = ok ∘ _,_ i
 
-  OAAO-theorem-aux-⊆ : (D : RDesc I) (js : ⟦ D ⟧ J) → ornProp (toROrn (erode D js)) (mapF D h js)
-  OAAO-theorem-aux-⊆ ∎       js         = tt
-  OAAO-theorem-aux-⊆ (ṿ i)   j          = refl
-  OAAO-theorem-aux-⊆ (σ S D) (s , js)   = refl , OAAO-theorem-aux-⊆ (D s) js
-  OAAO-theorem-aux-⊆ (D * E) (js , js') = OAAO-theorem-aux-⊆ D js , OAAO-theorem-aux-⊆ E js'
+  OAAO-theorem-aux-computation : (D : RDesc I) (js : ⟦ D ⟧ J) → ornProp (toROrn (erode D js)) (mapF D h js)
+  OAAO-theorem-aux-computation ∎       js         = tt
+  OAAO-theorem-aux-computation (ṿ i)   j          = refl
+  OAAO-theorem-aux-computation (σ S D) (s , js)   = refl , OAAO-theorem-aux-computation (D s) js
+  OAAO-theorem-aux-computation (D * E) (js , js') = OAAO-theorem-aux-computation D js , OAAO-theorem-aux-computation E js'
 
-  OAAO-theorem-aux-⊇ : (D : RDesc I) (js js' : ⟦ D ⟧ J) → ornProp (toROrn (erode D js')) (mapF D h js) → js ≡ js'
-  OAAO-theorem-aux-⊇ ∎       js        js'         p          = refl
-  OAAO-theorem-aux-⊇ (ṿ i)   j         j'          p          = cong-proj₂ p
-  OAAO-theorem-aux-⊇ (σ S D) (s , js)  (.s , js')  (refl , p) = cong (_,_ s) (OAAO-theorem-aux-⊇ (D s) js js' p)
-  OAAO-theorem-aux-⊇ (D * E) (js , ks) (js' , ks') (p , p')   = cong₂ _,_ (OAAO-theorem-aux-⊇ D js js' p) (OAAO-theorem-aux-⊇ E ks ks' p')
+  OAAO-theorem-aux-unique : (D : RDesc I) (js js' : ⟦ D ⟧ J) → ornProp (toROrn (erode D js')) (mapF D h js) → js ≡ js'
+  OAAO-theorem-aux-unique ∎       js        js'         p          = refl
+  OAAO-theorem-aux-unique (ṿ i)   j         j'          p          = cong-proj₂ p
+  OAAO-theorem-aux-unique (σ S D) (s , js)  (.s , js')  (refl , p) = cong (_,_ s) (OAAO-theorem-aux-unique (D s) js js' p)
+  OAAO-theorem-aux-unique (D * E) (js , ks) (js' , ks') (p , p')   = cong₂ _,_ (OAAO-theorem-aux-unique D js js' p)
+                                                                               (OAAO-theorem-aux-unique E ks ks' p')
 
-  OAAO-theorem : fun h • R ≃ ornAlg ⌈ algOrn D R ⌉ • Ṙ D (fun h)
+  OAAO-theorem : fun⁺ h •⁺ R ≃⁺ ornAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ h)
   OAAO-theorem =
-    wrap (λ {i} js → wrap (λ { ._ (j , r , refl) →
-                               Ḟ-map D h js , mapR-fun-computation (D at i) h js , js , r , OAAO-theorem-aux-⊆ (D at i) js })) ,
-    wrap (λ {i} js → wrap (λ { ij (ijs , rs , q) → aux-⊇ js ij ijs rs q }))
+    wrap (λ i → wrap λ { js ._ (j , r , refl) →
+                         Ḟ-map D h js , mapR-fun-computation (D at i) h js , js , r , OAAO-theorem-aux-computation (D at i) js }) ,
+    wrap (λ i → wrap λ { js ij (ijs , rs , q) → aux js ij ijs rs q })
     where
-      aux-⊇ : ∀ {i} (js : Ḟ D J i) (ij : proj₁ {B = J} ⁻¹ i) (ijs : Ḟ D (_⁻¹_ proj₁) i) (rs : mapR (D at i) (fun h) js ijs) →
-            (q : Λ (ornAlg ⌈ algOrn D R ⌉) ijs ij) → Λ (fun h • R) js ij
-      aux-⊇ js (ok (i , j)) ijs rs (js' , r , p) with mapR-fun-unique (D at i) h js ijs rs
-      aux-⊇ js (ok (i , j)) ._  rs (js' , r , p) | refl with OAAO-theorem-aux-⊇ (D at i) js js' p
-      aux-⊇ js (ok (i , j)) ._  rs (.js , r , p) | refl | refl = j , r , refl
+      aux : ∀ {i} (js : Ḟ D J i) (ij : proj₁ {B = J} ⁻¹ i) (ijs : Ḟ D (_⁻¹_ proj₁) i) (rs : mapR (D at i) (fun⁺ h) js ijs) →
+            (q : (ornAlg ⌈ algOrn D R ⌉ !!) i ijs ij) → ((fun⁺ h •⁺ R) !!) i js ij
+      aux js (ok (i , j)) ijs rs (js' , r , p) with mapR-fun-unique (D at i) h js ijs rs
+      aux js (ok (i , j)) ._  rs (js' , r , p) | refl with OAAO-theorem-aux-unique (D at i) js js' p
+      aux js (ok (i , j)) ._  rs (.js , r , p) | refl | refl = j , r , refl
 
   g : _⁻¹_ proj₁ ⇉ J
   g (ok (i , j)) = j
@@ -122,5 +122,3 @@ module OAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝ J) where
 
   hg-iso : ∀ i → Iso Fun (J i) (proj₁ {B = J} ⁻¹ i)
   hg-iso i = record { to = h; from = g; to-from-inverse = hg-inverse; from-to-inverse = frefl }
-
--}

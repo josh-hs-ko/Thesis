@@ -121,4 +121,3 @@ mutual
 
 ornAlg : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → Ḟ D (_⁻¹_ e) ↝⁺ (_⁻¹_ e)
 ornAlg (wrap O) = wrap λ i js j → ornProp (O j) js
-
