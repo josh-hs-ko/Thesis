@@ -1,4 +1,5 @@
 -- Definition and properties of componentwise join.
+-- Kept for future work.
 
 module Thesis.Relation.Join where
 

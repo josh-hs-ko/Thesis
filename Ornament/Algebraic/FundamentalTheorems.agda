@@ -87,7 +87,7 @@ AOOA-theorem {e = e} O =
 
 module OAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝ J) where
 
-  h : J ⇒ _⁻¹_ proj₁
+  h : J ⇉ _⁻¹_ proj₁
   h {i} = ok ∘ _,_ i
 
   OAAO-theorem-aux-⊆ : (D : RDesc I) (js : ⟦ D ⟧ J) → ornProp (toROrn (erode D js)) (mapF D h js)
@@ -114,7 +114,7 @@ module OAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝ J) where
       aux-⊇ js (ok (i , j)) ._  rs (js' , r , p) | refl with OAAO-theorem-aux-⊇ (D at i) js js' p
       aux-⊇ js (ok (i , j)) ._  rs (.js , r , p) | refl | refl = j , r , refl
 
-  g : _⁻¹_ proj₁ ⇒ J
+  g : _⁻¹_ proj₁ ⇉ J
   g (ok (i , j)) = j
 
   hg-inverse : ∀ {i} (ij : proj₁ ⁻¹ i) → h (g ij) ≡ ij

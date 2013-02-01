@@ -5,12 +5,11 @@ module Thesis.Examples.MinCoinChange where
 open import Thesis.Prelude.Function
 open import Thesis.Prelude.InverseImage
 open import Thesis.Prelude.Function.Fam
-open import Thesis.Prelude.Implication
+open import Thesis.Prelude.Preorder
 open import Thesis.Description hiding (_*_)
 open import Thesis.Ornament hiding (_*_)
 open import Thesis.Ornament.SequentialComposition
 open import Thesis.Relation
-open import Thesis.Relation.Meet
 open import Thesis.Examples.Nat hiding (_+_)
 open import Thesis.Examples.List
 open import Thesis.Examples.List.Sorted
@@ -59,7 +58,7 @@ CoinBagOD = wrap λ { {._} (ok c) →
 CoinBag : Coin → Set
 CoinBag = μ ⌊ CoinBagOD ⌋
 
-total-value-alg : Ḟ ⌊ CoinBagOD ⌋ (const ℕ) ⇒ (const ℕ)
+total-value-alg : Ḟ ⌊ CoinBagOD ⌋ (const ℕ) ⇉ (const ℕ)
 total-value-alg (false , _            ) = 0
 total-value-alg (true  , c , n , _ , m) = n * value c + m
 
@@ -69,6 +68,8 @@ total-value = fold total-value-alg
 lengthCB : ∀ {c} → CoinBag c → ℕ
 lengthCB = toℕ ∘ length ∘ forget (⌈ CoinSListOD ⌉ ⊙ ⌈ CoinBagOD ⌉)
 
+
+{-
 
 --------
 -- specification
@@ -118,3 +119,5 @@ monotonicity : α • Ṙ ⌊ CoinBagOD ⌋ R • α º ⊆ R
 monotonicity = {!!}
 
 Q : CBag ↝ CBag
+
+-}

@@ -33,16 +33,16 @@ FamObject = Σ[ I ∶ Set ] (I → Set)
 
 infixr 4 _,_
 
-_⇒_ : ∀ {I} → (I → Set) → (I → Set) → Set
-X ⇒ Y = ∀ {i} → X i → Y i
+_⇉_ : ∀ {I} → (I → Set) → (I → Set) → Set
+X ⇉ Y = ∀ {i} → X i → Y i
 
-infixr 1 _⇒_
+infixr 1 _⇉_
 
 record FamMorphism (IX JY : FamObject) : Set₁ where
   constructor _,_
   field
     e : proj₁ IX → proj₁ JY
-    u : proj₂ IX ⇒ (proj₂ JY ∘ e)
+    u : proj₂ IX ⇉ (proj₂ JY ∘ e)
 
 record FamMorphismEq (IX JY : FamObject) (f g : FamMorphism IX JY) : Set₁ where
   constructor _,_

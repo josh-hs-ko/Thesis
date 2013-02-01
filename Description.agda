@@ -39,9 +39,9 @@ _at_ : ∀ {I} → Desc I → I → RDesc I
 Ḟ D X i = ⟦ D at i ⟧ X
 
 data μ {I} (D : Desc I) : I → Set where
-  con : Ḟ D (μ D) ⇒ μ D
+  con : Ḟ D (μ D) ⇉ μ D
 
-decon : ∀ {I} {D : Desc I} → μ D ⇒ Ḟ D (μ D)
+decon : ∀ {I} {D : Desc I} → μ D ⇉ Ḟ D (μ D)
 decon (con xs) = xs
 
 μ-iso : ∀ {I} (D : Desc I) → ∀ i → Iso Fun (μ D i) (Ḟ D (μ D) i)
@@ -54,10 +54,10 @@ decon (con xs) = xs
 
 mutual
 
-  fold : ∀ {I X} {D : Desc I} → Ḟ D X ⇒ X → μ D ⇒ X
+  fold : ∀ {I X} {D : Desc I} → Ḟ D X ⇉ X → μ D ⇉ X
   fold {D = D} φ {i} (con ds) = φ (mapFold D (D at i) φ ds)
 
-  mapFold : ∀ {I} (D : Desc I) (E : RDesc I) → ∀ {X} → (Ḟ D X ⇒ X) → ⟦ E ⟧ (μ D) → ⟦ E ⟧ X
+  mapFold : ∀ {I} (D : Desc I) (E : RDesc I) → ∀ {X} → (Ḟ D X ⇉ X) → ⟦ E ⟧ (μ D) → ⟦ E ⟧ X
   mapFold D ∎        φ _          = _
   mapFold D (ṿ i)    φ d          = fold φ d
   mapFold D (σ S E)  φ (s , ds)   = s , mapFold D (E s) φ ds
@@ -100,7 +100,7 @@ reflection {I} D = induction D (λ x → fold con x ≡ x) (λ {i} xs all → co
 
 -- maps
 
-mapF : ∀ {I} (D : RDesc I) {X Y} → (X ⇒ Y) → ⟦ D ⟧ X → ⟦ D ⟧ Y
+mapF : ∀ {I} (D : RDesc I) {X Y} → (X ⇉ Y) → ⟦ D ⟧ X → ⟦ D ⟧ Y
 mapF ∎       f xs         = tt
 mapF (ṿ i)   f x          = f x
 mapF (σ S D) f (s , xs)   = s , mapF (D s) f xs
@@ -109,5 +109,5 @@ mapF (D * E) f (xs , xs') = mapF D f xs , mapF E f xs'
 remove-recursive-objects : ∀ {I} (D : RDesc I) {X} → ⟦ D ⟧ X → ⟦ D ⟧ (const ⊤)
 remove-recursive-objects D = mapF D !
 
-Ḟ-map : ∀ {I} (D : Desc I) {X Y} → (X ⇒ Y) → Ḟ D X ⇒ Ḟ D Y
+Ḟ-map : ∀ {I} (D : Desc I) {X Y} → (X ⇉ Y) → Ḟ D X ⇉ Ḟ D Y
 Ḟ-map D f {i} = mapF (D at i) f

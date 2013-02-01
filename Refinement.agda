@@ -102,7 +102,7 @@ record FRefinement {I J : Set} (e : J → I) (X : I → Set) (Y : J → Set) : S
   constructor wrap
   field
     comp : ∀ {i} (j : e ⁻¹ i) → Refinement (X i) (Y (und j))
-  forget : Y ⇒ (X ∘ e)
+  forget : Y ⇉ (X ∘ e)
   forget {j} = Refinement.forget (comp (ok j))
 
 FRef-refl : ∀ {I} {X : I → Set} → FRefinement id X X
@@ -111,7 +111,7 @@ FRef-refl = wrap λ { {._} (ok i) → Ref-refl }
 FRef-trans : ∀ {I J K} {e : J → I} {f : K → J} {X Y Z} → FRefinement e X Y → FRefinement f Y Z → FRefinement (e ∘ f) X Z
 FRef-trans {f = f} r s = wrap λ { {._} (ok k) → Ref-trans (FRefinement.comp r (ok (f k))) (FRefinement.comp s (ok k)) }
 
-canonFRef : ∀ {I J} {e : J → I} {X Y} → Y ⇒ (X ∘ e) → FRefinement e X Y
+canonFRef : ∀ {I J} {e : J → I} {X Y} → Y ⇉ (X ∘ e) → FRefinement e X Y
 canonFRef f = wrap λ { {._} (ok j) → canonRef f }
 
 

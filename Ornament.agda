@@ -59,10 +59,10 @@ idOrn D = wrap λ { {._} (ok i) → idROrn (D at i) }
 
 -- ornamental algebra
 
-eraseAlg : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → Ḟ E (μ D ∘ e) ⇒ μ D ∘ e
+eraseAlg : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → Ḟ E (μ D ∘ e) ⇉ μ D ∘ e
 eraseAlg {D = D} (wrap O) {j} = con ∘ erase (O (ok j))
 
-forget : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → μ E ⇒ μ D ∘ e
+forget : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → μ E ⇉ μ D ∘ e
 forget O = fold (eraseAlg O)
 
 forget-idOrn : ∀ {I} {D : Desc I} → ∀ {i} (x : μ D i) → forget (idOrn D) x ≡ x

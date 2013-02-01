@@ -12,8 +12,8 @@ import Thesis.Prelude.Equality
 import Thesis.Prelude.Function
 import Thesis.Prelude.Function.Fam
 import Thesis.Prelude.Function.Isomorphism
-import Thesis.Prelude.Implication
 import Thesis.Prelude.InverseImage
+import Thesis.Prelude.Preorder
 import Thesis.Prelude.Product
 import Thesis.Refinement
 import Thesis.Refinement.Category
@@ -38,7 +38,7 @@ import Thesis.Relation.Division
 import Thesis.Relation.Fold
 import Thesis.Relation.GreedyTheorem
 import Thesis.Relation.Hylomorphism
-import Thesis.Relation.Meet
+import Thesis.Relation.Join
 import Thesis.Relation.Minimum
 import Thesis.Examples.Insertion
 import Thesis.Examples.LeftistHeap
