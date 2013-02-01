@@ -35,9 +35,9 @@ R // = wrap λ i x y → R (i , x) (i , y)
 //-monotonic : {I : Set} {X Y : I → Set} {R S : Σ I X ↝ Σ I Y} → R ⊆ S → R // ⊆⁺ S //
 //-monotonic R⊆S = wrap λ i → wrap λ x y r → modus-ponens-⊆ R⊆S (i , x) (i , y) r
 
-//-preserves-comp : {I : Set} {X Y Z : I → Set} (R : Y ↝⁺ Z) (S : Σ I X ↝ Σ I Y) → (⋃ R • S) // ≃⁺ R •⁺ S //
-//-preserves-comp R S = wrap (λ i → wrap λ { x .z ((.i , y) , s , (z , r , refl)) → y , s , r }) ,
-                        wrap (λ i → wrap λ { x z (y , s , r) → (i , y) , (s , z , r , refl) })
+//-preserves-comp' : {I : Set} {X Y Z : I → Set} (R : Y ↝⁺ Z) (S : Σ I X ↝ Σ I Y) → (⋃ R • S) // ≃⁺ R •⁺ S //
+//-preserves-comp' R S = wrap (λ i → wrap λ { x .z ((.i , y) , s , (z , r , refl)) → y , s , r }) ,
+                         wrap (λ i → wrap λ { x z (y , s , r) → (i , y) , (s , z , r , refl) })
 
 ⋃-universal-⇒ : {I : Set} {X Y : I → Set} (R : X ↝⁺ Y) (S : Σ I X ↝ Σ I Y) → ⋃ R ⊆ S → R ⊆⁺ S //
 ⋃-universal-⇒ R S (wrap ⋃R⊆S) = wrap λ i → wrap λ x y r → ⋃R⊆S (i , x) (i , y) (y , r , refl)
