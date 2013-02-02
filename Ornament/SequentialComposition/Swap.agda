@@ -1,4 +1,5 @@
 -- The optimised predicate for an ornament refined by sequential composition can be swapped for the original optimised predicate.
+-- This file can take a long time to typecheck.
 
 open import Thesis.Prelude.Category
 open import Thesis.Prelude.Category.Isomorphism

@@ -9,7 +9,7 @@ See [the author's homepage](http://www.cs.ox.ac.uk/people/hsiang-shang.ko/) for 
 #### Thesis.Prelude.Category
 Basic definitions of categories and functors, including definitions of terminal object and functor composition.
 The collection of objects in a category is an Agda set, i.e., equality on objects is definitional equality,
-whereas the collection of arrows is a setoid, i.e., a set equipped with a equivalence relation.
+whereas the collection of arrows is a setoid, i.e., a set equipped with an equivalence relation.
 All operations on morphisms must respect the equivalence relation, including the morphism maps of functors.
 
 #### Thesis.Prelude.Category.Isomorphism
@@ -123,6 +123,7 @@ This file can take a long time to typecheck.
 #### Thesis.Ornament.ParallelComposition.Swap
 The optimised predicate for the parallel composition of two ornaments can be swapped
 for the pointwise conjunction of the optimised predicates for the two component ornaments.
+This file can take a long time to typecheck and may require a larger stack size.
 
 #### Thesis.Ornament.RefinementSemantics
 Definition of an optimised predicate for an ornament as the parallel composition of the ornament and the singleton ornament.
@@ -133,11 +134,15 @@ Sequential composition of ornaments.
 
 #### Thesis.Ornament.SequentialComposition.Swap
 The optimised predicate for an ornament refined by sequential composition can be swapped for the original optimised predicate.
+This file can take a long time to typecheck.
 
 #### Thesis.Relation
 Basic definitions of subsets and relations, combinators for specifying nondeterministic computation,
 relational inclusion wrapped up as preorder and setoid, combinators for reasoning with relations,
 componentwise relations between families of sets, and definition and properties of relators.
+
+#### Thesis.Relation.CompChain
+Combinators that help avoiding explicit applications of monotonicity and associativity of relational composition.
 
 #### Thesis.Relation.Division
 Definition of right-division of componentwise relations.

@@ -1,5 +1,6 @@
 -- The optimised predicate for the parallel composition of two ornaments can be swapped
 -- for the pointwise conjunction of the optimised predicates for the two component ornaments.
+-- This file can take a long time to typecheck and may require a larger stack size.
 
 open import Thesis.Ornament
 

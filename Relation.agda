@@ -154,6 +154,9 @@ fun-preserves-comp f g = wrap (λ { x ._ refl → g x , refl , refl }) , wrap (�
 fun-cong : {X Y : Set} {f g : X → Y} → f ≐ g → fun f ≃ fun g
 fun-cong f≐g = wrap (λ { x ._ refl → fsym f≐g x }) , wrap (λ { x ._ refl → f≐g x })
 
+fun-simple : {X Y : Set} (f : X → Y) → fun f • fun f º ⊆ idR
+fun-simple f = wrap λ { ._ ._ (x , refl , refl) → refl }
+
 º-cong : {X Y : Set} {R S : X ↝ Y} → R ≃ S → R º ≃ S º
 º-cong (R⊆S , R⊇S) = º-monotonic R⊆S , º-monotonic R⊇S
 
@@ -298,6 +301,9 @@ fun⁺-preserves-comp f g = wrap (λ i → proj₁ (fun-preserves-comp (f {i}) (
 
 fun⁺-cong : {I : Set} {X Y : I → Set} {f g : X ⇉ Y} → (∀ i → f {i} ≐ g {i}) → fun⁺ f ≃⁺ fun⁺ g
 fun⁺-cong f≐g = wrap (λ i → proj₁ (fun-cong (f≐g i))) , wrap (λ i → proj₂ (fun-cong (f≐g i)))
+
+fun⁺-simple : {I : Set} {X Y : I → Set} (f : X ⇉ Y) → fun⁺ f •⁺ fun⁺ f º⁺ ⊆⁺ idR⁺
+fun⁺-simple f = wrap λ i → fun-simple (f {i})
 
 º⁺-cong : {I : Set} {X Y : I → Set} {R S : X ↝⁺ Y} → R ≃⁺ S → R º⁺ ≃⁺ S º⁺
 º⁺-cong (R⊆⁺S , R⊇⁺S) = º⁺-monotonic R⊆⁺S , º⁺-monotonic R⊇⁺S

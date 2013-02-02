@@ -10,6 +10,9 @@ open import Thesis.Description hiding (_*_)
 open import Thesis.Ornament hiding (_*_)
 open import Thesis.Ornament.SequentialComposition
 open import Thesis.Relation
+open import Thesis.Relation.CompChain
+open import Thesis.Relation.Fold
+open import Thesis.Relation.GreedyTheorem
 open import Thesis.Examples.Nat hiding (_+_)
 open import Thesis.Examples.List
 open import Thesis.Examples.List.Sorted
@@ -38,7 +41,7 @@ value : Coin → ℕ
 value 1p = 1
 value 2p = 2
 value 5p = 5
-value ∞p = 999
+value ∞p = 42
 
 _<_ : Coin → Coin → Set
 _<_ = _<ℕ_ on value
@@ -66,58 +69,49 @@ total-value : ∀ {c} → CoinBag c → ℕ
 total-value = fold total-value-alg
 
 lengthCB : ∀ {c} → CoinBag c → ℕ
-lengthCB = toℕ ∘ length ∘ forget (⌈ CoinSListOD ⌉ ⊙ ⌈ CoinBagOD ⌉)
+lengthCB = toℕ ∘ forget (⌈ ListOD Coin ⌉ ⊙ (⌈ CoinSListOD ⌉ ⊙ ⌈ CoinBagOD ⌉))
 
-
-{-
 
 --------
 -- specification
 
-R : CoinBag ↝ CoinBag
-R = wrap (flip _≤ℕ_ on lengthCB)
+leq-ℕ : const {B = Coin} ℕ ↝⁺ const ℕ
+leq-ℕ = wrap (const (flip _≤ℕ_))
 
-R-transitive : R • R ⊆ R
-R-transitive = wrap λ b → wrap λ { b' (b'' , b≥b'' , b''≥b') → DecTotalOrder.trans ℕ-DecTotalOrder b''≥b' b≥b'' }
+leq-ℕ-transitive : leq-ℕ •⁺ leq-ℕ ⊆⁺ leq-ℕ
+leq-ℕ-transitive = wrap (const (wrap λ { x y (z , z≤x , y≤z) → DecTotalOrder.trans ℕ-DecTotalOrder y≤z z≤x }))
+
+R : CoinBag ↝⁺ CoinBag
+R = fun⁺ lengthCB º⁺ •⁺ leq-ℕ •⁺ fun⁺ lengthCB
+
+R-transitive : R •⁺ R ⊆⁺ R
+R-transitive =
+  begin
+    (fun⁺ lengthCB º⁺ •⁺ leq-ℕ •⁺ fun⁺ lengthCB) •⁺ (fun⁺ lengthCB º⁺ •⁺ leq-ℕ •⁺ fun⁺ lengthCB)
+      ⊆⁺⟨ proj₁ (chain-normalise⁺
+                  (([ fun⁺ lengthCB º⁺ ]⁺ ▪⁺ [ leq-ℕ ]⁺ ▪⁺ [ fun⁺ lengthCB ]⁺) ▪⁺ ([ fun⁺ lengthCB º⁺ ]⁺ ▪⁺ [ leq-ℕ ]⁺ ▪⁺ [ fun⁺ lengthCB ]⁺))) ⟩
+    fun⁺ lengthCB º⁺ •⁺ leq-ℕ •⁺ fun⁺ lengthCB •⁺ fun⁺ lengthCB º⁺ •⁺ leq-ℕ •⁺ fun⁺ lengthCB
+      ⊆⁺⟨ ⊆⁺-chain (fun⁺ lengthCB º⁺ ▪⁺ leq-ℕ ◇⁺) (fun⁺ lengthCB ▪⁺ fun⁺ lengthCB º⁺ ◇⁺) (idR⁺ ◇⁺) (fun⁺-simple lengthCB) ⟩
+    fun⁺ lengthCB º⁺ •⁺ leq-ℕ •⁺ idR⁺ •⁺ leq-ℕ •⁺ fun⁺ lengthCB
+      ⊆⁺⟨ ⊆⁺-chain (fun⁺ lengthCB º⁺ ◇⁺) (leq-ℕ ▪⁺ idR⁺ ◇⁺) (leq-ℕ ◇⁺) (proj₁ (idR⁺-r leq-ℕ)) ⟩
+    fun⁺ lengthCB º⁺ •⁺ leq-ℕ •⁺ leq-ℕ •⁺ fun⁺ lengthCB
+      ⊆⁺⟨ ⊆⁺-chain (fun⁺ lengthCB º⁺ ◇⁺) (leq-ℕ ▪⁺ leq-ℕ ◇⁺) (leq-ℕ ◇⁺) leq-ℕ-transitive ⟩
+    fun⁺ lengthCB º⁺ •⁺ leq-ℕ •⁺ fun⁺ lengthCB
+  □
+  where open PreorderReasoning (⊆⁺-Preorder CoinBag CoinBag) renaming (_∼⟨_⟩_ to _⊆⁺⟨_⟩_; _∎ to _□)
+
+S : Ḟ ⌊ CoinBagOD ⌋ (const ℕ) ↝⁺ (const ℕ)
+S = fun⁺ total-value-alg
 
 {-
 
-unbounded : CoinBag ↝ CoinBag
-unbounded = (λ c _ → c ≡ ∞p) ¿
-
-unbounded-transitive : unbounded • unbounded ⊆ unbounded
-unbounded-transitive =
+monotonicity : α •⁺ Ṙ ⌊ CoinBagOD ⌋ R •⁺ α º⁺ ⊆⁺ R
+monotonicity = 
   begin
-    unbounded • unbounded
-      ⊆⟨ •-monotonic-r unbounded (coreflexive (λ c _ → c ≡ ∞p)) ⟩
-    idR • unbounded
-      ⊆⟨ proj₁ (idR-l unbounded) ⟩
-    unbounded
+    α •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ lengthCB º⁺ •⁺ leq-ℕ •⁺ fun⁺ lengthCB) •⁺ α º⁺
+      ⊆⁺⟨ {!!} ⟩
+    fun⁺ lengthCB º⁺ •⁺ leq-ℕ •⁺ fun⁺ lengthCB
   □
-  where open PreorderReasoning (⊆-Preorder CoinBag CoinBag) renaming (_∼⟨_⟩_ to _⊆⟨_⟩_; _∎ to _□)
-
-R : CoinBag ↝ CoinBag
-R = leq ∩ unbounded
-
-R-transitive : R • R ⊆ R
-R-transitive =
-  (begin
-     R • R ⊆ R
-       ⇐⟨ uncurry ∩-universal-⇐ ⟩
-     ((R • R ⊆ leq) × (R • R ⊆ unbounded))
-       ⇐⟨ (let (p , q) = ∩-universal-⇒ ⊆-refl in ⊆-trans (•-monotonic p p) ** ⊆-trans (•-monotonic q q)) ⟩
-     ((leq • leq ⊆ leq) × (unbounded • unbounded ⊆ unbounded))
-   □) (leq-transitive , unbounded-transitive)
-  where open PreorderReasoning (⇐-Preorder) renaming (_∼⟨_⟩_ to _⇐⟨_⟩_; _∎ to _□)
-
--}
-
-S : Ḟ ⌊ CoinBagOD ⌋ (const ℕ) ↝ (const ℕ)
-S = fun total-value-alg
-
-monotonicity : α • Ṙ ⌊ CoinBagOD ⌋ R • α º ⊆ R
-monotonicity = {!!}
-
-Q : CBag ↝ CBag
+  where open PreorderReasoning (⊆⁺-Preorder CoinBag CoinBag) renaming (_∼⟨_⟩_ to _⊆⁺⟨_⟩_; _∎ to _□)
 
 -}
