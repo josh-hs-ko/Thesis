@@ -3,11 +3,12 @@
 open import Thesis.Description
 open import Thesis.Relation
 open import Thesis.Relation.Fold
+open import Thesis.Relation.Meet
 
 module Thesis.Relation.GreedyTheorem
   {I : Set} (D : Desc I) {X : I → Set} (R : μ D ↝⁺ μ D) (S : Ḟ D X ↝⁺ X)
   (R-transitive : R •⁺ R ⊆⁺ R) (monotonicity : α •⁺ Ṙ D R •⁺ α º⁺ ⊆⁺ R)
-  (Q : Ḟ D X ↝⁺ Ḟ D X) (greedy-condition : α •⁺ Ṙ D (foldR S º⁺) •⁺ Q º⁺ ⊆⁺ R º⁺ •⁺ α •⁺ Ṙ D (foldR S º⁺)) where
+  (Q : Ḟ D X ↝⁺ Ḟ D X) (greedy-condition : α •⁺ Ṙ D (foldR S º⁺) •⁺ (Q ∩⁺ (S º⁺ •⁺ S)) º⁺ ⊆⁺ R º⁺ •⁺ α •⁺ Ṙ D (foldR S º⁺)) where
 
 open import Thesis.Prelude.InverseImage
 open import Thesis.Prelude.Category.Isomorphism
@@ -64,10 +65,12 @@ private
                 (α •⁺ Ṙ D H •⁺ S º⁺ •⁺ (min⁺ Q •⁺Λ (S º⁺))º⁺) º⁺
                   ⊆⁺⟨ º⁺-monotonic (⊆⁺-chain-l (α ▪⁺ Ṙ D H ◇⁺) (proj₂ (º⁺-preserves-comp (min⁺ Q •⁺Λ (S º⁺)) S))) ⟩′
                 (α •⁺ Ṙ D H •⁺ (min⁺ Q •⁺Λ (S º⁺) •⁺ S)º⁺) º⁺
+                  ⊆⁺⟨ º⁺-monotonic (⊆⁺-chain-l (α ▪⁺ Ṙ D H ◇⁺) (º⁺-monotonic (•⁺-monotonic-r S (proj₁ (min⁺-context Q (S º⁺)))))) ⟩′
+                (α •⁺ Ṙ D H •⁺ (min⁺ (Q ∩⁺ (S º⁺ •⁺ S)) •⁺Λ (S º⁺) •⁺ S)º⁺) º⁺
                   ⊆⁺⟨ º⁺-monotonic (⊆⁺-chain-l (α ▪⁺ Ṙ D H ◇⁺) (º⁺-monotonic (proj₂ (min⁺-universal-⇒ ⊆⁺-refl)))) ⟩′
-                (α •⁺ Ṙ D H •⁺ Q º⁺) º⁺
-                  ⊆⁺⟨ º⁺-monotonic (•⁺-monotonic-l α (•⁺-monotonic-r (Q º⁺) (Ṙ-monotonic D (proj₁ (foldR-α-lemma (foldR S º⁺)))))) ⟩′
-                (α •⁺ Ṙ D (foldR S º⁺) •⁺ Q º⁺) º⁺
+                (α •⁺ Ṙ D H •⁺ (Q ∩⁺ (S º⁺ •⁺ S)) º⁺) º⁺
+                  ⊆⁺⟨ º⁺-monotonic (⊆⁺-chain (α ◇⁺) (Ṙ D H ◇⁺) (Ṙ D (foldR S º⁺) ◇⁺) (Ṙ-monotonic D (proj₁ (foldR-α-lemma (foldR S º⁺))))) ⟩′
+                (α •⁺ Ṙ D (foldR S º⁺) •⁺ (Q ∩⁺ (S º⁺ •⁺ S)) º⁺) º⁺
                   ⊆⁺⟨ º⁺-monotonic greedy-condition ⟩′
                 (R º⁺ •⁺ α •⁺ Ṙ D (foldR S º⁺)) º⁺
                   ⊆⁺⟨ proj₁ (º⁺-chain (R º⁺ ▪⁺ α ▪⁺ Ṙ D (foldR S º⁺) ◇⁺)) ⟩′
