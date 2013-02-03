@@ -12,17 +12,20 @@ open import Thesis.Ornament.SequentialComposition
 open import Thesis.Relation
 open import Thesis.Relation.CompChain
 open import Thesis.Relation.Fold
-open import Thesis.Relation.GreedyTheorem
+open import Thesis.Relation.Join
+open import Thesis.Relation.Meet
+import Thesis.Relation.GreedyTheorem as GreedyTheorem
 open import Thesis.Examples.Nat hiding (_+_)
 open import Thesis.Examples.List
 open import Thesis.Examples.List.Sorted
 
 open import Function using (id; const; _∘_; flip; _on_)
+open import Data.Empty using (⊥)
 open import Data.Unit using (⊤; tt)
 open import Data.Bool using (Bool; false; true)
-open import Data.Nat using (ℕ; _+_; _*_) renaming (_≤_ to _≤ℕ_; _<_ to _<ℕ_; decTotalOrder to ℕ-DecTotalOrder)
+open import Data.Nat using (ℕ; _+_; _*_) renaming (_≤_ to _≤ℕ_; decTotalOrder to ℕ-DecTotalOrder)
 open import Data.Nat.Properties using (_+-mono_) renaming (<-trans to <ℕ-trans)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; uncurry) renaming (map to _**_)
+open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; curry) renaming (map to _**_)
 open import Relation.Binary using (module DecTotalOrder)
 import Relation.Binary.PreorderReasoning as PreorderReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
@@ -35,42 +38,35 @@ data Coin : Set where
   1p : Coin
   2p : Coin
   5p : Coin
-  ∞p : Coin
 
 value : Coin → ℕ
 value 1p = 1
 value 2p = 2
 value 5p = 5
-value ∞p = 42
 
-_<_ : Coin → Coin → Set
-_<_ = _<ℕ_ on value
+_≤_ : Coin → Coin → Set
+_≤_ = _≤ℕ_ on value
 
 
 --------
--- coin bags as sorted association lists
+-- coin bags as sorted coin lists
 
-CoinSListOD : OrnDesc Coin ! ⌊ ListOD Coin ⌋
-CoinSListOD = SListOD Coin (flip _<_) (flip <ℕ-trans)
-
-CoinBagOD : OrnDesc Coin id ⌊ CoinSListOD ⌋
-CoinBagOD = wrap λ { {._} (ok c) →
-                  σ Bool λ { false → ∎
-                           ; true → σ[ d ∶ Coin ] Δ[ n ∶ ℕ ] σ (d < c) λ _ → ṿ (ok d) } }
+CoinBagOD : OrnDesc Coin ! ⌊ ListOD Coin ⌋
+CoinBagOD = SListOD Coin (flip _≤_) (flip (DecTotalOrder.trans ℕ-DecTotalOrder))
 
 CoinBag : Coin → Set
 CoinBag = μ ⌊ CoinBagOD ⌋
 
 total-value-alg : Ḟ ⌊ CoinBagOD ⌋ (const ℕ) ⇉ (const ℕ)
-total-value-alg (false , _            ) = 0
-total-value-alg (true  , c , n , _ , m) = n * value c + m
+total-value-alg (false , _        ) = 0
+total-value-alg (true  , c , _ , m) = value c + m
 
 total-value : ∀ {c} → CoinBag c → ℕ
 total-value = fold total-value-alg
 
 count-alg : Ḟ ⌊ CoinBagOD ⌋ (const ℕ) ⇉ (const ℕ)
-count-alg (false , _            ) = 0
-count-alg (true  , c , n , _ , m) = n + m
+count-alg (false , _        ) = 0
+count-alg (true  , c , _ , m) = 1 + m
 
 count : ∀ {c} → CoinBag c → ℕ
 count = fold count-alg
@@ -112,14 +108,12 @@ R-transitive =
 S : Ḟ ⌊ CoinBagOD ⌋ (const ℕ) ↝⁺ (const ℕ)
 S = fun⁺ total-value-alg
 
-postulate count-alg-monotonic : fun⁺ count-alg •⁺ Ṙ ⌊ CoinBagOD ⌋ leq-ℕ ⊆⁺ leq-ℕ •⁺ fun⁺ count-alg
-{- [ Proved. ]
+count-alg-monotonic : fun⁺ count-alg •⁺ Ṙ ⌊ CoinBagOD ⌋ leq-ℕ ⊆⁺ leq-ℕ •⁺ fun⁺ count-alg
 count-alg-monotonic =
   wrap λ c → wrap λ { (false , _              ) ._ (._ , (_ , _ , refl) , refl) →
                         0 , refl , DecTotalOrder.refl ℕ-DecTotalOrder
-                    ; (true  , d , n , d≤c , m) ._ (._ , (._ , (._ , (._ , (m' , m'≤m , refl) , refl) , refl) , refl) , refl) →
-                        n + m , refl , DecTotalOrder.refl ℕ-DecTotalOrder {n} +-mono m'≤m }
--}
+                    ; (true  , d , d≤c , n) ._ (._ , (._ , (._ , (m , m≤n , refl) , refl) , refl) , refl) →
+                        1 + n , refl , DecTotalOrder.refl ℕ-DecTotalOrder {1} +-mono m≤n }
 
 postulate
   R-monotonic-lemma :
@@ -187,8 +181,7 @@ R-monotonic =
             (proj₂ (º⁺-chain (fun⁺ count-alg ▪⁺ Ṙ ⌊ CoinBagOD ⌋ (leq-ℕ º⁺) ▪⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count) ▪⁺ α º⁺ ◇⁺))) ⟩
     (fun⁺ count-alg •⁺ Ṙ ⌊ CoinBagOD ⌋ (leq-ℕ º⁺) •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count) •⁺ α º⁺) º⁺ •⁺
      fun⁺ count-alg •⁺ Ṙ ⌊ CoinBagOD ⌋  leq-ℕ     •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count) •⁺ α º⁺
-      ⊆⁺⟨ •⁺-monotonic (º⁺-monotonic
-                        (R-monotonic-lemma (leq-ℕ º⁺) (fun⁺-monotonic-alg-lemma ⌊ CoinBagOD ⌋ count-alg leq-ℕ count-alg-monotonic)))
+      ⊆⁺⟨ •⁺-monotonic (º⁺-monotonic (R-monotonic-lemma (leq-ℕ º⁺) (fun⁺-monotonic-alg-lemma ⌊ CoinBagOD ⌋ count-alg leq-ℕ count-alg-monotonic)))
                       (R-monotonic-lemma leq-ℕ count-alg-monotonic) ⟩
     (leq-ℕ º⁺ •⁺ fun⁺ count) º⁺ •⁺ leq-ℕ •⁺ fun⁺ count
       ⊆⁺⟨ ⊆⁺-chain-r ((leq-ℕ º⁺ •⁺ fun⁺ count) º⁺ ◇⁺) (fun⁺ count º⁺ ▪⁺ leq-ℕ ◇⁺) (proj₁ (º⁺-preserves-comp (leq-ℕ º⁺) (fun⁺ count))) ⟩
@@ -197,8 +190,30 @@ R-monotonic =
     fun⁺ count º⁺ •⁺ leq-ℕ •⁺ fun⁺ count
   □
   where open PreorderReasoning (⊆⁺-Preorder CoinBag CoinBag) renaming (_∼⟨_⟩_ to _⊆⁺⟨_⟩_; _∎ to _□)
-
 -}
 
+nil : {X : Coin → Set} → Ḟ ⌊ CoinBagOD ⌋ X ↝⁺ Ḟ ⌊ CoinBagOD ⌋ X
+nil = wrap λ { c (false , _) → return (false , tt)
+             ; c (true  , _) → none }
+
+cons-leq : {X : Coin → Set} → Ḟ ⌊ CoinBagOD ⌋ X ↝⁺ Ḟ ⌊ CoinBagOD ⌋ X
+cons-leq = wrap λ { c (false , _    ) → none
+                  ; c (true  , d , _) → (_≤_ d) >>= λ e → any>>= λ r → return (true , e , r) }
+
+
 Q : Ḟ ⌊ CoinBagOD ⌋ (const ℕ) ↝⁺ Ḟ ⌊ CoinBagOD ⌋ (const ℕ)
-Q = {!!}
+Q = nil ∪⁺ cons-leq
+
+greedy-condition :
+  α •⁺ Ṙ ⌊ CoinBagOD ⌋ (foldR (fun⁺ total-value-alg) º⁺) •⁺ (Q ∩⁺ (fun⁺ total-value-alg º⁺ •⁺ fun⁺ total-value-alg)) º⁺
+    ⊆⁺ R º⁺ •⁺ α •⁺ Ṙ ⌊ CoinBagOD ⌋ (foldR (fun⁺ total-value-alg) º⁺)
+greedy-condition = {!!}
+
+{-
+
+open GreedyTheorem (⌊ CoinBagOD ⌋) R S R-transitive R-monotonic Q greedy-condition
+
+solve : (c : Coin) (n : ℕ) → GreedySolution c n
+solve c n = {!!}
+
+-}

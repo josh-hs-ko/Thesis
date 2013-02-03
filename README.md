@@ -158,8 +158,7 @@ A variant of the Greedy Theorem and its embedding into inductive families.
 Definition of hylomorphisms and the Hylomorphism Theorem.
 
 #### Thesis.Relation.Join
-Definition and properties of componentwise join.
-Kept for future work.
+Definition and properties of binary join and its componentwise version, and definition of summing join (kept for future work).
 
 #### Thesis.Relation.Meet
 Definition of meet and its componentwise version.

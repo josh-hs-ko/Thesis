@@ -1,5 +1,4 @@
--- Definition and properties of componentwise join.
--- Kept for future work.
+-- Definition and properties of binary join and its componentwise version, and definition of summing join (kept for future work).
 
 module Thesis.Relation.Join where
 
@@ -7,10 +6,35 @@ open import Thesis.Prelude.Preorder
 open import Thesis.Relation
 
 open import Function using (id; _∘_)
-open import Data.Product using (Σ; _,_; _×_)
+open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
+open import Data.Sum using (_⊎_; inj₁; inj₂)
 import Relation.Binary.PreorderReasoning as PreorderReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
+
+_∪_ : {X Y : Set} → X ↝ Y → X ↝ Y → X ↝ Y
+(R ∪ S) x y = R x y ⊎ S x y
+
+∪-universal-⇒ : {X Y : Set} {R S T : X ↝ Y} → R ∪ S ⊆ T → (R ⊆ T) × (S ⊆ T)
+∪-universal-⇒ R∪S⊆T = wrap (λ x y r → modus-ponens-⊆ R∪S⊆T x y (inj₁ r)) ,
+                      wrap (λ x y s → modus-ponens-⊆ R∪S⊆T x y (inj₂ s))
+
+∪-universal-⇐ : {X Y : Set} {R S T : X ↝ Y} → R ⊆ T → S ⊆ T → R ∪ S ⊆ T
+∪-universal-⇐ R⊆T S⊆T = wrap λ { x y (inj₁ r) → modus-ponens-⊆ R⊆T x y r
+                               ; x y (inj₂ s) → modus-ponens-⊆ S⊆T x y s }
+
+_∪⁺_ : {I : Set} {X Y : I → Set} → X ↝⁺ Y → X ↝⁺ Y → X ↝⁺ Y
+(R ∪⁺ S) = wrap λ i → (R !!) i ∪ (S !!) i
+
+∪⁺-universal-⇒ : {I : Set} {X Y : I → Set} {R S T : X ↝⁺ Y} → R ∪⁺ S ⊆⁺ T → (R ⊆⁺ T) × (S ⊆⁺ T)
+∪⁺-universal-⇒ (wrap R∪⁺S⊆⁺T) = wrap (λ i → proj₁ (∪-universal-⇒ (R∪⁺S⊆⁺T i))) , wrap (λ i → proj₂ (∪-universal-⇒ (R∪⁺S⊆⁺T i)))
+
+∪⁺-universal-⇐ : {I : Set} {X Y : I → Set} {R S T : X ↝⁺ Y} → R ⊆⁺ T → S ⊆⁺ T → R ∪⁺ S ⊆⁺ T
+∪⁺-universal-⇐ (wrap R⊆⁺T) (wrap S⊆⁺T) = wrap λ i → ∪-universal-⇐ (R⊆⁺T i) (S⊆⁺T i)
+
+
+--------
+-- summing join
 
 ⋃ : {I : Set} {X Y : I → Set} → X ↝⁺ Y → Σ I X ↝ Σ I Y
 ⋃ R (i , x) = map℘ (_,_ i) ((R !!) i x)
