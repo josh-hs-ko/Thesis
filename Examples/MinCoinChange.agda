@@ -68,8 +68,12 @@ total-value-alg (true  , c , n , _ , m) = n * value c + m
 total-value : ∀ {c} → CoinBag c → ℕ
 total-value = fold total-value-alg
 
-lengthCB : ∀ {c} → CoinBag c → ℕ
-lengthCB = toℕ ∘ forget (⌈ ListOD Coin ⌉ ⊙ (⌈ CoinSListOD ⌉ ⊙ ⌈ CoinBagOD ⌉))
+count-alg : Ḟ ⌊ CoinBagOD ⌋ (const ℕ) ⇉ (const ℕ)
+count-alg (false , _            ) = 0
+count-alg (true  , c , n , _ , m) = n + m
+
+count : ∀ {c} → CoinBag c → ℕ
+count = fold count-alg
 
 
 --------
@@ -78,40 +82,73 @@ lengthCB = toℕ ∘ forget (⌈ ListOD Coin ⌉ ⊙ (⌈ CoinSListOD ⌉ ⊙ �
 leq-ℕ : const {B = Coin} ℕ ↝⁺ const ℕ
 leq-ℕ = wrap (const (flip _≤ℕ_))
 
+leq-ℕ-reflexive : idR⁺ ⊆⁺ leq-ℕ
+leq-ℕ-reflexive = {!!}
+
 leq-ℕ-transitive : leq-ℕ •⁺ leq-ℕ ⊆⁺ leq-ℕ
 leq-ℕ-transitive = wrap (const (wrap λ { x y (z , z≤x , y≤z) → DecTotalOrder.trans ℕ-DecTotalOrder y≤z z≤x }))
 
 R : CoinBag ↝⁺ CoinBag
-R = fun⁺ lengthCB º⁺ •⁺ leq-ℕ •⁺ fun⁺ lengthCB
+R = fun⁺ count º⁺ •⁺ leq-ℕ •⁺ fun⁺ count
 
 R-transitive : R •⁺ R ⊆⁺ R
 R-transitive =
   begin
-    (fun⁺ lengthCB º⁺ •⁺ leq-ℕ •⁺ fun⁺ lengthCB) •⁺ (fun⁺ lengthCB º⁺ •⁺ leq-ℕ •⁺ fun⁺ lengthCB)
+    (fun⁺ count º⁺ •⁺ leq-ℕ •⁺ fun⁺ count) •⁺ (fun⁺ count º⁺ •⁺ leq-ℕ •⁺ fun⁺ count)
       ⊆⁺⟨ proj₁ (chain-normalise⁺
-                  (([ fun⁺ lengthCB º⁺ ]⁺ ▪⁺ [ leq-ℕ ]⁺ ▪⁺ [ fun⁺ lengthCB ]⁺) ▪⁺ ([ fun⁺ lengthCB º⁺ ]⁺ ▪⁺ [ leq-ℕ ]⁺ ▪⁺ [ fun⁺ lengthCB ]⁺))) ⟩
-    fun⁺ lengthCB º⁺ •⁺ leq-ℕ •⁺ fun⁺ lengthCB •⁺ fun⁺ lengthCB º⁺ •⁺ leq-ℕ •⁺ fun⁺ lengthCB
-      ⊆⁺⟨ ⊆⁺-chain (fun⁺ lengthCB º⁺ ▪⁺ leq-ℕ ◇⁺) (fun⁺ lengthCB ▪⁺ fun⁺ lengthCB º⁺ ◇⁺) (idR⁺ ◇⁺) (fun⁺-simple lengthCB) ⟩
-    fun⁺ lengthCB º⁺ •⁺ leq-ℕ •⁺ idR⁺ •⁺ leq-ℕ •⁺ fun⁺ lengthCB
-      ⊆⁺⟨ ⊆⁺-chain (fun⁺ lengthCB º⁺ ◇⁺) (leq-ℕ ▪⁺ idR⁺ ◇⁺) (leq-ℕ ◇⁺) (proj₁ (idR⁺-r leq-ℕ)) ⟩
-    fun⁺ lengthCB º⁺ •⁺ leq-ℕ •⁺ leq-ℕ •⁺ fun⁺ lengthCB
-      ⊆⁺⟨ ⊆⁺-chain (fun⁺ lengthCB º⁺ ◇⁺) (leq-ℕ ▪⁺ leq-ℕ ◇⁺) (leq-ℕ ◇⁺) leq-ℕ-transitive ⟩
-    fun⁺ lengthCB º⁺ •⁺ leq-ℕ •⁺ fun⁺ lengthCB
+                  (([ fun⁺ count º⁺ ]⁺ ▪⁺ [ leq-ℕ ]⁺ ▪⁺ [ fun⁺ count ]⁺) ▪⁺ ([ fun⁺ count º⁺ ]⁺ ▪⁺ [ leq-ℕ ]⁺ ▪⁺ [ fun⁺ count ]⁺))) ⟩
+    fun⁺ count º⁺ •⁺ leq-ℕ •⁺ fun⁺ count •⁺ fun⁺ count º⁺ •⁺ leq-ℕ •⁺ fun⁺ count
+      ⊆⁺⟨ ⊆⁺-chain (fun⁺ count º⁺ ▪⁺ leq-ℕ ◇⁺) (fun⁺ count ▪⁺ fun⁺ count º⁺ ◇⁺) (idR⁺ ◇⁺) (fun⁺-simple count) ⟩
+    fun⁺ count º⁺ •⁺ leq-ℕ •⁺ idR⁺ •⁺ leq-ℕ •⁺ fun⁺ count
+      ⊆⁺⟨ ⊆⁺-chain (fun⁺ count º⁺ ◇⁺) (leq-ℕ ▪⁺ idR⁺ ◇⁺) (leq-ℕ ◇⁺) (proj₁ (idR⁺-r leq-ℕ)) ⟩
+    fun⁺ count º⁺ •⁺ leq-ℕ •⁺ leq-ℕ •⁺ fun⁺ count
+      ⊆⁺⟨ ⊆⁺-chain (fun⁺ count º⁺ ◇⁺) (leq-ℕ ▪⁺ leq-ℕ ◇⁺) (leq-ℕ ◇⁺) leq-ℕ-transitive ⟩
+    fun⁺ count º⁺ •⁺ leq-ℕ •⁺ fun⁺ count
   □
   where open PreorderReasoning (⊆⁺-Preorder CoinBag CoinBag) renaming (_∼⟨_⟩_ to _⊆⁺⟨_⟩_; _∎ to _□)
 
 S : Ḟ ⌊ CoinBagOD ⌋ (const ℕ) ↝⁺ (const ℕ)
 S = fun⁺ total-value-alg
 
-{-
+count-alg-monotonic : fun⁺ count-alg •⁺ Ṙ ⌊ CoinBagOD ⌋ leq-ℕ ⊆⁺ leq-ℕ •⁺ fun⁺ count-alg
+count-alg-monotonic = {!!}
 
-monotonicity : α •⁺ Ṙ ⌊ CoinBagOD ⌋ R •⁺ α º⁺ ⊆⁺ R
-monotonicity = 
+R-monotonic-lemma :
+  (R' : const {B = Coin} ℕ ↝⁺ const ℕ) → (fun⁺ count-alg •⁺ Ṙ ⌊ CoinBagOD ⌋ R' ⊆⁺ R' •⁺ fun⁺ count-alg) →
+  fun⁺ count-alg •⁺ Ṙ ⌊ CoinBagOD ⌋ R' •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count) •⁺ α º⁺ ⊆⁺ R' •⁺ fun⁺ count
+R-monotonic-lemma R' monotonicity = {!!}
+
+R-monotonic : α •⁺ Ṙ ⌊ CoinBagOD ⌋ R •⁺ α º⁺ ⊆⁺ R
+R-monotonic = 
   begin
-    α •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ lengthCB º⁺ •⁺ leq-ℕ •⁺ fun⁺ lengthCB) •⁺ α º⁺
+    α •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count º⁺ •⁺ leq-ℕ •⁺ fun⁺ count) •⁺ α º⁺
       ⊆⁺⟨ {!!} ⟩
-    fun⁺ lengthCB º⁺ •⁺ leq-ℕ •⁺ fun⁺ lengthCB
+    α •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count º⁺) •⁺ Ṙ ⌊ CoinBagOD ⌋ leq-ℕ •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count) •⁺ α º⁺
+      ⊆⁺⟨ {!!} ⟩
+    α •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count º⁺) •⁺ Ṙ ⌊ CoinBagOD ⌋ (leq-ℕ •⁺ idR⁺) •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count) •⁺ α º⁺
+      ⊆⁺⟨ {!!} ⟩
+    α •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count º⁺) •⁺ Ṙ ⌊ CoinBagOD ⌋ (leq-ℕ •⁺ leq-ℕ) •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count) •⁺ α º⁺
+      ⊆⁺⟨ {!!} ⟩
+    α •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count º⁺) •⁺ Ṙ ⌊ CoinBagOD ⌋ leq-ℕ •⁺ Ṙ ⌊ CoinBagOD ⌋ leq-ℕ •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count) •⁺ α º⁺
+      ⊆⁺⟨ {!!} ⟩
+    α •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count º⁺) •⁺ Ṙ ⌊ CoinBagOD ⌋ leq-ℕ •⁺ idR⁺ •⁺ Ṙ ⌊ CoinBagOD ⌋ leq-ℕ •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count) •⁺ α º⁺
+      ⊆⁺⟨ {!!} ⟩
+    α •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count º⁺) •⁺ Ṙ ⌊ CoinBagOD ⌋ leq-ℕ •⁺ fun⁺ count-alg º⁺ •⁺
+    fun⁺ count-alg •⁺ Ṙ ⌊ CoinBagOD ⌋ leq-ℕ •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count) •⁺ α º⁺
+      ⊆⁺⟨ {!!} ⟩
+    α •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count) º⁺ •⁺ Ṙ ⌊ CoinBagOD ⌋ leq-ℕ •⁺ fun⁺ count-alg º⁺ •⁺
+    fun⁺ count-alg •⁺ Ṙ ⌊ CoinBagOD ⌋ leq-ℕ •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count) •⁺ α º⁺
+      ⊆⁺⟨ {!!} ⟩
+    α •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count) º⁺ •⁺ Ṙ ⌊ CoinBagOD ⌋ (leq-ℕ º⁺) º⁺ •⁺ fun⁺ count-alg º⁺ •⁺
+    fun⁺ count-alg •⁺ Ṙ ⌊ CoinBagOD ⌋ leq-ℕ •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count) •⁺ α º⁺
+      ⊆⁺⟨ {!!} ⟩
+    (fun⁺ count-alg •⁺ Ṙ ⌊ CoinBagOD ⌋ (leq-ℕ º⁺) •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count) •⁺ α º⁺) º⁺ •⁺
+     fun⁺ count-alg •⁺ Ṙ ⌊ CoinBagOD ⌋ leq-ℕ      •⁺ Ṙ ⌊ CoinBagOD ⌋ (fun⁺ count) •⁺ α º⁺
+      ⊆⁺⟨ •⁺-monotonic (º⁺-monotonic (R-monotonic-lemma (leq-ℕ º⁺) {!!})) (R-monotonic-lemma leq-ℕ count-alg-monotonic) ⟩
+    (leq-ℕ º⁺ •⁺ fun⁺ count) º⁺ •⁺ leq-ℕ •⁺ fun⁺ count
+      ⊆⁺⟨ ⊆⁺-chain-r ((leq-ℕ º⁺ •⁺ fun⁺ count) º⁺ ◇⁺) (fun⁺ count º⁺ ▪⁺ leq-ℕ ◇⁺) (proj₁ (º⁺-preserves-comp (leq-ℕ º⁺) (fun⁺ count))) ⟩
+    fun⁺ count º⁺ •⁺ leq-ℕ •⁺ leq-ℕ •⁺ fun⁺ count
+      ⊆⁺⟨ ⊆⁺-chain (fun⁺ count º⁺ ◇⁺) (leq-ℕ ▪⁺ leq-ℕ ◇⁺) (leq-ℕ ◇⁺) leq-ℕ-transitive ⟩
+    fun⁺ count º⁺ •⁺ leq-ℕ •⁺ fun⁺ count
   □
   where open PreorderReasoning (⊆⁺-Preorder CoinBag CoinBag) renaming (_∼⟨_⟩_ to _⊆⁺⟨_⟩_; _∎ to _□)
-
--}
