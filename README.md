@@ -142,7 +142,8 @@ relational inclusion wrapped up as preorder and setoid, combinators for reasonin
 componentwise relations between families of sets, and definition and properties of relators.
 
 #### Thesis.Relation.CompChain
-Combinators that help avoiding explicit applications of monotonicity and associativity of relational composition.
+Combinators that help avoiding explicit applications of monotonicity and associativity of relational composition
+and preservation of composition by relators and converse.
 
 #### Thesis.Relation.Division
 Definition of right-division of componentwise relations.

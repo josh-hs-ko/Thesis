@@ -70,10 +70,7 @@ private
                 (α •⁺ Ṙ D (foldR S º⁺) •⁺ Q º⁺) º⁺
                   ⊆⁺⟨ º⁺-monotonic greedy-condition ⟩′
                 (R º⁺ •⁺ α •⁺ Ṙ D (foldR S º⁺)) º⁺
-                  ⊆⁺⟨ proj₁ (º⁺-preserves-comp (R º⁺) (α •⁺ Ṙ D (foldR S º⁺))) ⟩′
-                (α •⁺ Ṙ D (foldR S º⁺)) º⁺ •⁺ R
-                  ⊆⁺⟨ ⊆⁺-chain-r (((α •⁺ Ṙ D (foldR S º⁺)) º⁺) ◇⁺) ((Ṙ D (foldR S º⁺) º⁺) ▪⁺ (α º⁺) ◇⁺)
-                       (proj₁ (º⁺-preserves-comp α (Ṙ D (foldR S º⁺)))) ⟩′
+                  ⊆⁺⟨ proj₁ (º⁺-chain (R º⁺ ▪⁺ α ▪⁺ Ṙ D (foldR S º⁺) ◇⁺)) ⟩′
                 Ṙ D (foldR S º⁺) º⁺ •⁺ α º⁺ •⁺ R
                   ⊆⁺⟨ ⊆⁺-chain-r ((Ṙ D (foldR S º⁺) º⁺) ◇⁺) (Ṙ D (foldR S) ◇⁺) (proj₂ (Ṙ-preserves-conv D (foldR S º⁺))) ⟩′
                 Ṙ D (foldR S) •⁺ α º⁺ •⁺ R

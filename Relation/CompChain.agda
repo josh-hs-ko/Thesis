@@ -1,4 +1,5 @@
--- Combinators that help avoiding explicit applications of monotonicity and associativity of relational composition.
+-- Combinators that help avoiding explicit applications of monotonicity and associativity of relational composition
+-- and preservation of composition by relators and converse.
 
 module Thesis.Relation.CompChain where
 
@@ -81,7 +82,7 @@ mapChain⁺-Ṙ D (R ▪⁺ Rs) = Ṙ D R ▪⁺ mapChain⁺-Ṙ D Rs
 Ṙ-chain D (R ▪⁺ Rs) = ≃⁺-trans (Ṙ-preserves-comp D R (collapse⁺ Rs)) (•⁺-cong-l (Ṙ D R) (Ṙ-chain D Rs))
 
 snocChain⁺ : {I : Set} {X Y Z : I → Set} → CompChain⁺ Y Z → X ↝⁺ Y → CompChain⁺ X Z
-snocChain⁺ (R    ◇⁺) S = R •⁺ S ◇⁺
+snocChain⁺ (R    ◇⁺) S = R ▪⁺ S ◇⁺
 snocChain⁺ (R ▪⁺ Rs) S = R ▪⁺ snocChain⁺ Rs S
 
 collapse⁺-snocChain⁺-lemma :

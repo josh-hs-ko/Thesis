@@ -30,16 +30,14 @@ hylo-fixed-point =
     foldR R •⁺ foldR S º⁺
       ≃⁺⟨ •⁺-cong-l (foldR R) (º⁺-cong (foldR-computation' D S)) ⟩
     foldR R •⁺ (S •⁺ Ṙ D (foldR S) •⁺ α º⁺) º⁺
-      ≃⁺⟨ •⁺-cong-l (foldR R) (º⁺-preserves-comp S (Ṙ D (foldR S) •⁺ α º⁺)) ⟩
-    foldR R •⁺ (Ṙ D (foldR S) •⁺ α º⁺) º⁺ •⁺ S º⁺
-      ≃⁺⟨ ≃⁺-chain (foldR R ◇⁺) ((Ṙ D (foldR S) •⁺ α º⁺) º⁺ ◇⁺) (α ▪⁺ Ṙ D (foldR S) º⁺ ◇⁺) (º⁺-preserves-comp (Ṙ D (foldR S)) (α º⁺)) ⟩
+      ≃⁺⟨ •⁺-cong-l (foldR R) (º⁺-chain (S ▪⁺ Ṙ D (foldR S) ▪⁺ α º⁺ ◇⁺)) ⟩
     foldR R •⁺ α •⁺ Ṙ D (foldR S) º⁺ •⁺ S º⁺
       ≃⁺⟨ Setoid.sym setoid (≃⁺-chain (foldR R ▪⁺ α ◇⁺) (Ṙ D (foldR S º⁺) ◇⁺) (Ṙ D (foldR S) º⁺ ◇⁺) (Ṙ-preserves-conv D (foldR S))) ⟩
     foldR R •⁺ α •⁺ Ṙ D (foldR S º⁺) •⁺ S º⁺
       ≃⁺⟨ ≃⁺-chain-r (foldR R ▪⁺ α ◇⁺) (R ▪⁺ Ṙ D (foldR R) ◇⁺) (foldR-computation D R) ⟩
     R •⁺ Ṙ D (foldR R) •⁺ Ṙ D (foldR S º⁺) •⁺ S º⁺
-      ≃⁺⟨ Setoid.sym setoid
-           (≃⁺-chain (R ◇⁺) (Ṙ D (foldR R •⁺ foldR S º⁺) ◇⁺) (Ṙ D (foldR R) ▪⁺ Ṙ D (foldR S º⁺) ◇⁺) (Ṙ-preserves-comp D (foldR R) (foldR S º⁺))) ⟩
+      ≃⁺⟨ Setoid.sym setoid (≃⁺-chain (R ◇⁺) (Ṙ D (foldR R •⁺ foldR S º⁺) ◇⁺) (Ṙ D (foldR R) ▪⁺ Ṙ D (foldR S º⁺) ◇⁺)
+           (Ṙ-preserves-comp D (foldR R) (foldR S º⁺))) ⟩
     R •⁺ Ṙ D (foldR R •⁺ foldR S º⁺) •⁺ S º⁺
   □
   where setoid = ≃⁺-Setoid X Y
