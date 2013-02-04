@@ -182,7 +182,7 @@ Sorted lists indexed by a lower bound as an ornamentation of lists.
 Vectors, i.e., length-indexed lists, defined as the optimised predicate for the ornament from natural numbers to lists.
 
 #### Thesis.Examples.MinCoinChange
-Solving the minimum coin change problem with the greedy theorem and algebraic ornamentation.
+Solving the minimum coin change problem with the Greedy Theorem and algebraic ornamentation.
 
 #### Thesis.Examples.Nat
 Peano-style natural numbers.

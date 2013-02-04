@@ -149,6 +149,9 @@ _≃_ {X} {Y} = Setoid._≈_ (≃-Setoid X Y)
 fun-preserves-comp : {X Y Z : Set} (f : Y → Z) (g : X → Y) → fun (f ∘ g) ≃ fun f • fun g
 fun-preserves-comp f g = wrap (λ { x ._ refl → g x , refl , refl }) , wrap (λ { x ._ (._ , refl , refl) → refl })
 
+º-preserves-idR : {X : Set} → idR º ≃ idR {X}
+º-preserves-idR = wrap (λ { x ._ refl → refl }) , wrap (λ { x ._ refl → refl })
+
 º-preserves-comp : {X Y Z : Set} (R : Y ↝ Z) (S : X ↝ Y) → (R • S) º ≃ S º • R º
 º-preserves-comp R S = wrap (λ { z x (y , s , r) → y , r , s }) , wrap (λ { z x (y , r , s) → y , s , r })
 
@@ -364,6 +367,9 @@ _≃⁺_ {I} {X} {Y} = Setoid._≈_ (≃⁺-Setoid X Y)
 fun⁺-preserves-comp : {I : Set} {X Y Z : I → Set} (f : Y ⇉ Z) (g : X ⇉ Y) → fun⁺ (λ {i} → f {i} ∘ g {i}) ≃⁺ fun⁺ f •⁺ fun⁺ g
 fun⁺-preserves-comp f g = wrap (λ i → proj₁ (fun-preserves-comp (f {i}) (g {i}))) , wrap (λ i → proj₂ (fun-preserves-comp (f {i}) (g {i})))
 
+º⁺-preserves-idR⁺ : {I : Set} {X : I → Set} → idR⁺ º⁺ ≃⁺ idR⁺ {I} {X}
+º⁺-preserves-idR⁺ = wrap (λ i → proj₁ º-preserves-idR) , wrap (λ i → proj₂ º-preserves-idR)
+
 º⁺-preserves-comp : {I : Set} {X Y Z : I → Set} (R : Y ↝⁺ Z) (S : X ↝⁺ Y) → (R •⁺ S) º⁺ ≃⁺ S º⁺ •⁺ R º⁺
 º⁺-preserves-comp R S = wrap (λ i → proj₁ (º-preserves-comp ((R !!) i) ((S !!) i))) , wrap (λ i → proj₂ (º-preserves-comp ((R !!) i) ((S !!) i)))
 
@@ -501,6 +507,18 @@ mapR-fun-unique (D * E) f (xs , xs') (ys , ys') (.ys , r , .ys' , r' , refl) = c
 fun-preserves-map : {I : Set} (D : Desc I) {X Y : I → Set} (f : X ⇉ Y) → fun⁺ (Ḟ-map D (λ {i} → f {i})) ≃⁺ Ṙ D (fun⁺ f)
 fun-preserves-map D f = wrap (λ i → wrap λ { xs ._ refl → mapR-fun-computation (D at i) f xs }) ,
                         wrap (λ i → wrap λ xs → mapR-fun-unique (D at i) f xs)
+
+Ṙ-preserves-idR⁺ : {I : Set} (D : Desc I) {X : I → Set} → Ṙ D (idR⁺ {I} {X}) ≃⁺ idR⁺
+Ṙ-preserves-idR⁺ D {X} =
+  begin
+    Ṙ D idR⁺
+      ≃⁺⟨ Setoid.sym setoid (fun-preserves-map D id) ⟩
+    fun⁺ (Ḟ-map D id)
+      ≃⁺⟨ fun⁺-cong (Ḟ-map-preserves-id D) ⟩
+    idR⁺
+  □
+  where setoid = ≃⁺-Setoid (Ḟ D X) (Ḟ D X)
+        open EqReasoning setoid renaming (_≈⟨_⟩_ to _≃⁺⟨_⟩_; _∎ to _□)
 
 fun⁺-monotonic-alg-lemma :
  {I : Set} (D : Desc I) {X : I → Set} (f : Ḟ D X ⇉ X) (R : X ↝⁺ X) → fun⁺ f •⁺ Ṙ D R ⊆⁺ R •⁺ fun⁺ f → fun⁺ f •⁺ Ṙ D (R º⁺) ⊆⁺ R º⁺ •⁺ fun⁺ f

@@ -7,7 +7,7 @@ open import Thesis.Prelude.Category.Isomorphism
 open import Thesis.Prelude.Function
 open import Thesis.Prelude.Function.Fam
 
-open import Function using (const)
+open import Function using (id; const)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; _×_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; cong₂)
@@ -106,8 +106,17 @@ mapF (ṿ i)   f x          = f x
 mapF (σ S D) f (s , xs)   = s , mapF (D s) f xs
 mapF (D * E) f (xs , xs') = mapF D f xs , mapF E f xs'
 
+mapF-preserves-id : ∀ {I} (D : RDesc I) {X : I → Set} → mapF D (λ {i} → id {A = X i}) ≐ id
+mapF-preserves-id ∎ xs               = refl
+mapF-preserves-id (ṿ i) x            = refl
+mapF-preserves-id (σ S D) (s , xs)   = cong (_,_ s) (mapF-preserves-id (D s) xs)
+mapF-preserves-id (D * E) (xs , xs') = cong₂ _,_ (mapF-preserves-id D xs) (mapF-preserves-id E xs')
+
 remove-recursive-objects : ∀ {I} (D : RDesc I) {X} → ⟦ D ⟧ X → ⟦ D ⟧ (const ⊤)
 remove-recursive-objects D = mapF D !
 
 Ḟ-map : ∀ {I} (D : Desc I) {X Y} → (X ⇉ Y) → Ḟ D X ⇉ Ḟ D Y
 Ḟ-map D f {i} = mapF (D at i) f
+
+Ḟ-map-preserves-id : ∀ {I} (D : Desc I) {X : I → Set} → ∀ i → Ḟ-map D (λ {i} → id {A = X i}) {i} ≐ id
+Ḟ-map-preserves-id D i = mapF-preserves-id (D at i)

@@ -28,12 +28,13 @@ open import Function using (id; const; _∘_; flip; _on_)
 open import Data.Empty using (⊥)
 open import Data.Unit using (⊤; tt)
 open import Data.Bool using (Bool; false; true)
-open import Data.Nat using (ℕ; zero; suc; _+_; s≤s) renaming (_≤_ to _≤ℕ_; decTotalOrder to ℕ-DecTotalOrder)
-open import Data.Nat.Properties using (_+-mono_)
+open import Data.Nat using (ℕ; zero; suc; _+_; z≤n; s≤s) renaming (_≤_ to _≤ℕ_; decTotalOrder to ℕ-DecTotalOrder)
+open import Data.Nat.Properties using (_+-mono_; module SemiringSolver); open Data.Nat.Properties.SemiringSolver renaming (con to :con)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
+open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Relation.Binary using (module DecTotalOrder)
 import Relation.Binary.PreorderReasoning as PreorderReasoning
-open import Relation.Binary.PropositionalEquality using (_≡_; refl)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst)
 
 
 --------
@@ -73,6 +74,13 @@ CoinBagO = ⌈ CoinBagOD ⌉
 
 CoinBag : Coin → Set
 CoinBag = μ CoinBagD
+
+nil : ∀ {c} → CoinBag c
+nil = con (false , tt)
+
+cons : (d : Coin) → ∀ {c} → d ≤ c → CoinBag d → CoinBag c
+cons d d≤c b = con (true , d , d≤c , b)
+
 
 total-value-alg : Ḟ CoinBagD (const ℕ) ⇉ (const ℕ)
 total-value-alg (false , _        ) = 0
@@ -130,7 +138,7 @@ count-alg-monotonic =
   wrap λ c → wrap λ { (false , _              ) ._ (._ , (_ , _ , refl) , refl) →
                         0 , refl , DecTotalOrder.refl ℕ-DecTotalOrder
                     ; (true  , d , d≤c , n) ._ (._ , (._ , (._ , (m , m≤n , refl) , refl) , refl) , refl) →
-                        1 + n , refl , DecTotalOrder.refl ℕ-DecTotalOrder {1} +-mono m≤n }
+                        1 + n , refl , ≤ℕ-refl {1} +-mono m≤n }
 
 postulate
   R-monotonic-lemma :
@@ -209,8 +217,8 @@ R-monotonic =
   where open PreorderReasoning (⊆⁺-Preorder CoinBag CoinBag) renaming (_∼⟨_⟩_ to _⊆⁺⟨_⟩_; _∎ to _□)
 -}
 
-nil : {X : Coin → Set} → Ḟ CoinBagD X ↝⁺ Ḟ CoinBagD X
-nil = wrap λ { c (false , _) → return (false , tt)
+isNil : {X : Coin → Set} → Ḟ CoinBagD X ↝⁺ Ḟ CoinBagD X
+isNil = wrap λ { c (false , _) → return (false , tt)
              ; c (true  , _) → none }
 
 cons-leq : {X : Coin → Set} → Ḟ CoinBagD X ↝⁺ Ḟ CoinBagD X
@@ -219,7 +227,7 @@ cons-leq = wrap λ { c (false , _    ) → none
 
 
 Q : Ḟ CoinBagD (const ℕ) ↝⁺ Ḟ CoinBagD (const ℕ)
-Q = nil ∪⁺ cons-leq
+Q = isNil ∪⁺ cons-leq
 
 CoinBag'OD : OrnDesc (Coin × ℕ) proj₁ CoinBagD
 CoinBag'OD = algOrn CoinBagD (fun⁺ total-value-alg)
@@ -280,8 +288,37 @@ viewCoinBag' {5p} {.(1 + m)} (con ((true , 1p , l , m) , refl , b)) = 5p1p l b
 viewCoinBag' {5p} {.(2 + m)} (con ((true , 2p , l , m) , refl , b)) = 5p2p l b
 viewCoinBag' {5p} {.(5 + m)} (con ((true , 5p , l , m) , refl , b)) = 5p5p l b
 
+leq-count-fusion-condition : leq-ℕ º⁺ •⁺ fun⁺ count-alg ≃⁺ (leq-ℕ º⁺ •⁺ fun⁺ count-alg) •⁺ Ṙ CoinBagD (leq-ℕ º⁺)
+leq-count-fusion-condition =
+  (begin
+     leq-ℕ º⁺ •⁺ fun⁺ count-alg
+       ⊆⁺⟨ proj₂ (idR⁺-r (leq-ℕ º⁺ •⁺ fun⁺ count-alg)) ⟩
+     (leq-ℕ º⁺ •⁺ fun⁺ count-alg) •⁺ idR⁺
+       ⊆⁺⟨ •⁺-monotonic-l (leq-ℕ º⁺ •⁺ fun⁺ count-alg) (proj₂ (Ṙ-preserves-idR⁺ CoinBagD)) ⟩
+     (leq-ℕ º⁺ •⁺ fun⁺ count-alg) •⁺ Ṙ CoinBagD idR⁺
+       ⊆⁺⟨ •⁺-monotonic-l (leq-ℕ º⁺ •⁺ fun⁺ count-alg) (Ṙ-monotonic CoinBagD (proj₂ º⁺-preserves-idR⁺)) ⟩
+     (leq-ℕ º⁺ •⁺ fun⁺ count-alg) •⁺ Ṙ CoinBagD (idR⁺ º⁺)
+       ⊆⁺⟨ •⁺-monotonic-l (leq-ℕ º⁺ •⁺ fun⁺ count-alg) (Ṙ-monotonic CoinBagD (º⁺-monotonic leq-ℕ-reflexive)) ⟩
+     (leq-ℕ º⁺ •⁺ fun⁺ count-alg) •⁺ Ṙ CoinBagD (leq-ℕ º⁺)
+   □) ,
+  (begin
+     (leq-ℕ º⁺ •⁺ fun⁺ count-alg) •⁺ Ṙ CoinBagD (leq-ℕ º⁺)
+       ⊆⁺⟨ proj₁ (•⁺-assoc (leq-ℕ º⁺) (fun⁺ count-alg) (Ṙ CoinBagD (leq-ℕ º⁺))) ⟩
+     leq-ℕ º⁺ •⁺ fun⁺ count-alg •⁺ Ṙ CoinBagD (leq-ℕ º⁺)
+       ⊆⁺⟨ •⁺-monotonic-l (leq-ℕ º⁺) (fun⁺-monotonic-alg-lemma CoinBagD count-alg leq-ℕ count-alg-monotonic) ⟩
+     leq-ℕ º⁺ •⁺ leq-ℕ º⁺ •⁺ fun⁺ count-alg
+       ⊆⁺⟨ ⊆⁺-chain-r (leq-ℕ º⁺ ▪⁺ leq-ℕ º⁺ ◇⁺) ((leq-ℕ •⁺ leq-ℕ) º⁺ ◇⁺) (proj₂ (º⁺-preserves-comp leq-ℕ leq-ℕ)) ⟩
+     (leq-ℕ •⁺ leq-ℕ) º⁺ •⁺ fun⁺ count-alg
+       ⊆⁺⟨ •⁺-monotonic-r (fun⁺ count-alg) (º⁺-monotonic leq-ℕ-transitive) ⟩
+     leq-ℕ º⁺ •⁺ fun⁺ count-alg
+   □)
+  where open PreorderReasoning (⊆⁺-Preorder (Ḟ CoinBagD (const ℕ)) (const ℕ)) renaming (_∼⟨_⟩_ to _⊆⁺⟨_⟩_; _∎ to _□)
+
+leq-count-fusion : leq-ℕ º⁺ •⁺ foldR {D = CoinBagD} (fun⁺ count-alg) ≃⁺ foldR (leq-ℕ º⁺ •⁺ fun⁺ count-alg)
+leq-count-fusion = foldR-fusion CoinBagD (leq-ℕ º⁺) (fun⁺ count-alg) (leq-ℕ º⁺ •⁺ fun⁺ count-alg) leq-count-fusion-condition
+
 CoinBag''OD : OrnDesc (proj₁ ⋈ proj₁) pull CoinBagD
-CoinBag''OD = CoinBag'O ⊗ ⌈ algOrn CoinBagD (fun⁺ count-alg) ⌉
+CoinBag''OD = CoinBag'O ⊗ ⌈ algOrn CoinBagD (leq-ℕ º⁺ •⁺ fun⁺ count-alg) ⌉
 
 CoinBag''D : Desc (proj₁ ⋈ proj₁)
 CoinBag''D = ⌊ CoinBag''OD ⌋
@@ -292,29 +329,51 @@ CoinBag''O = ⌈ CoinBag''OD ⌉
 CoinBag'' : Coin → ℕ → ℕ → Set
 CoinBag'' c n l = μ CoinBag''D (ok (c , n) , ok (c , l))
 
-inject : {c : Coin} {n : ℕ} → (b : CoinBag' c n) → CoinBag'' c n (count (forget CoinBag'O b))
-inject {c} {n} b =
+nil'' : {c : Coin} {l : ℕ} → CoinBag'' c 0 l
+nil'' = con ((false , tt) , refl , (false , tt) , (0 , refl , z≤n) , refl , tt)
+
+cons'' : (d : Coin) → ∀ {c} → d ≤ c → ∀ {n l l'} → 1 + l ≤ℕ l' → CoinBag'' d n l → CoinBag'' c (value d + n) l'
+cons'' d {c} d≤c {n} {l} {l'} 1+l≤l' b =
+  con ((true , d , d≤c , n) , refl , (true , d , d≤c , l) , (1 + l , refl , 1+l≤l') , refl , refl , refl , b)
+
+inject : {c : Coin} {n : ℕ} → (b : CoinBag' c n) → ∀ {m} → count (forget CoinBag'O b) ≤ℕ m → CoinBag'' c n m
+inject {c} {n} b {m} l≤m =
   Iso.from Fun
     (Refinement.i (FRefinement.comp
-                     (toFRefinement (⊗-FSwap CoinBag'O ⌈ algOrn CoinBagD (fun⁺ count-alg) ⌉ idFSwap (algOrn-FSwap CoinBagD (fun⁺ count-alg))))
-                     (ok (ok (c , n) , ok (c , count (forget CoinBag'O b))))))
+                     (toFRefinement (⊗-FSwap CoinBag'O ⌈ algOrn CoinBagD (leq-ℕ º⁺ •⁺ fun⁺ count-alg) ⌉
+                                       idFSwap (algOrn-FSwap CoinBagD (leq-ℕ º⁺ •⁺ fun⁺ count-alg))))
+                     (ok (ok (c , n) , ok (c , m)))))
     (forget CoinBag'O b ,
      proj₂ (Iso.to Fun (Refinement.i (FRefinement.comp (RSem' CoinBag'O) (ok (c , n)))) b) ,
-     modus-ponens-⊆⁺ (proj₁ (fun⁺-preserves-fold CoinBagD count-alg)) c (forget CoinBag'O b) (count (forget CoinBag'O b)) refl)
+     modus-ponens-⊆⁺ (proj₁ leq-count-fusion) c (forget CoinBag'O b) m
+       (count (forget CoinBag'O b) ,
+        modus-ponens-⊆⁺ (proj₁ (fun⁺-preserves-fold CoinBagD count-alg)) c (forget CoinBag'O b) (count (forget CoinBag'O b)) refl ,
+        l≤m))
 
 relax : {c : Coin} {n : ℕ} {l : ℕ} → (b : CoinBag'' c n l) → ∀ {d} → c ≤ d → CoinBag'' d n l
-relax (con ((false , _) , refl , (false , _) , refl , _)) c≤d = con ((false , tt) , refl , (false , tt) , refl , refl , tt)
+relax (con ((false , _) , refl , (false , _) , (._ , refl , lep) , _)) c≤d = nil''
 relax (con ((false , _) , _ , (true , _) , _ , () , _)) c≤d
 relax (con ((true  , _) , _ , (false , _) , _ , () , _)) c≤d
-relax (con ((true  , e , e≤c , n) , refl , (true , .e , .e≤c , l) , refl , refl , refl , refl , b)) c≤d =
-  con ((true , e , ≤ℕ-trans e≤c c≤d , n) , refl , (true , e , ≤ℕ-trans e≤c c≤d , l) , refl , refl , refl , refl , b)
+relax (con ((true , e , e≤c , n) , refl ,
+            (true , .e , .e≤c , l) , (._ , refl , lep) , refl , refl , refl , b)) c≤d = cons'' e (≤ℕ-trans e≤c c≤d) lep b
+
+insert1 : {c : Coin} {n : ℕ} {l l' : ℕ} → 1 + l ≤ℕ l' → CoinBag'' c n l → CoinBag'' c (1 + n) l'
+insert1 {1p} {l = l} {l'} 1+l≤l' (con ((false , _) , refl , (false , _) , (._ , refl , lep) , _)) = cons'' 1p (s≤s z≤n) 1+l≤l' nil''
+insert1 {2p} {l = l} {l'} 1+l≤l' (con ((false , _) , refl , (false , _) , (._ , refl , lep) , _)) = cons'' 1p (s≤s z≤n) 1+l≤l' nil''
+insert1 {5p} {l = l} {l'} 1+l≤l' (con ((false , _) , refl , (false , _) , (._ , refl , lep) , _)) = cons'' 1p (s≤s z≤n) 1+l≤l' nil''
+insert1                   1+l≤l' (con ((false , _) , _    , (true  , _) , _ , () , _))
+insert1                   1+l≤l' (con ((true  , _) , _    , (false , _) , _ , () , _))
+insert1 {c}  {l = l} {l'} 1+l≤l' (con ((true  , e , e≤c , n) , refl , (true , .e , .e≤c , _) , (._ , refl , lep) , refl , refl , refl , b)) =
+  subst (λ m → CoinBag'' c m l')
+        (solve 2 (λ n' ve → ve :+ (:con 1 :+ n') := :con 1 :+ (ve :+ n')) refl n (value e))
+        (cons'' e {c} e≤c 1+l≤l' (insert1 lep b))
 
 greedy-lemma : (c d : Coin) → d ≤ c → (m n : ℕ) → value d + m ≡ value c + n → (b : CoinBag' d m) → CoinBag'' c n (count (forget CoinBag'O b))
 greedy-lemma  c   d  d≤c  m       n _    b with coinCompareView d c d≤c
-greedy-lemma .1p .1p _   .n       n refl b | 1p≤1p = inject b
+greedy-lemma .1p .1p _   .n       n refl b | 1p≤1p = inject b ≤ℕ-refl
 greedy-lemma .2p .1p _   .(1 + n) n refl b | 1p≤2p with viewCoinBag' b
 greedy-lemma .2p .1p d≤c .(1 + n) n refl .(cons' 1p l refl b) | 1p≤2p
-  | 1p1p l b = {!!}
+  | 1p1p l b = relax (inject b (z≤n {1} +-mono ≤ℕ-refl {count (forget CoinBag'O b)})) (s≤s z≤n)
 greedy-lemma .5p .1p _   .(4 + n) n refl b | 1p≤5p with viewCoinBag' b
 greedy-lemma .5p .1p d≤c .(4 + n) n refl .(cons' 1p l₀ refl b) | 1p≤5p
   | 1p1p l₀ b with viewCoinBag' b
@@ -331,8 +390,8 @@ greedy-lemma .5p .1p d≤c .(4 + n) n refl .(cons' 1p l₀ refl (cons' 1p l₁ r
   | 1p1p l₀ .(cons' 1p l₁ refl (cons' 1p l₂ refl (cons' 1p l₃ refl b)))
   | 1p1p l₁ .(cons' 1p l₂ refl (cons' 1p l₃ refl b))
   | 1p1p l₂ .(cons' 1p l₃ refl b)
-  | 1p1p l₃ b = {!b!}
-greedy-lemma .2p .2p _   .n       n refl b | 2p≤2p = inject b
+  | 1p1p l₃ b = relax (inject b (z≤n {4} +-mono ≤ℕ-refl {count (forget CoinBag'O b)})) (s≤s z≤n)
+greedy-lemma .2p .2p _   .n       n refl b | 2p≤2p = inject b ≤ℕ-refl
 greedy-lemma .5p .2p _   .(3 + n) n refl b
   | 2p≤5p with viewCoinBag' b
 greedy-lemma .5p .2p d≤c .(3 + n) n refl .(cons' 1p l₀ refl b)
@@ -346,7 +405,7 @@ greedy-lemma .5p .2p d≤c .(3 + n) n refl .(cons' 1p l₀ refl (cons' 1p l₁ r
   | 2p≤5p
   | 2p1p l₀ .(cons' 1p l₁ refl (cons' 1p l₂ refl b))
   | 1p1p l₁ .(cons' 1p l₂ refl b)
-  | 1p1p l₂ b = {!!}
+  | 1p1p l₂ b = relax (inject b (z≤n {3} +-mono ≤ℕ-refl {count (forget CoinBag'O b)})) (s≤s z≤n)
 greedy-lemma .5p .2p d≤c .(3 + n) n refl .(cons' 2p l₀ refl b)
   | 2p≤5p
   | 2p2p l₀ b
@@ -354,17 +413,28 @@ greedy-lemma .5p .2p d≤c .(3 + n) n refl .(cons' 2p l₀ refl b)
 greedy-lemma .5p .2p d≤c .(3 + n) n refl .(cons' 2p l₀ refl (cons' 1p l₁ refl b))
   | 2p≤5p
   | 2p2p l₀ .(cons' 1p l₁ refl b)
-  | 2p1p l₁ b = {!b!}
+  | 2p1p l₁ b = relax (inject b (z≤n {2} +-mono ≤ℕ-refl {count (forget CoinBag'O b)})) (s≤s z≤n)
 greedy-lemma .5p .2p d≤c .(4 + m) .(1 + m) refl .(cons' 2p l₀ refl con (cons' 2p l₁ refl b))
   | 2p≤5p
   | 2p2p l₀ .(cons' 2p l₁ refl b)
-  | 2p2p {m} l₁ b = {!insert 1 b!}
-greedy-lemma .5p .5p _   .n       n refl b | 5p≤5p = inject b
+  | 2p2p {m} l₁ b = insert1 (z≤n {1} +-mono ≤ℕ-refl {1 + count (forget CoinBag'O b)}) (relax (inject b ≤ℕ-refl) (s≤s (s≤s z≤n)))
+greedy-lemma .5p .5p _   .n       n refl b | 5p≤5p = inject b ≤ℕ-refl
 
 greedy-condition :
   α •⁺ Ṙ CoinBagD (foldR (fun⁺ total-value-alg) º⁺) •⁺ (Q ∩⁺ (fun⁺ total-value-alg º⁺ •⁺ fun⁺ total-value-alg)) º⁺
     ⊆⁺ R º⁺ •⁺ α •⁺ Ṙ CoinBagD (foldR (fun⁺ total-value-alg) º⁺)
-greedy-condition = {!!}
+greedy-condition = wrap λ c →
+  wrap λ { (false , _) ._ (._ , ((false , _) , (inj₁ refl , .0 , refl , refl) , _ , _ , refl) , refl) →
+             nil , ((false , tt) , (tt , tt , refl) , refl) , (zero , (zero , refl , z≤n) , refl)
+         ; (false , _) ._ (_ , ((true  , _) , (inj₁ () , _) , _) , refl)
+         ; (false , _) ._ (_ , ((false , _) , (inj₂ () , _) , _) , refl)
+         ; (false , _) ._ (_ , ((true  , _) , (inj₂ (_ , _ , _ , ()) , _) , _) , refl)
+         ; (true  , x) ._ (_ , ((false , _) , (inj₁ () , _) , _) , refl)
+         ; (true  , x) ._ (_ , ((true  , _) , (inj₁ () , _) , _) , refl)
+         ; (true  , x) ._ (_ , ((false , _) , (inj₂ () , _) , _) , refl)
+         ; (true  , d , d≤c , n) ._
+           (._ , ((true  , d' , d'≤c , n') , (inj₂ (._ , d'≤d , ._ , refl) , ._ , d'+n'≡d+n , refl) ,
+                  (._ , (._ , (b , total-value-d'-b-n' , refl) , refl) , refl)) , refl) → {!(greedy-lemma d d' d'≤d n' n d'+n'≡d+n (Iso.from Fun (Refinement.i (FRefinement.comp (RSem' CoinBag'O) (ok (d' , n')))) (b , ?)))!} , {!!} } -- FRefinement.comp (RSem' CoinBag''O) (
 
 {-
 
