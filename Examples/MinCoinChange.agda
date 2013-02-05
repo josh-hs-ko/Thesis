@@ -28,16 +28,30 @@ open import Thesis.Examples.List
 open import Thesis.Examples.List.Sorted
 
 open import Function using (id; const; _∘_; flip; _on_)
-open import Data.Empty using (⊥)
+open import Data.Empty using (⊥; ⊥-elim)
 open import Data.Unit using (⊤; tt)
 open import Data.Bool using (Bool; false; true)
-open import Data.Nat using (ℕ; zero; suc; _+_; z≤n; s≤s) renaming (_≤_ to _≤ℕ_; decTotalOrder to ℕ-DecTotalOrder)
-open import Data.Nat.Properties using (_+-mono_; module SemiringSolver); open Data.Nat.Properties.SemiringSolver renaming (con to :con)
+open import Data.Nat using (ℕ; zero; suc; _+_; z≤n; s≤s)
+                     renaming (_≤_ to _≤ℕ_; _<_ to _<ℕ_; _<′_ to _<ℕ′_; _≤?_ to _≤ℕ?_; decTotalOrder to ℕ-DecTotalOrder)
+open import Data.Nat.Properties using (m≤m+n; ¬i+1+j≤i; 1+n≰n; ≤⇒≤′; ≰⇒>; _+-mono_; module SemiringSolver)
+open Data.Nat.Properties.SemiringSolver renaming (con to :con)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
+open import Relation.Nullary using (Dec; yes; no)
 open import Relation.Binary using (module DecTotalOrder)
 import Relation.Binary.PreorderReasoning as PreorderReasoning
-open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl; sym)
+open import Induction.Nat using (<-rec)
+
+
+≤ℕ-refl : {x : ℕ} → x ≤ℕ x
+≤ℕ-refl = DecTotalOrder.refl ℕ-DecTotalOrder
+
+≤ℕ-trans : ∀ {x y z} → x ≤ℕ y → y ≤ℕ z → x ≤ℕ z
+≤ℕ-trans = DecTotalOrder.trans ℕ-DecTotalOrder
+
+≤ℕ-reflexive : ∀ {x y} → x ≡ y → x ≤ℕ y
+≤ℕ-reflexive = DecTotalOrder.reflexive ℕ-DecTotalOrder
 
 
 --------
@@ -56,34 +70,43 @@ value 5p = 5
 _≤_ : Coin → Coin → Set
 _≤_ = _≤ℕ_ on value
 
-data CoinCompareView : Coin → Coin → Set where
-  1p≤1p : CoinCompareView 1p 1p
-  1p≤2p : CoinCompareView 1p 2p
-  1p≤5p : CoinCompareView 1p 5p
-  2p≤2p : CoinCompareView 2p 2p
-  2p≤5p : CoinCompareView 2p 5p
-  5p≤5p : CoinCompareView 5p 5p
+1p-minimum : (c : Coin) → 1p ≤ c
+1p-minimum 1p = ≤ℕ-refl
+1p-minimum 2p = s≤s z≤n
+1p-minimum 5p = s≤s z≤n
 
-compareCoin : (c d : Coin) → c ≤ d → CoinCompareView c d
-compareCoin 1p 1p c≤d = 1p≤1p
-compareCoin 1p 2p c≤d = 1p≤2p
-compareCoin 1p 5p c≤d = 1p≤5p
-compareCoin 2p 1p (s≤s ())
-compareCoin 2p 2p c≤d = 2p≤2p
-compareCoin 2p 5p c≤d = 2p≤5p
-compareCoin 5p 1p (s≤s ())
-compareCoin 5p 2p (s≤s (s≤s ()))
-compareCoin 5p 5p c≤d = 5p≤5p
+5p-maximum : (c : Coin) → c ≤ 5p
+5p-maximum 1p = s≤s z≤n
+5p-maximum 2p = s≤s (s≤s z≤n)
+5p-maximum 5p = ≤ℕ-refl
+
+coin-above-zero : (c : Coin) → 0 <ℕ value c
+coin-above-zero 1p = s≤s z≤n
+coin-above-zero 2p = s≤s z≤n
+coin-above-zero 5p = s≤s z≤n
+
+data CoinOrderedView : Coin → Coin → Set where
+  1p≤1p : CoinOrderedView 1p 1p
+  1p≤2p : CoinOrderedView 1p 2p
+  1p≤5p : CoinOrderedView 1p 5p
+  2p≤2p : CoinOrderedView 2p 2p
+  2p≤5p : CoinOrderedView 2p 5p
+  5p≤5p : CoinOrderedView 5p 5p
+
+view-ordered-coin : (c d : Coin) → c ≤ d → CoinOrderedView c d
+view-ordered-coin 1p 1p c≤d = 1p≤1p
+view-ordered-coin 1p 2p c≤d = 1p≤2p
+view-ordered-coin 1p 5p c≤d = 1p≤5p
+view-ordered-coin 2p 1p (s≤s ())
+view-ordered-coin 2p 2p c≤d = 2p≤2p
+view-ordered-coin 2p 5p c≤d = 2p≤5p
+view-ordered-coin 5p 1p (s≤s ())
+view-ordered-coin 5p 2p (s≤s (s≤s ()))
+view-ordered-coin 5p 5p c≤d = 5p≤5p
 
 
 --------
 -- coin bags as sorted coin lists
-
-≤ℕ-refl : {x : ℕ} → x ≤ℕ x
-≤ℕ-refl = DecTotalOrder.refl ℕ-DecTotalOrder
-
-≤ℕ-trans : ∀ {x y z} → x ≤ℕ y → y ≤ℕ z → x ≤ℕ z
-≤ℕ-trans = DecTotalOrder.trans ℕ-DecTotalOrder
 
 CoinBagOD : OrnDesc Coin ! ⌊ ListOD Coin ⌋
 CoinBagOD = SListOD Coin (flip _≤_) (flip ≤ℕ-trans)
@@ -154,6 +177,10 @@ R-transitive =
 
 S : Ḟ CoinBagD (const ℕ) ↝⁺ (const ℕ)
 S = fun⁺ total-value-alg
+
+
+--------
+-- Monotonicity
 
 count-alg-monotonic : fun⁺ count-alg •⁺ Ṙ CoinBagD leq-ℕ ⊆⁺ leq-ℕ •⁺ fun⁺ count-alg
 count-alg-monotonic =
@@ -239,6 +266,10 @@ R-monotonic =
   where open PreorderReasoning (⊆⁺-Preorder CoinBag CoinBag) renaming (_∼⟨_⟩_ to _⊆⁺⟨_⟩_; _∎ to _□)
 -}
 
+
+--------
+-- Greedy condition
+
 isNil : {X : Coin → Set} → Ḟ CoinBagD X ↝⁺ Ḟ CoinBagD X
 isNil = wrap λ { c (false , _) → return (false , tt)
              ; c (true  , _) → none }
@@ -246,7 +277,6 @@ isNil = wrap λ { c (false , _) → return (false , tt)
 cons-leq : {X : Coin → Set} → Ḟ CoinBagD X ↝⁺ Ḟ CoinBagD X
 cons-leq = wrap λ { c (false , _    ) → none
                   ; c (true  , d , _) → (_≤_ d) >>= λ e → any>>= λ r → return (true , e , r) }
-
 
 Q : Ḟ CoinBagD (const ℕ) ↝⁺ Ḟ CoinBagD (const ℕ)
 Q = isNil ∪⁺ cons-leq
@@ -291,7 +321,7 @@ data CoinBag'View' : {c : Coin} {n : ℕ} {l : ℕ} → CoinBag' c n l → Set w
 view'CoinBag' : ∀ {c n l} (b : CoinBag' c n l) → CoinBag'View' b
 view'CoinBag'     b  with viewCoinBag' b
 view'CoinBag'     ._ | vnil = empty
-view'CoinBag' {c} ._ | vcons  d  d≤c b with compareCoin d c d≤c
+view'CoinBag' {c} ._ | vcons  d  d≤c b with view-ordered-coin d c d≤c
 view'CoinBag'     ._ | vcons .1p d≤c b | 1p≤1p = 1p1p d≤c b
 view'CoinBag'     ._ | vcons .1p d≤c b | 1p≤2p = 1p2p d≤c b
 view'CoinBag'     ._ | vcons .1p d≤c b | 1p≤5p = 1p5p d≤c b
@@ -305,17 +335,15 @@ relax ._ c≤d | vnil          = nil'
 relax ._ c≤d | vcons e e≤c b = cons' e (≤ℕ-trans e≤c c≤d) refl refl b
 
 insert1 : {c : Coin} {n : ℕ} {l : ℕ} → CoinBag' c n l → CoinBag' c (1 + n) (1 + l)
-insert1      b  with viewCoinBag' b
-insert1 {1p} ._ | vnil              = cons' 1p (s≤s z≤n) refl refl nil'
-insert1 {2p} ._ | vnil              = cons' 1p (s≤s z≤n) refl refl nil'
-insert1 {5p} ._ | vnil              = cons' 1p (s≤s z≤n) refl refl nil'
-insert1      ._ | vcons d d≤c {n} b = cons' d d≤c (solve 2 (λ m vd → vd :+ (:con 1 :+ m) := :con 1 :+ (vd :+ m)) refl n (value d)) refl (insert1 b)
+insert1     b  with viewCoinBag' b
+insert1 {c} ._ | vnil              = cons' 1p (1p-minimum c) refl refl nil'
+insert1     ._ | vcons d d≤c {n} b = cons' d d≤c (solve 2 (λ m vd → vd :+ (:con 1 :+ m) := :con 1 :+ (vd :+ m)) refl n (value d)) refl (insert1 b)
 
 postulate
   greedy-lemma :
     (c d : Coin) → c ≤ d → (m n : ℕ) → value c + m ≡ value d + n → {l : ℕ} (b : CoinBag' c m l) → Σ[ l' ∶ ℕ ] CoinBag' d n l' × l' ≤ℕ l
 {- [Proved.]
-greedy-lemma  c   d  c≤d  m        n       eq       b  with compareCoin c d c≤d
+greedy-lemma  c   d  c≤d  m        n       eq       b  with view-ordered-coin c d c≤d
 greedy-lemma .1p .1p c≤d .n        n       refl {l} b  | 1p≤1p = l , b , ≤ℕ-refl
 greedy-lemma .1p .2p c≤d .(1 + n)  n       refl     b  | 1p≤2p with view'CoinBag' b
 greedy-lemma .1p .2p c≤d .(1 + n)  n       refl     ._ | 1p≤2p | 1p1p _ {l} b = l , relax b (s≤s z≤n) , z≤n {1} +-mono ≤ℕ-refl {l}
@@ -338,10 +366,12 @@ greedy-lemma .2p .5p c≤d .(4 + m) .(1 + m) refl     ._ | 2p≤5p | 2p2p _ ._ |
 greedy-lemma .5p .5p c≤d .n       n        refl {l} b  | 5p≤5p = l , b , ≤ℕ-refl
 -}
 
-greedy-condition-aux :
-  (c : Coin) (ns : Ḟ CoinBagD (const ℕ) c) (b : CoinBag c) →
-  ((α •⁺ Ṙ CoinBagD (foldR (fun⁺ total-value-alg) º⁺) •⁺ (Q ∩⁺ (fun⁺ total-value-alg º⁺ •⁺ fun⁺ total-value-alg)) º⁺) !!) c ns b →
-  ((R º⁺ •⁺ α •⁺ Ṙ CoinBagD (foldR (fun⁺ total-value-alg) º⁺)) !!) c ns b
+postulate
+  greedy-condition-aux :
+    (c : Coin) (ns : Ḟ CoinBagD (const ℕ) c) (b : CoinBag c) →
+    ((α •⁺ Ṙ CoinBagD (foldR (fun⁺ total-value-alg) º⁺) •⁺ (Q ∩⁺ (fun⁺ total-value-alg º⁺ •⁺ fun⁺ total-value-alg)) º⁺) !!) c ns b →
+    ((R º⁺ •⁺ α •⁺ Ṙ CoinBagD (foldR (fun⁺ total-value-alg) º⁺)) !!) c ns b
+{- [Proved}
 greedy-condition-aux c (false , _) ._ (._ , ((false , _) , (inj₁ refl , .0 , refl , refl) , _ , _ , refl) , refl) =
   nil , ((false , tt) , (tt , tt , refl) , refl) , (zero , (zero , refl , z≤n) , refl)
 greedy-condition-aux c (false , _) ._ (_ , ((true  , _) , (inj₁ () , _) , _) , refl)
@@ -369,7 +399,7 @@ greedy-condition-aux c (true  , d , d≤c , n) ._
     l : ℕ
     l = proj₁ greedy-lemma-invocation
     postulate better-solution : Σ[ b' ∶ CoinBag d ] foldR' (fun⁺ total-value-alg) d b' n × foldR' (fun⁺ count-alg) d b' l
-{-  [Agda hangs here unexpectedly.]
+{-  [Agda hangs here mysteriously.]
     better-solution =
       Iso.to Fun (Refinement.i
         (FRefinement.comp
@@ -379,11 +409,12 @@ greedy-condition-aux c (true  , d , d≤c , n) ._
         (proj₁ (proj₂ greedy-lemma-invocation))
 -}
     postulate better-evidence : count (proj₁ better-solution) ≤ℕ count b
-{-  [Agda hangs here unexpectedly.]
+{-  [Agda hangs here mysteriously.]
     better-evidence = ≤ℕ-trans (DecTotalOrder.reflexive ℕ-DecTotalOrder
                                  (modus-ponens-⊆⁺ (proj₂ (fun⁺-preserves-fold CoinBagD count-alg))
                                     d (proj₁ better-solution) l (proj₂ (proj₂ better-solution))))
                                (proj₂ (proj₂ greedy-lemma-invocation))
+-}
 -}
 
 greedy-condition :
@@ -391,11 +422,60 @@ greedy-condition :
     ⊆⁺ R º⁺ •⁺ α •⁺ Ṙ CoinBagD (foldR (fun⁺ total-value-alg) º⁺)
 greedy-condition = wrap λ c → wrap (greedy-condition-aux c)
 
-open GreedyTheorem (CoinBagD) R S R-transitive R-monotonic Q greedy-condition
 
-{-
+--------
+-- Greedy solution
+
+open GreedyTheorem CoinBagD R S R-transitive R-monotonic Q greedy-condition
+
+data AtLeastView : ℕ → ℕ → Set where
+  at-least  : (m : ℕ) (n : ℕ)    → AtLeastView m (m + n)
+  less-than : {m n : ℕ} → n <ℕ m → AtLeastView m n
+
+at-least-view : (m n : ℕ) → AtLeastView m n
+at-least-view zero    n = at-least zero n
+at-least-view (suc m) zero = less-than (s≤s z≤n)
+at-least-view (suc m) (suc  n       ) with at-least-view m n
+at-least-view (suc m) (suc .(m + n')) | at-least .m n' = at-least (suc m) n'
+at-least-view (suc m) (suc  n       ) | less-than n<m  = less-than (s≤s n<m)
+
+UsableCoin : ℕ → Coin → Coin → Set
+UsableCoin n c d = (d ≤ c) × (Σ[ n' ∶ ℕ ] value d + n' ≡ n)
+
+postulate
+  maximum-coin : (n : ℕ) → 0 <ℕ n → (c : Coin) → Σ[ d ∶ Coin ] UsableCoin n c d × ((e : Coin) → UsableCoin n c e → e ≤ d)
+{- [To be revised.]
+maximum-coin  n       0<n with at-least-view 5 n
+maximum-coin .(5 + n) _   | at-least .5 n = 5p , n , refl , λ d _ _ → 5p-maximum d
+maximum-coin  n       _   | less-than n<5 with at-least-view 2 n
+maximum-coin .(2 + n) _   | less-than n<5 | at-least .2 n =
+  2p , n , refl , λ { 1p m eq → 1p-minimum 2p
+                    ; 2p m eq → ≤ℕ-refl
+                    ; 5p m eq → ⊥-elim (¬i+1+j≤i 5 (≤ℕ-trans (s≤s (≤ℕ-reflexive eq)) n<5)) }
+maximum-coin  n       _   | less-than n<5 | less-than n<2 with at-least-view 1 n
+maximum-coin .(1 + n) _   | less-than n<5 | less-than n<2 | at-least .1 n =
+  1p , n , refl , λ { 1p m eq → 1p-minimum 1p
+                    ; 2p m eq → ⊥-elim (¬i+1+j≤i 2 (≤ℕ-trans (s≤s (≤ℕ-reflexive eq)) n<2))
+                    ; 5p m eq → ⊥-elim (¬i+1+j≤i 2 (≤ℕ-trans (s≤s (≤ℕ-reflexive eq)) n<2)) }
+maximum-coin .0       ()  | less-than n<5 | less-than n<2 | less-than (s≤s z≤n)
+-}
 
 greedy : (c : Coin) (n : ℕ) → GreedySolution c n
-greedy c n = {!!}
-
--}
+greedy c n = <-rec P f n c
+  where
+    P : ℕ → Set
+    P n = ∀ c → GreedySolution c n
+    f : (n : ℕ) → ((n' : ℕ) → n' <ℕ′ n → P n') → P n
+    f  n r c with n ≤ℕ? 0
+    f .0 r c | yes z≤n =
+      con ((false , tt) ,
+           (refl , (λ { (false , _) _ → inj₁ refl
+                      ; (true , d , _) eq →
+                          ⊥-elim (1+n≰n (≤ℕ-trans (coin-above-zero d) (≤ℕ-trans (m≤m+n (value d) _) (≤ℕ-reflexive eq)))) })) , tt)
+    f  n r c | no n≰0 with maximum-coin n (≰⇒> n≰0) c
+    f ._ r c | no n≰0 | d , (d≤c , n' , refl) , guc =
+      con ((true , d , d≤c , n') ,
+           (refl , (λ { (false , _) eq →
+                          ⊥-elim (1+n≰n (≤ℕ-trans (coin-above-zero d) (≤ℕ-trans (m≤m+n (value d) _) (≤ℕ-reflexive (sym eq)))))
+                      ; (true  , e , e≤c , m) eq → inj₂ (d , guc e (e≤c , m , eq) , (d≤c , n') , refl) })) ,
+           r n' (≤⇒≤′ (coin-above-zero d +-mono ≤ℕ-refl {n'})) d)
