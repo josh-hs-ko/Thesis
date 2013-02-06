@@ -126,7 +126,6 @@ nil = con (false , tt)
 cons : (d : Coin) → ∀ {c} → d ≤ c → CoinBag d → CoinBag c
 cons d d≤c b = con (true , d , d≤c , b)
 
-
 total-value-alg : Ḟ CoinBagD (const ℕ) ⇉ (const ℕ)
 total-value-alg (false , _        ) = 0
 total-value-alg (true  , c , _ , m) = value c + m
@@ -263,16 +262,9 @@ R-monotonic =
 --------
 -- Greedy condition
 
-isNil : {X : Coin → Set} → Ḟ CoinBagD X ↝⁺ Ḟ CoinBagD X
-isNil = wrap λ { c (false , _) → return (false , tt)
-             ; c (true  , _) → none }
-
-cons-leq : {X : Coin → Set} → Ḟ CoinBagD X ↝⁺ Ḟ CoinBagD X
-cons-leq = wrap λ { c (false , _    ) → none
-                  ; c (true  , d , _) → (_≤_ d) >>= λ e → any>>= λ r → return (true , e , r) }
-
 Q : Ḟ CoinBagD (const ℕ) ↝⁺ Ḟ CoinBagD (const ℕ)
-Q = isNil ∪⁺ cons-leq
+Q = wrap λ { c (false , _    ) → return (false , tt)
+           ; c (true  , d , _) → (_≤_ d) >>= λ e → any>>= λ r → return (true , e , r) }
 
 CoinBag'OD : OrnDesc (proj₁ ⋈ proj₁) pull CoinBagD
 CoinBag'OD = ⌈ algOrn CoinBagD (fun⁺ total-value-alg) ⌉ ⊗ ⌈ algOrn CoinBagD (fun⁺ count-alg) ⌉
@@ -360,17 +352,13 @@ greedy-condition-aux :
   (c : Coin) (ns : Ḟ CoinBagD (const ℕ) c) (b : CoinBag c) →
   ((α •⁺ Ṙ CoinBagD (foldR (fun⁺ total-value-alg) º⁺) •⁺ (Q ∩⁺ (fun⁺ total-value-alg º⁺ •⁺ fun⁺ total-value-alg)) º⁺) !!) c ns b →
   ((R º⁺ •⁺ α •⁺ Ṙ CoinBagD (foldR (fun⁺ total-value-alg) º⁺)) !!) c ns b
-greedy-condition-aux c (false , _) ._ (._ , ((false , _) , (inj₁ refl , .0 , refl , refl) , _ , _ , refl) , refl) =
+greedy-condition-aux c (false , _) ._ (._ , ((false , _) , (refl , ._ , refl , refl) , _ , _ , refl) , refl) =
   nil , ((false , tt) , (tt , tt , refl) , refl) , (zero , (zero , refl , z≤n) , refl)
-greedy-condition-aux c (false , _) ._ (_ , ((true  , _) , (inj₁ () , _) , _) , refl)
-greedy-condition-aux c (false , _) ._ (_ , ((false , _) , (inj₂ () , _) , _) , refl)
-greedy-condition-aux c (false , _) ._ (_ , ((true  , _) , (inj₂ (_ , _ , _ , ()) , _) , _) , refl)
-greedy-condition-aux c (true  , _) ._ (_ , ((false , _) , (inj₁ () , _) , _) , refl)
-greedy-condition-aux c (true  , _) ._ (_ , ((true  , _) , (inj₁ () , _) , _) , refl)
-greedy-condition-aux c (true  , _) ._ (_ , ((false , _) , (inj₂ () , _) , _) , refl)
+greedy-condition-aux c (false , _) ._ ( _ , ((true  , _) , ((_ , _ , _ , ()) , _) , _) , refl)
+greedy-condition-aux c (true  , _) ._ ( _ , ((false , _) , (() , _) , _) , refl)
 greedy-condition-aux c (true  , d , d≤c , n) ._
-                       (._ , ((true  , d' , d'≤c , n') , (inj₂ (._ , d'≤d , ._ , refl) , ._ , d'+n'≡d+n , refl) ,
-                              (._ , (._ , (b , total-value-d'-b-n' , refl) , refl) , refl)) , refl) =
+                       (._ , ((true  , d' , d'≤c , n') , ((._ , d'≤d , ._ , refl) , ._ , d'+n'≡d+n , refl) ,
+                              ._ , (._ , (b , total-value-d'-b-n' , refl) , refl) , refl) , refl) =
   cons d d≤c (proj₁ better-solution) ,
   (_ , (_ , (_ , (_ , proj₁ (proj₂ better-solution) , refl) , refl) , refl) , refl) ,
   (_ , (1 + count b , refl , s≤s better-evidence) , refl)
@@ -419,7 +407,7 @@ coin-above-zero-lemma : ∀ d {k} → value d + k ≢ 0
 coin-above-zero-lemma d eq = 1+n≰n (≤ℕ-trans (coin-above-zero d) (≤ℕ-trans (m≤m+n (value d) _) (≤ℕ-reflexive eq)))
 
 gnil : ∀ {c} → GreedySolution c 0
-gnil = con ((false , tt) , (refl , (λ { (false , _) _ → inj₁ refl
+gnil = con ((false , tt) , (refl , (λ { (false , _) _ → refl
                                       ; (true , d , _) eq → ⊥-elim (coin-above-zero-lemma d eq) })) , tt)
 
 UsableCoin : ℕ → Coin → Coin → Set
@@ -429,7 +417,7 @@ gcons : (d : Coin) → ∀ {c} → d ≤ c → ∀ {n'} → ((e : Coin) → Usab
         GreedySolution d n' → GreedySolution c (value d + n')
 gcons d d≤c {n'} guc g =
   con ((true , d , d≤c , n') , (refl , (λ { (false , _) eq → ⊥-elim (coin-above-zero-lemma d (sym eq))
-                                          ; (true  , e , e≤c , m) eq → inj₂ (d , guc e (e≤c , m , eq) , (d≤c , n') , refl)})) , g)
+                                          ; (true  , e , e≤c , m) eq → d , guc e (e≤c , m , eq) , (d≤c , n') , refl })) , g)
 
 data AtLeastView : ℕ → ℕ → Set where
   at-least  : (m : ℕ) (n : ℕ)    → AtLeastView m (m + n)
