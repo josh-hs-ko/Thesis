@@ -183,9 +183,8 @@ Vectors, i.e., length-indexed lists, defined as the optimised predicate for the 
 
 #### Thesis.Examples.MinCoinChange
 Solving the minimum coin change problem with the Greedy Theorem and algebraic ornamentation.
-Several code fragments mysteriously make Agda hang, but should be type-correct.
+Several code fragments make Agda thrash mysteriously, but should be type-correct.
 These fragments are commented out and postulated.
-Even so, this file can still take a long time to typecheck.
 
 #### Thesis.Examples.Nat
 Peano-style natural numbers.
