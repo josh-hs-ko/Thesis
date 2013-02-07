@@ -99,10 +99,10 @@ module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (
   integrate-aux :
     ∀ {D' E' F'} (O' : ROrn e D' E') (P' : ROrn f D' F') →
     (ys : ⟦ E' ⟧ (μ E)) (all : All E' integrate-Ind ys)  (zs : ⟦ F' ⟧ (μ F)) →
-    erase O' {μ D} (mapFold E E' (eraseAlg O) ys) ≡ erase P' (mapFold F F' (eraseAlg P) zs) →
+    erase O' {μ D} (mapFold E E' (ornAlg O) ys) ≡ erase P' (mapFold F F' (ornAlg P) zs) →
     Σ[ ps ∶ ⟦ toRDesc (pcROrn O' P') ⟧ (μ ⌊ O ⊗ P ⌋) ]
-      erase (diffROrn-l O' P') (mapFold ⌊ O ⊗ P ⌋ (toRDesc (pcROrn O' P')) (λ {jk} → eraseAlg (diffOrn-l O P) {jk}) ps) ≡ ys
-    × erase (diffROrn-r O' P') (mapFold ⌊ O ⊗ P ⌋ (toRDesc (pcROrn O' P')) (λ {jk} → eraseAlg (diffOrn-r O P) {jk}) ps) ≡ zs
+      erase (diffROrn-l O' P') (mapFold ⌊ O ⊗ P ⌋ (toRDesc (pcROrn O' P')) (λ {jk} → ornAlg (diffOrn-l O P) {jk}) ps) ≡ ys
+    × erase (diffROrn-r O' P') (mapFold ⌊ O ⊗ P ⌋ (toRDesc (pcROrn O' P')) (λ {jk} → ornAlg (diffOrn-r O P) {jk}) ps) ≡ zs
   integrate-aux ∎           ∎            ys         all          zs         eq = tt , refl , refl
   integrate-aux ∎           (Δ T P')     ys         all          (t , zs)   eq =
     (_,_ t ** (id ** cong (_,_ t))) (integrate-aux ∎ (P' t) ys all zs refl)
@@ -140,18 +140,18 @@ module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (
   
   integrate-aux₃ :
     ∀ {i} (j : e ⁻¹ i) {i'} (k : f ⁻¹ i') → i ≡ i' → (ys : ⟦ E at und j ⟧ (μ E)) (zs : ⟦ F at und k ⟧ (μ F)) →
-    con {D = D} (erase (Orn.comp O j) (mapFold E (E at und j) (eraseAlg O) ys))
-      ≅ con {D = D} (erase (Orn.comp P k) (mapFold F (F at und k) (eraseAlg P) zs)) →
-    erase (Orn.comp O j) {μ D} (mapFold E (E at und j) (eraseAlg O) ys)
-      ≅ erase (Orn.comp P k) {μ D} (mapFold F (F at und k) (eraseAlg P) zs)
+    con {D = D} (erase (Orn.comp O j) (mapFold E (E at und j) (ornAlg O) ys))
+      ≅ con {D = D} (erase (Orn.comp P k) (mapFold F (F at und k) (ornAlg P) zs)) →
+    erase (Orn.comp O j) {μ D} (mapFold E (E at und j) (ornAlg O) ys)
+      ≅ erase (Orn.comp P k) {μ D} (mapFold F (F at und k) (ornAlg P) zs)
   integrate-aux₃ j k refl ys zs eq = ≡-to-≅ (cong decon (≅-to-≡ eq))
   
   integrate-aux₄ :
     ∀ {i} (j : e ⁻¹ i) {i'} (k : f ⁻¹ i') → i ≡ i' → (ys : ⟦ E at und j ⟧ (μ E)) (zs : ⟦ F at und k ⟧ (μ F)) →
-    con {D = D} (erase (Orn.comp O (ok (und j))) (mapFold E (E at und j) (eraseAlg O) ys))
-      ≅ con {D = D} (erase (Orn.comp P (ok (und k))) (mapFold F (F at und k) (eraseAlg P) zs)) →
-    erase (Orn.comp O j) {μ D} (mapFold E (E at und j) (eraseAlg O) ys)
-      ≅ erase (Orn.comp P k) {μ D} (mapFold F (F at und k) (eraseAlg P) zs)
+    con {D = D} (erase (Orn.comp O (ok (und j))) (mapFold E (E at und j) (ornAlg O) ys))
+      ≅ con {D = D} (erase (Orn.comp P (ok (und k))) (mapFold F (F at und k) (ornAlg P) zs)) →
+    erase (Orn.comp O j) {μ D} (mapFold E (E at und j) (ornAlg O) ys)
+      ≅ erase (Orn.comp P k) {μ D} (mapFold F (F at und k) (ornAlg P) zs)
   integrate-aux₄ (ok j) (ok k) ieq ys zs eq = integrate-aux₃ (ok j) (ok k) ieq ys zs eq
   
   integrate-alg : ∀ {j} (ys : Ḟ E (μ E) j) → All (E at j) integrate-Ind ys → integrate-Ind (con ys)
@@ -187,12 +187,12 @@ module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (
             (all : All (toRDesc (pcROrn O' P')) integrate-inv-Ind ps) (eq : _) →
             proj₁ (integrate-aux O' P'
                     (erase (diffROrn-l O' P')
-                           (mapFold ⌊ O ⊗ P ⌋ (toRDesc (pcROrn O' P')) (λ {jk} → eraseAlg (diffOrn-l O P) {jk}) ps))
+                           (mapFold ⌊ O ⊗ P ⌋ (toRDesc (pcROrn O' P')) (λ {jk} → ornAlg (diffOrn-l O P) {jk}) ps))
                     (everywhereInduction E E' integrate-Ind integrate-alg
                        (erase (diffROrn-l O' P') 
-                              (mapFold ⌊ O ⊗ P ⌋ (toRDesc (pcROrn O' P')) (λ {jk} → eraseAlg (diffOrn-l O P) {jk}) ps)))
+                              (mapFold ⌊ O ⊗ P ⌋ (toRDesc (pcROrn O' P')) (λ {jk} → ornAlg (diffOrn-l O P) {jk}) ps)))
                     (erase (diffROrn-r O' P')
-                           (mapFold ⌊ O ⊗ P ⌋ (toRDesc (pcROrn O' P')) (λ {jk} → eraseAlg (diffOrn-r O P) {jk}) ps)) eq) ≡ ps
+                           (mapFold ⌊ O ⊗ P ⌋ (toRDesc (pcROrn O' P')) (λ {jk} → ornAlg (diffOrn-r O P) {jk}) ps)) eq) ≡ ps
       aux ∎            ∎          ps          all eq = refl
       aux ∎            (Δ T P')   (t , ps)    all eq = cong (_,_ t) (aux ∎ (P' t) ps all refl)
       aux (ṿ {j} refl) (ṿ idx')   p           all eq = aux' (ok j) refl idx' p _ all

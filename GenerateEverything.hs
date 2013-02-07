@@ -23,6 +23,12 @@ readme_header =
     "composable datatype refinements based on " ++
     "McBride's ornamentation.",
     "",
+		"All files typecheck with Agda-2.3.1. " ++
+		"(The module Thesis.Ornament.SequentialComposition " ++
+		"would bump into [an error of Agda-2.3.2]" ++
+		"(http://code.google.com/p/agda/issues/detail?id=754), " ++
+		"and takes a very long time to typecheck in Agda-2.3.3.)",
+		"",
     "See [the author's homepage]" ++
     "(http://www.cs.ox.ac.uk/people/hsiang-shang.ko/) " ++
     "for more information, including published papers.",

@@ -67,8 +67,8 @@ forget-after-forget {e = e} {f} {D} {E} {F} O P =
               (λ {i} fs all → cong con (aux (Orn.comp O (ok (f i))) (Orn.comp P (ok i)) fs all))
   where aux : ∀ {D' E' F'} (O' : ROrn e D' E') (P' : ROrn f E' F') →
               (fs : ⟦ F' ⟧ (μ F)) (all : All F' (λ x → forget (O ⊙ P) x ≡ forget O (forget P x)) fs) →
-              erase (scROrn O' P') {μ D} (mapFold F F' (eraseAlg (O ⊙ P)) fs)
-                ≡ erase O' (mapFold E E' (eraseAlg O) (erase P' (mapFold F F' (eraseAlg P) fs)))
+              erase (scROrn O' P') {μ D} (mapFold F F' (ornAlg (O ⊙ P)) fs)
+                ≡ erase O' (mapFold E E' (ornAlg O) (erase P' (mapFold F F' (ornAlg P) fs)))
         aux ∎          ∎          fs         all          = refl
         aux ∎          (Δ T P')   (t , fs)   all          = aux ∎ (P' t) fs all
         aux (ṿ refl)   (ṿ refl)   fs         all          = all

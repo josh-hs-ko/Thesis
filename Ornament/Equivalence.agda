@@ -64,24 +64,24 @@ OrnEq-forget : ∀ {I J} {e e' : J → I} {D E} (O : Orn e D E) (O' : Orn e' D E
 OrnEq-forget {I} {J} {e} {e'} {D} {E} O O' (eeq , eraseeq) =
   induction E (λ x → forget O x ≅ forget O' x) (λ {j} es all → aux j es all refl refl)
   where aux'' : (E' : RDesc J) (es : ⟦ E' ⟧ (μ E)) (all : All E' (λ x → forget O x ≅ forget O' x) es) →
-                HoriEq E' (mapFold E E' (eraseAlg O) es) E' (mapFold E E' (eraseAlg O') es)
+                HoriEq E' (mapFold E E' (ornAlg O) es) E' (mapFold E E' (ornAlg O') es)
         aux'' ∎          es         all          = ∎
         aux'' (ṿ i)      es         all          = ṿ all
         aux'' (σ S E')   (s , es)   all          = σ s (aux'' (E' s) es all)
         aux'' (E' * E'') (es , es') (all , all') = aux'' E' es all * aux'' E'' es' all'
         aux' : ∀ {i'} j → (es : ⟦ E at j ⟧ (μ E)) (all : All (E at j) (λ x → forget O x ≅ forget O' x) es) →
                (eq' : e' j ≡ i') →
-               erase (Orn.comp O (ok j)) {μ D} (mapFold E (E at j) (eraseAlg O) es)
-                 ≅ subst (Ḟ D (μ D)) eq' (erase (Orn.comp O' (ok j)) (mapFold E (E at j) (eraseAlg O') es))
+               erase (Orn.comp O (ok j)) {μ D} (mapFold E (E at j) (ornAlg O) es)
+                 ≅ subst (Ḟ D (μ D)) eq' (erase (Orn.comp O' (ok j)) (mapFold E (E at j) (ornAlg O') es))
         aux' j es all refl = HoriEq-to-≅ (D at e j) (D at e' j) (cong (Desc.comp D) (eeq j))
-                                         (erase (Orn.comp O (ok j)) {μ D} (mapFold E (E at j) (eraseAlg O) es))
-                                         (erase (Orn.comp O' (ok j)) (mapFold E (E at j) (eraseAlg O') es))
-                                         (eraseeq j (μ D) (mapFold E (E at j) (eraseAlg O) es)
-                                                          (mapFold E (E at j) (eraseAlg O') es)
+                                         (erase (Orn.comp O (ok j)) {μ D} (mapFold E (E at j) (ornAlg O) es))
+                                         (erase (Orn.comp O' (ok j)) (mapFold E (E at j) (ornAlg O') es))
+                                         (eraseeq j (μ D) (mapFold E (E at j) (ornAlg O) es)
+                                                          (mapFold E (E at j) (ornAlg O') es)
                                                           (aux'' (E at j) es all))
         aux : (j : J) (es : ⟦ E at j ⟧ (μ E)) (all : All (E at j) (λ x → forget O x ≅ forget O' x) es) →
               ∀ {i} (eq : e j ≡ i) → ∀ {i'} (eq' : e' j ≡ i') →
-              con {D = D} (subst (Ḟ D (μ D)) eq (erase (Orn.comp O (ok j)) (mapFold E (E at j) (eraseAlg O) es)))
-                ≅ con {D = D} (subst (Ḟ D (μ D)) eq' (erase (Orn.comp O' (ok j)) (mapFold E (E at j) (eraseAlg O') es)))
+              con {D = D} (subst (Ḟ D (μ D)) eq (erase (Orn.comp O (ok j)) (mapFold E (E at j) (ornAlg O) es)))
+                ≅ con {D = D} (subst (Ḟ D (μ D)) eq' (erase (Orn.comp O' (ok j)) (mapFold E (E at j) (ornAlg O') es)))
         aux j es all eq eq' with trans (trans (sym eq) (eeq j)) eq'
         aux j es all refl eq' | refl = hcong con (aux' j es all eq')

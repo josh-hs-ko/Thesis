@@ -107,17 +107,17 @@ algOrn-FSwap D R = wrap λ { {._} (ok (i , j)) → record { Q = λ x → foldR' 
 
 mutual
 
-  ornProp : ∀ {I J} {e : J → I} {D E} → ROrn e D E → ⟦ D ⟧ (_⁻¹_ e) → Set
-  ornProp ∎           _          = ⊤
-  ornProp (ṿ {j} idx) j'         = und j' ≡ j
-  ornProp (σ S O)     (s , js)   = ornProp (O s) js
-  ornProp (Δ T O)     js         = Σ[ t ∶ T ] ornProp (O t) js
-  ornProp (∇ s {D} O) (s' , js)  = Σ (s ≡ s') (ornProp-∇ {D = D} O js)
-  ornProp (O * P)     (js , js') = ornProp O js × ornProp P js'
+  clsP : ∀ {I J} {e : J → I} {D E} → ROrn e D E → ℘ (⟦ D ⟧ (_⁻¹_ e))
+  clsP ∎           _          = ⊤
+  clsP (ṿ {j} idx) j'         = und j' ≡ j
+  clsP (σ S O)     (s , js)   = clsP (O s) js
+  clsP (Δ T O)     js         = Σ[ t ∶ T ] clsP (O t) js
+  clsP (∇ s {D} O) (s' , js)  = Σ (s ≡ s') (clsP-∇ {D = D} O js)
+  clsP (O * P)     (js , js') = clsP O js × clsP P js'
 
-  ornProp-∇ : ∀ {I J} {e : J → I} {S : Set} {D : S → RDesc I} {E} →
+  clsP-∇ : ∀ {I J} {e : J → I} {S : Set} {D : S → RDesc I} {E} →
               ∀ {s} → ROrn e (D s) E → ∀ {s'} → ⟦ D s' ⟧ (_⁻¹_ e) → s ≡ s' → Set
-  ornProp-∇ {s} O js refl = ornProp O js
+  clsP-∇ {s} O js refl = clsP O js
 
-ornAlg : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → Ḟ D (_⁻¹_ e) ↝⁺ (_⁻¹_ e)
-ornAlg (wrap O) = wrap λ i js j → ornProp (O j) js
+clsAlg : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → Ḟ D (_⁻¹_ e) ↝⁺ (_⁻¹_ e)
+clsAlg (wrap O) = wrap λ i js j → clsP (O j) js

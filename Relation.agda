@@ -30,7 +30,7 @@ return : {A : Set} → A → ℘ A
 return = _≡_
 
 _>>=_ : {A B : Set} → (S : ℘ A) → (A → ℘ B) → ℘ B
-_>>=_ {A} S f = λ y → Σ[ x ∶ A ] S x × f x y
+_>>=_ {A} s f = λ y → Σ[ x ∶ A ] s x × f x y
 
 map℘ : {A B : Set} → (A → B) → ℘ A → ℘ B
 map℘ f s = s >>= (return ∘ f)

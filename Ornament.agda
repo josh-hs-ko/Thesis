@@ -59,16 +59,16 @@ idOrn D = wrap λ { {._} (ok i) → idROrn (D at i) }
 
 -- ornamental algebra
 
-eraseAlg : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → Ḟ E (μ D ∘ e) ⇉ μ D ∘ e
-eraseAlg {D = D} (wrap O) {j} = con ∘ erase (O (ok j))
+ornAlg : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → Ḟ E (μ D ∘ e) ⇉ μ D ∘ e
+ornAlg {D = D} (wrap O) {j} = con ∘ erase (O (ok j))
 
 forget : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → μ E ⇉ μ D ∘ e
-forget O = fold (eraseAlg O)
+forget O = fold (ornAlg O)
 
 forget-idOrn : ∀ {I} {D : Desc I} → ∀ {i} (x : μ D i) → forget (idOrn D) x ≡ x
 forget-idOrn {I} {D} = induction D (λ x → forget (idOrn D) x ≡ x) (λ {i} xs all → cong con (aux (D at i) xs all))
   where aux : (D' : RDesc I) (xs : ⟦ D' ⟧ (μ D)) (all : All D' (λ x → forget (idOrn D) x ≡ x) xs) →
-              erase (idROrn D') (mapFold D D' (eraseAlg (idOrn D)) xs) ≡ xs
+              erase (idROrn D') (mapFold D D' (ornAlg (idOrn D)) xs) ≡ xs
         aux ∎         xs         all          = refl
         aux (ṿ i)     xs         all          = all
         aux (σ S D')  (s , xs)   all          = cong (_,_ s) (aux (D' s) xs all)
@@ -163,7 +163,7 @@ forget-singOrn {I} {D} =
   induction ⌊ singOrn D ⌋ (λ { {i , x} s → forget ⌈ singOrn D ⌉ s ≡ x }) (λ { {i , con xs} ss all → cong con (aux (D at i) xs ss all) })
   where aux : (D' : RDesc I) (xs : ⟦ D' ⟧ (μ D)) (ss : ⟦ toRDesc (erode D' xs) ⟧ (μ ⌊ singOrn D ⌋))
               (all : All (toRDesc (erode D' xs)) (λ { {i , x} s → forget ⌈ singOrn D ⌉ {i , x} s ≡ x }) ss) →
-              erase (toROrn (erode D' xs)) (mapFold ⌊ singOrn D ⌋ (toRDesc (erode D' xs)) (λ {ix} → eraseAlg ⌈ singOrn D ⌉ {ix}) ss) ≡ xs
+              erase (toROrn (erode D' xs)) (mapFold ⌊ singOrn D ⌋ (toRDesc (erode D' xs)) (λ {ix} → ornAlg ⌈ singOrn D ⌉ {ix}) ss) ≡ xs
         aux ∎         xs         ss         all          = refl
         aux (ṿ i)     xs         ss         all          = all
         aux (σ S D')  (s , xs)   ss         all          = cong (_,_ s) (aux (D' s) xs ss all)
