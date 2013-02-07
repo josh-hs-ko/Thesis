@@ -103,7 +103,7 @@ algOrn-FSwap D R = wrap λ { {._} (ok (i , j)) → record { Q = λ x → foldR' 
 
 
 --------
--- ornamental algebras
+-- classifying algebras
 
 mutual
 
