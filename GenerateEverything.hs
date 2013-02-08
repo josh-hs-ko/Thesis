@@ -27,7 +27,7 @@ readme_header =
 		"(The module Thesis.Ornament.SequentialComposition " ++
 		"would bump into [an error of Agda-2.3.2]" ++
 		"(http://code.google.com/p/agda/issues/detail?id=754), " ++
-		"and takes a very long time to typecheck in Agda-2.3.3.)",
+		"and takes a very long time to typecheck with Agda-2.3.3.)",
 		"",
     "See [the author's homepage]" ++
     "(http://www.cs.ox.ac.uk/people/hsiang-shang.ko/) " ++
