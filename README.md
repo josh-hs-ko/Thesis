@@ -92,14 +92,13 @@ Ornamental descriptions are provided for constructing new descriptions from old 
 Singleton ornaments are also defined, which create as many singleton types as there are elements of the base type.
 
 #### Thesis.Ornament.Algebraic
-Definition of (relational) algebraic ornaments and ornamental algebras (which
-are a different kind of algebras from McBride's ornamental algebras).
+Definition of (relational) algebraic ornaments and classifying algebras.
 The optimised predicate of an algebraic ornament can be swapped for a relational fold with the algebra of the ornament.
 
 #### Thesis.Ornament.Algebraic.FundamentalTheorems
-Two fundamental theorems about algebraic ornaments and ornamental algebras.
-*The AOOA Theorem:* Algebraic ornamentation by an ornamental algebra produces an isomorphic datatype.
-*The OAAO Theorem:* An ornamental algebra derived from an algebraic ornament is isomorphic to the algebra of the ornament.
+Two fundamental theorems about algebraic ornaments and classifying algebras.
+*The AOOA Theorem:* Algebraic ornamentation by an classifying algebra produces an isomorphic datatype.
+*The OAAO Theorem:* A classifying algebra derived from an algebraic ornament is isomorphic to the algebra of the ornament.
 
 #### Thesis.Ornament.Algebraic.Fusion
 Fold fusion theorems for algebraic ornamentation.
