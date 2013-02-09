@@ -97,7 +97,7 @@ The optimised predicate of an algebraic ornament can be swapped for a relational
 
 #### Thesis.Ornament.Algebraic.FundamentalTheorems
 Two fundamental theorems about algebraic ornaments and classifying algebras.
-*The AOOA Theorem:* Algebraic ornamentation by an classifying algebra produces an isomorphic datatype.
+*The AOOA Theorem:* Algebraic ornamentation by a classifying algebra produces an isomorphic datatype.
 *The OAAO Theorem:* A classifying algebra derived from an algebraic ornament is isomorphic to the algebra of the ornament.
 
 #### Thesis.Ornament.Algebraic.Fusion
