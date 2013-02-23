@@ -27,7 +27,9 @@ readme_header =
 		"(The module Thesis.Ornament.SequentialComposition " ++
 		"would bump into [an error of Agda-2.3.2]" ++
 		"(http://code.google.com/p/agda/issues/detail?id=754), " ++
-		"and takes a very long time to typecheck with Agda-2.3.3.)",
+		"and the module Thesis.Ornament.Isomorphism would bump into " ++
+		"[another error of Agda-2.3.3]" ++
+		"(http://code.google.com/p/agda/issues/detail?id=778).)",
 		"",
     "See [the author's homepage]" ++
     "(http://www.cs.ox.ac.uk/people/hsiang-shang.ko/) " ++

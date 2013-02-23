@@ -10,7 +10,7 @@ open import Thesis.Prelude.Category.Pullback
 open import Thesis.Prelude.Function
 
 open import Function using (_∘_; type-signature)
-open import Data.Product using (Σ; _,_; proj₁; proj₂)
+open import Data.Product using (Σ; _,_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; sym; trans)
 open import Relation.Binary.HeterogeneousEquality using (_≅_; ≅-to-≡) renaming (refl to hrefl)
 
@@ -45,19 +45,29 @@ elim-⁻¹ P p (ok a) = p a
 --------
 -- set-theoretic pullbacks
 
-data _⋈_ {A B C : Set} (f : A → C) (g : B → C) : Set where
-  _,_ : {c : C} → f ⁻¹ c → g ⁻¹ c → f ⋈ g
+record _⋈_ {A B C : Set} (f : A → C) (g : B → C) : Set where
+  constructor _,_
+  field
+    {c} : C
+    l   : f ⁻¹ c
+    r   : g ⁻¹ c
 
 infixr 4 _,_
 
 pull : {A B C : Set} {f : A → C} {g : B → C} → f ⋈ g → C
 pull (_,_ {c} _ _) = c
 
+pproj₁ : {A B C : Set} {f : A → C} {g : B → C} → (p : f ⋈ g) → f ⁻¹ (_⋈_.c p)
+pproj₁ (a , _) = a
+
+pproj₂ : {A B C : Set} {f : A → C} {g : B → C} → (p : f ⋈ g) → g ⁻¹ (_⋈_.c p)
+pproj₂ (_ , b) = b
+
 π₁ : {A B C : Set} {f : A → C} {g : B → C} → f ⋈ g → A
-π₁ (a , _) = und a
+π₁ = und ∘ pproj₁
 
 π₂ : {A B C : Set} {f : A → C} {g : B → C} → f ⋈ g → B
-π₂ (_ , b) = und b
+π₂ = und ∘ pproj₂
 
 decouple : {A B C : Set} {f : A → C} {g : B → C} {p q : f ⋈ g} → π₁ p ≡ π₁ q → π₂ p ≡ π₂ q → p ≡ q
 decouple {f = f} {g} {ok a , b} {ok .a , b'} refl eq = cong (_,_ {c = f a} (ok a)) (≅-to-≡ (aux b b' eq))
