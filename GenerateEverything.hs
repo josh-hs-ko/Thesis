@@ -28,7 +28,7 @@ readme_header =
 		"some files can take a very long time to typecheck. " ++
 		"(The module Thesis.Ornament.SequentialComposition " ++
 		"would bump into [an error of Agda 2.3.2]" ++
-		"(http://code.google.com/p/agda/issues/detail?id=754).)" ++
+		"(http://code.google.com/p/agda/issues/detail?id=754).)",
 		"",
     "See [the author's homepage]" ++
     "(http://www.cs.ox.ac.uk/people/hsiang-shang.ko/) " ++
