@@ -115,8 +115,8 @@ mutual
   clsP (O * P)     (js , js') = clsP O js × clsP P js'
 
   clsP-∇ : ∀ {I J} {e : J → I} {S : Set} {D : S → RDesc I} {E} →
-              ∀ {s} → ROrn e (D s) E → ∀ {s'} → ⟦ D s' ⟧ (_⁻¹_ e) → s ≡ s' → Set
-  clsP-∇ {s} O js refl = clsP O js
+           ∀ {s} → ROrn e (D s) E → ∀ {s'} → ⟦ D s' ⟧ (_⁻¹_ e) → s ≡ s' → Set
+  clsP-∇ O js refl = clsP O js
 
 clsAlg : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → Ḟ D (_⁻¹_ e) ↝⁺ (_⁻¹_ e)
 clsAlg (wrap O) = wrap λ i js j → clsP (O j) js

@@ -170,7 +170,7 @@ module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (
 
   integrate-inv : ∀ {jk} (p : μ ⌊ O ⊗ P ⌋ jk) → integrate-inv-Ind p
   integrate-inv =
-    induction ⌊ O ⊗ P ⌋ integrate-inv-Ind (λ { {jk} ps all eq refl refl → cong con (aux (Orn.comp O (pproj₁ jk)) (Orn.comp P (pproj₂ jk)) ps all _) })
+    induction ⌊ O ⊗ P ⌋ integrate-inv-Ind (λ { {j , k} ps all eq refl refl → cong con (aux (Orn.comp O j) (Orn.comp P k) ps all _) })
     where
       aux' : ∀ {i k} (j : e ⁻¹ i) (idx : e (und j) ≡ i) (idx' : f k ≡ i)
              (p : μ ⌊ O ⊗ P ⌋ (j , from≡ idx')) (eq : _)

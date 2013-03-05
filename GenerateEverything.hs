@@ -20,16 +20,15 @@ readme_header =
   [ "# Composable structures for dependently typed programming (TBD)",
     "",
     "This implements, in Agda, a framework of " ++
-    "composable datatype refinements based on " ++
-    "McBride's ornamentation.",
+		"composable datatype refinements " ++
+    "based on [McBride's datatype ornamentation]" ++
+		"(http://personal.cis.strath.ac.uk/~conor/pub/OAAO/LitOrn.pdf).",
     "",
-		"All files typecheck with Agda-2.3.1. " ++
+		"All files typecheck with Agda 2.3.1 or 2.3.3, but note that " ++
+		"some files can take a very long time to typecheck. " ++
 		"(The module Thesis.Ornament.SequentialComposition " ++
-		"would bump into [an error of Agda-2.3.2]" ++
-		"(http://code.google.com/p/agda/issues/detail?id=754), " ++
-		"and the module Thesis.Ornament.Isomorphism would bump into " ++
-		"[another error of Agda-2.3.3]" ++
-		"(http://code.google.com/p/agda/issues/detail?id=778).)",
+		"would bump into [an error of Agda 2.3.2]" ++
+		"(http://code.google.com/p/agda/issues/detail?id=754).)" ++
 		"",
     "See [the author's homepage]" ++
     "(http://www.cs.ox.ac.uk/people/hsiang-shang.ko/) " ++

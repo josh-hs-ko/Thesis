@@ -1,6 +1,6 @@
 -- Two fundamental theorems about algebraic ornaments and classifying algebras.
--- *The AOOA Theorem:* Algebraic ornamentation by a classifying algebra produces an isomorphic datatype.
--- *The OAAO Theorem:* A classifying algebra derived from an algebraic ornament is isomorphic to the algebra of the ornament.
+-- *The AOCA Theorem:* Algebraic ornamentation by a classifying algebra produces an isomorphic datatype.
+-- *The CAAO Theorem:* A classifying algebra derived from an algebraic ornament is isomorphic to the algebra of the ornament.
 
 module Thesis.Ornament.Algebraic.FundamentalTheorems where
 
@@ -75,8 +75,8 @@ ft-existence-unique {I} {J} {e = e} (wrap O) (ok (.(e j) , ok j)) {X} = aux (O (
     aux (O' * O'') (xs , xs') ((js , js') , (p , p') , (q , q'))  with aux O' xs (js , p , q) | aux O'' xs' (js' , p' , q')
     aux (O' * O'') (xs , xs') ((._ , ._) , (._ , ._) , (._ , ._)) | refl | refl = refl
 
-AOOA-theorem : ∀ {I J} {e : J → I} {D E} → (O : Orn e D E) → IsoOrn (tweakOrn O)
-AOOA-theorem {e = e} O =
+AOCA-theorem : ∀ {I J} {e : J → I} {D E} → (O : Orn e D E) → IsoOrn (tweakOrn O)
+AOCA-theorem {e = e} O =
   record { from = λ j → e j , ok j; to-from-inverse = frefl; from-to-inverse = λ { (.(e j) , ok j) → refl } } ,
   ft-existence O , ft-existence-unique O
 
@@ -84,34 +84,34 @@ AOOA-theorem {e = e} O =
 --------
 -- classifying algebra derived from an algebraic ornament is isomorphic to the algebra of the ornament
 
-module OAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝⁺ J) where
+module CAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝⁺ J) where
 
   h : J ⇉ _⁻¹_ proj₁
   h {i} = ok ∘ _,_ i
 
-  OAAO-theorem-aux-computation : (D : RDesc I) (js : ⟦ D ⟧ J) → clsP (toROrn (erode D js)) (mapF D h js)
-  OAAO-theorem-aux-computation ∎       js         = tt
-  OAAO-theorem-aux-computation (ṿ i)   j          = refl
-  OAAO-theorem-aux-computation (σ S D) (s , js)   = refl , OAAO-theorem-aux-computation (D s) js
-  OAAO-theorem-aux-computation (D * E) (js , js') = OAAO-theorem-aux-computation D js , OAAO-theorem-aux-computation E js'
+  CAAO-theorem-aux-computation : (D : RDesc I) (js : ⟦ D ⟧ J) → clsP (toROrn (erode D js)) (mapF D h js)
+  CAAO-theorem-aux-computation ∎       js         = tt
+  CAAO-theorem-aux-computation (ṿ i)   j          = refl
+  CAAO-theorem-aux-computation (σ S D) (s , js)   = refl , CAAO-theorem-aux-computation (D s) js
+  CAAO-theorem-aux-computation (D * E) (js , js') = CAAO-theorem-aux-computation D js , CAAO-theorem-aux-computation E js'
 
-  OAAO-theorem-aux-unique : (D : RDesc I) (js js' : ⟦ D ⟧ J) → clsP (toROrn (erode D js')) (mapF D h js) → js ≡ js'
-  OAAO-theorem-aux-unique ∎       js        js'         p          = refl
-  OAAO-theorem-aux-unique (ṿ i)   j         j'          p          = cong-proj₂ p
-  OAAO-theorem-aux-unique (σ S D) (s , js)  (.s , js')  (refl , p) = cong (_,_ s) (OAAO-theorem-aux-unique (D s) js js' p)
-  OAAO-theorem-aux-unique (D * E) (js , ks) (js' , ks') (p , p')   = cong₂ _,_ (OAAO-theorem-aux-unique D js js' p)
-                                                                               (OAAO-theorem-aux-unique E ks ks' p')
+  CAAO-theorem-aux-unique : (D : RDesc I) (js js' : ⟦ D ⟧ J) → clsP (toROrn (erode D js')) (mapF D h js) → js ≡ js'
+  CAAO-theorem-aux-unique ∎       js        js'         p          = refl
+  CAAO-theorem-aux-unique (ṿ i)   j         j'          p          = cong-proj₂ p
+  CAAO-theorem-aux-unique (σ S D) (s , js)  (.s , js')  (refl , p) = cong (_,_ s) (CAAO-theorem-aux-unique (D s) js js' p)
+  CAAO-theorem-aux-unique (D * E) (js , ks) (js' , ks') (p , p')   = cong₂ _,_ (CAAO-theorem-aux-unique D js js' p)
+                                                                               (CAAO-theorem-aux-unique E ks ks' p')
 
-  OAAO-theorem : fun⁺ h •⁺ R ≃⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ h)
-  OAAO-theorem =
+  CAAO-theorem : fun⁺ h •⁺ R ≃⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ h)
+  CAAO-theorem =
     wrap (λ i → wrap λ { js ._ (j , r , refl) →
-                         Ḟ-map D h js , mapR-fun-computation (D at i) h js , js , r , OAAO-theorem-aux-computation (D at i) js }) ,
+                         Ḟ-map D h js , mapR-fun-computation (D at i) h js , js , r , CAAO-theorem-aux-computation (D at i) js }) ,
     wrap (λ i → wrap λ { js ij (ijs , rs , q) → aux js ij ijs rs q })
     where
       aux : ∀ {i} (js : Ḟ D J i) (ij : proj₁ {B = J} ⁻¹ i) (ijs : Ḟ D (_⁻¹_ proj₁) i) (rs : mapR (D at i) (fun⁺ h) js ijs) →
             (q : (clsAlg ⌈ algOrn D R ⌉ !!) i ijs ij) → ((fun⁺ h •⁺ R) !!) i js ij
       aux js (ok (i , j)) ijs rs (js' , r , p) with mapR-fun-unique (D at i) h js ijs rs
-      aux js (ok (i , j)) ._  rs (js' , r , p) | refl with OAAO-theorem-aux-unique (D at i) js js' p
+      aux js (ok (i , j)) ._  rs (js' , r , p) | refl with CAAO-theorem-aux-unique (D at i) js js' p
       aux js (ok (i , j)) ._  rs (.js , r , p) | refl | refl = j , r , refl
 
   g : _⁻¹_ proj₁ ⇉ J

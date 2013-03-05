@@ -1,6 +1,4 @@
 -- Solving the minimum coin change problem with the Greedy Theorem and algebraic ornamentation.
--- Several code fragments make Agda thrash mysteriously, but should be type-correct.
--- These fragments are commented out and postulated.
 
 module Thesis.Examples.MinCoinChange where
 
@@ -376,8 +374,7 @@ greedy-condition-aux c (true  , d , d≤c , n) ._
             (b , total-value-d'-b-n' , modus-ponens-⊆⁺ (proj₁ (fun⁺-preserves-fold CoinBagD count-alg)) d' b (count b) refl))
     l : ℕ
     l = proj₁ greedy-lemma-invocation
-    postulate better-solution : Σ[ b' ∶ CoinBag d ] foldR' (fun⁺ total-value-alg) d b' n × foldR' (fun⁺ count-alg) d b' l
-{-  [Agda thrashes here mysteriously.]
+    better-solution : Σ[ b' ∶ CoinBag d ] foldR' (fun⁺ total-value-alg) d b' n × foldR' (fun⁺ count-alg) d b' l
     better-solution =
       Iso.to Fun (Refinement.i
         (FRefinement.comp
@@ -385,14 +382,11 @@ greedy-condition-aux c (true  , d , d≤c , n) ._
                                    (algOrn-FSwap CoinBagD (fun⁺ total-value-alg)) (algOrn-FSwap CoinBagD (fun⁺ count-alg))))
            (ok (ok (d , n) , (ok (d , l))))))
         (proj₁ (proj₂ greedy-lemma-invocation))
--}
-    postulate better-evidence : count (proj₁ better-solution) ≤ count b
-{-  [Agda thrashes here mysteriously.]
+    better-evidence : count (proj₁ better-solution) ≤ count b
     better-evidence = ≤-trans (DecTotalOrder.reflexive ℕ-DecTotalOrder
                                  (modus-ponens-⊆⁺ (proj₂ (fun⁺-preserves-fold CoinBagD count-alg))
                                     d (proj₁ better-solution) l (proj₂ (proj₂ better-solution))))
-                               (proj₂ (proj₂ greedy-lemma-invocation))
--}
+                              (proj₂ (proj₂ greedy-lemma-invocation))
 
 greedy-condition :
   α •⁺ Ṙ CoinBagD (foldR (fun⁺ total-value-alg) º⁺) •⁺ (Q ∩⁺ (fun⁺ total-value-alg º⁺ •⁺ fun⁺ total-value-alg)) º⁺

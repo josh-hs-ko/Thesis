@@ -49,19 +49,19 @@ record _⋈_ {A B C : Set} (f : A → C) (g : B → C) : Set where
   constructor _,_
   field
     {c} : C
-    l   : f ⁻¹ c
-    r   : g ⁻¹ c
+    a   : f ⁻¹ c
+    b   : g ⁻¹ c
 
 infixr 4 _,_
 
 pull : {A B C : Set} {f : A → C} {g : B → C} → f ⋈ g → C
-pull (_,_ {c} _ _) = c
+pull = _⋈_.c
 
-pproj₁ : {A B C : Set} {f : A → C} {g : B → C} → (p : f ⋈ g) → f ⁻¹ (_⋈_.c p)
-pproj₁ (a , _) = a
+pproj₁ : {A B C : Set} {f : A → C} {g : B → C} → (p : f ⋈ g) → f ⁻¹ (pull p)
+pproj₁ = _⋈_.a
 
-pproj₂ : {A B C : Set} {f : A → C} {g : B → C} → (p : f ⋈ g) → g ⁻¹ (_⋈_.c p)
-pproj₂ (_ , b) = b
+pproj₂ : {A B C : Set} {f : A → C} {g : B → C} → (p : f ⋈ g) → g ⁻¹ (pull p)
+pproj₂ = _⋈_.b
 
 π₁ : {A B C : Set} {f : A → C} {g : B → C} → f ⋈ g → A
 π₁ = und ∘ pproj₁

@@ -1,9 +1,8 @@
 # Composable structures for dependently typed programming (TBD)
 
-This implements, in Agda, a framework of composable datatype refinements based on McBride's ornamentation.
+This implements, in Agda, a framework of composable datatype refinements based on [McBride's datatype ornamentation](http://personal.cis.strath.ac.uk/~conor/pub/OAAO/LitOrn.pdf).
 
-All files typecheck with Agda-2.3.1. (The module Thesis.Ornament.SequentialComposition would bump into [an error of Agda-2.3.2](http://code.google.com/p/agda/issues/detail?id=754), and the module Thesis.Ornament.Isomorphism would bump into [another error of Agda-2.3.3](http://code.google.com/p/agda/issues/detail?id=778).)
-
+All files typecheck with Agda 2.3.1 or 2.3.3, but note that some files can take a very long time to typecheck. (The module Thesis.Ornament.SequentialComposition would bump into [an error of Agda 2.3.2](http://code.google.com/p/agda/issues/detail?id=754).)
 See [the author's homepage](http://www.cs.ox.ac.uk/people/hsiang-shang.ko/) for more information, including published papers.
 
 ## Module descriptions
@@ -97,8 +96,8 @@ The optimised predicate of an algebraic ornament can be swapped for a relational
 
 #### Thesis.Ornament.Algebraic.FundamentalTheorems
 Two fundamental theorems about algebraic ornaments and classifying algebras.
-*The AOOA Theorem:* Algebraic ornamentation by a classifying algebra produces an isomorphic datatype.
-*The OAAO Theorem:* A classifying algebra derived from an algebraic ornament is isomorphic to the algebra of the ornament.
+*The AOCA Theorem:* Algebraic ornamentation by a classifying algebra produces an isomorphic datatype.
+*The CAAO Theorem:* A classifying algebra derived from an algebraic ornament is isomorphic to the algebra of the ornament.
 
 #### Thesis.Ornament.Algebraic.Fusion
 Fold fusion theorems for algebraic ornamentation.
@@ -184,8 +183,6 @@ Vectors, i.e., length-indexed lists, defined as the optimised predicate for the 
 
 #### Thesis.Examples.MinCoinChange
 Solving the minimum coin change problem with the Greedy Theorem and algebraic ornamentation.
-Several code fragments make Agda thrash mysteriously, but should be type-correct.
-These fragments are commented out and postulated.
 
 #### Thesis.Examples.Nat
 Peano-style natural numbers.
