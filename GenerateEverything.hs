@@ -24,7 +24,7 @@ readme_header =
     "based on [McBride's datatype ornamentation]" ++
 		"(http://personal.cis.strath.ac.uk/~conor/pub/OAAO/LitOrn.pdf).",
     "",
-		"All files typecheck with Agda 2.3.1 or 2.3.3, but note that " ++
+		"All files typecheck with Agda 2.3.3, but note that " ++
 		"some files can take a very long time to typecheck. " ++
 		"(The module Thesis.Ornament.SequentialComposition " ++
 		"would bump into [an error of Agda 2.3.2]" ++
