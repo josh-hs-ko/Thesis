@@ -12,159 +12,167 @@ open import Thesis.Description
 open import Function using (id; _∘_)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; proj₁)
+open import Data.List using (List; []; _∷_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; cong; cong₂; setoid)
 
 
 --------
 -- ornaments
 
-data ROrn {I J} (e : J → I) : RDesc I → RDesc J → Set₁ where
-  ∎   : ROrn e ∎ ∎
-  ṿ   : ∀ {j i} (idx : e j ≡ i) → ROrn e (ṿ i) (ṿ j)
+data Ė {I J : Set} (e : J → I) : List J → List I → Set where
+  []  : Ė e [] []
+  _∷_ : {j : J} {i : I} (eq : e j ≡ i) {js : List J} {is : List I} (eqs : Ė e js is) → Ė e (j ∷ js) (i ∷ is)
+
+data ROrn {I J : Set} (e : J → I) : RDesc I → RDesc J → Set₁ where
+  ṿ   : {js : List J} {is : List I} (eqs : Ė e js is) → ROrn e (ṿ is) (ṿ js)
   σ   : (S : Set) → ∀ {D E} (O : ∀ s → ROrn e (D s) (E s)) → ROrn e (σ S D) (σ S E)
   Δ   : (T : Set) → ∀ {D E} (O : ∀ t → ROrn e D (E t)) → ROrn e D (σ T E)
   ∇   : {S : Set} (s : S) → ∀ {D E} (O : ROrn e (D s) E) → ROrn e (σ S D) E
-  _*_ : ∀ {D E} (O : ROrn e D E) → ∀ {D' E'} (O' : ROrn e D' E') → ROrn e (D * D') (E * E')
 
 syntax σ S (λ s → O) = σ[ s ∶ S ] O
 syntax Δ T (λ t → O) = Δ[ t ∶ T ] O
 
-erase : ∀ {I J} {e : J → I} {D E} → ROrn e D E → ∀ {X} → ⟦ E ⟧ (X ∘ e) → ⟦ D ⟧ X
-erase ∎        _        = tt
-erase (ṿ refl) x        = x
+erase-Ṁ : {I J : Set} {e : J → I} {js : List J} {is : List I} → Ė e js is → {X : I → Set} → Ṁ (X ∘ e) js → Ṁ X is
+erase-Ṁ []           _        = tt
+erase-Ṁ (refl ∷ eqs) (x , xs) = x , erase-Ṁ eqs xs
+
+erase : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} → ROrn e D E → {X : I → Set} → ⟦ E ⟧ (X ∘ e) → ⟦ D ⟧ X
+erase (ṿ eqs)  xs       = erase-Ṁ eqs xs
 erase (σ S O)  (s , xs) = s , erase (O s) xs
 erase (Δ T O)  (t , xs) = erase (O t) xs
 erase (∇ s O)  xs       = s , erase O xs
-erase (O * O') (x , x') = erase O x , erase O' x'
 
-idROrn : ∀ {I} (D : RDesc I) → ROrn id D D
-idROrn ∎       = ∎
-idROrn (ṿ i)   = ṿ refl
+Ė-id : {I : Set} (is : List I) → Ė id is is
+Ė-id []       = []
+Ė-id (i ∷ is) = refl ∷ Ė-id is
+
+idROrn : {I : Set} (D : RDesc I) → ROrn id D D
+idROrn (ṿ is)  = ṿ (Ė-id is)
 idROrn (σ S D) = σ[ s ∶ S ] idROrn (D s)
-idROrn (D * E) = idROrn D * idROrn E
+
+erase-idROrn-Ṁ : {I : Set} {X : I → Set} (is : List I) (xs : Ṁ X is) → erase-Ṁ (Ė-id is) xs ≡ xs
+erase-idROrn-Ṁ []       _        = refl
+erase-idROrn-Ṁ (i ∷ is) (x , xs) = cong₂ _,_ refl (erase-idROrn-Ṁ is xs)
 
 erase-idROrn : ∀ {I} (D : RDesc I) → ∀ {X} {xs : ⟦ D ⟧ X} → erase (idROrn D) xs ≡ xs
-erase-idROrn ∎                       = refl
-erase-idROrn (ṿ i)                   = refl
-erase-idROrn (σ S D) {xs = s , xs  } = cong (_,_ s) (erase-idROrn (D s))
-erase-idROrn (D * E) {xs = xs , xs'} = cong₂ _,_ (erase-idROrn D) (erase-idROrn E)
+erase-idROrn (ṿ is)  {xs = xs    } = erase-idROrn-Ṁ is xs
+erase-idROrn (σ S D) {xs = s , xs} = cong (_,_ s) (erase-idROrn (D s))
 
 record Orn {I J : Set} (e : J → I) (D : Desc I) (E : Desc J) : Set₁ where
   constructor wrap
   field
-    comp : ∀ {i} (j : e ⁻¹ i) → ROrn e (D at i) (E at und j)
+    comp : ∀ {i} (j : e ⁻¹ i) → ROrn e (Desc.comp D i) (Desc.comp E (und j))
 
-idOrn : ∀ {I} (D : Desc I) → Orn id D D
-idOrn D = wrap λ { {._} (ok i) → idROrn (D at i) }
+idOrn : {I : Set} (D : Desc I) → Orn id D D
+idOrn D = wrap λ { {._} (ok i) → idROrn (Desc.comp D i) }
 
 -- ornamental algebra
 
-ornAlg : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → Ḟ E (μ D ∘ e) ⇉ μ D ∘ e
-ornAlg {D = D} (wrap O) {j} = con ∘ erase (O (ok j))
+ornAlg : {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) → Ḟ E (μ D ∘ e) ⇉ μ D ∘ e
+ornAlg {D = D} O {j} = con ∘ erase (Orn.comp O (ok j))
 
 forget : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → μ E ⇉ μ D ∘ e
 forget O = fold (ornAlg O)
 
 forget-idOrn : ∀ {I} {D : Desc I} → ∀ {i} (x : μ D i) → forget (idOrn D) x ≡ x
-forget-idOrn {I} {D} = induction D (λ x → forget (idOrn D) x ≡ x) (λ {i} xs all → cong con (aux (D at i) xs all))
-  where aux : (D' : RDesc I) (xs : ⟦ D' ⟧ (μ D)) (all : All D' (λ x → forget (idOrn D) x ≡ x) xs) →
+forget-idOrn {I} {D} = induction D (λ _ x → forget (idOrn D) x ≡ x) (λ i xs ihs → cong con (aux (Desc.comp D i) xs ihs))
+  where aux : (D' : RDesc I) (xs : ⟦ D' ⟧ (μ D)) → All D' (λ _ x → forget (idOrn D) x ≡ x) xs →
               erase (idROrn D') (mapFold D D' (ornAlg (idOrn D)) xs) ≡ xs
-        aux ∎         xs         all          = refl
-        aux (ṿ i)     xs         all          = all
-        aux (σ S D')  (s , xs)   all          = cong (_,_ s) (aux (D' s) xs all)
-        aux (D' * E') (xs , xs') (all , all') = cong₂ _,_ (aux D' xs all) (aux E' xs' all')
-
+        aux (ṿ [])       _        _          = refl
+        aux (ṿ (i ∷ is)) (x , xs) (ih , ihs) = cong₂ _,_ ih (aux (ṿ is) xs ihs)
+        aux (σ S D')     (s , xs) ihs        = cong (_,_ s) (aux (D' s) xs ihs)
 
 --------
 -- ornamental descriptions
 
 data ROrnDesc {I : Set} (J : Set) (e : J → I) : RDesc I → Set₁ where
-  ∎   : ROrnDesc J e ∎
-  ṿ   : ∀ {i} (j : e ⁻¹ i) → ROrnDesc J e (ṿ i)
+  ṿ   : {is : List I} (js : Ṁ (InvImage e) is) → ROrnDesc J e (ṿ is)
   σ   : (S : Set) → ∀ {D} (O : ∀ s → ROrnDesc J e (D s)) → ROrnDesc J e (σ S D)
   Δ   : (T : Set) → ∀ {D} (O : T → ROrnDesc J e D) → ROrnDesc J e D
   ∇   : {S : Set} (s : S) → ∀ {D} (O : ROrnDesc J e (D s)) → ROrnDesc J e (σ S D)
-  _*_ : ∀ {D} (O : ROrnDesc J e D) → ∀ {D'} (O' : ROrnDesc J e D') → ROrnDesc J e (D * D')
 
 record OrnDesc {I : Set} (J : Set) (e : J → I) (D : Desc I) : Set₁ where
   constructor wrap
   field
-    comp : ∀ {i} (j : e ⁻¹ i) → ROrnDesc J e (D at i)
+    comp : ∀ {i} (j : e ⁻¹ i) → ROrnDesc J e (Desc.comp D i)
 
-toRDesc : ∀ {I J} {e : J → I} {D} → ROrnDesc J e D → RDesc J
-toRDesc ∎             = ∎
-toRDesc (ṿ (ok j))    = ṿ j
-toRDesc (σ S O)       = σ[ s ∶ S ] toRDesc (O s)
-toRDesc (Δ T O)       = σ[ t ∶ T ] toRDesc (O t)
-toRDesc (∇ s O)       = toRDesc O
-toRDesc (O * O')      = toRDesc O * toRDesc O'
+und-Ṁ : {I J : Set} {e : J → I} (is : List I) → Ṁ (InvImage e) is → List J
+und-Ṁ []        _           = []
+und-Ṁ (._ ∷ is) (ok j , js) = j ∷ und-Ṁ is js
 
-⌊_⌋ : ∀ {I J} {e : J → I} {D} → OrnDesc J e D → Desc J
+toRDesc : {I J : Set} {e : J → I} {D : RDesc I} → ROrnDesc J e D → RDesc J
+toRDesc (ṿ js)  = ṿ (und-Ṁ _ js)
+toRDesc (σ S O) = σ[ s ∶ S ] toRDesc (O s)
+toRDesc (Δ T O) = σ[ t ∶ T ] toRDesc (O t)
+toRDesc (∇ s O) = toRDesc O
+
+⌊_⌋ : {I J : Set} {e : J → I} {D : Desc I} → OrnDesc J e D → Desc J
 ⌊ wrap O ⌋ = wrap λ j → toRDesc (O (ok j))
 
-toROrn : ∀ {I J} {e : J → I} {D} → (O : ROrnDesc J e D) → ROrn e D (toRDesc O)
-toROrn ∎          = ∎
-toROrn (ṿ (ok j)) = ṿ refl
-toROrn (σ S O)    = σ[ s ∶ S ] toROrn (O s)
-toROrn (Δ T O)    = Δ[ t ∶ T ] toROrn (O t)
-toROrn (∇ s O)    = ∇ s (toROrn O)
-toROrn (O * O')   = toROrn O * toROrn O'
+to≡-Ṁ : {I J : Set} {e : J → I} (is : List I) (js : Ṁ (InvImage e) is) → Ė e (und-Ṁ is js) is
+to≡-Ṁ []        _           = []
+to≡-Ṁ (._ ∷ is) (ok j , js) = refl ∷ to≡-Ṁ is js
 
-⌈_⌉ : ∀ {I J} {e : J → I} {D} → (O : OrnDesc J e D) → Orn e D ⌊ O ⌋
+toROrn : {I J : Set} {e : J → I} {D : RDesc I} → (O : ROrnDesc J e D) → ROrn e D (toRDesc O)
+toROrn (ṿ js)  = ṿ (to≡-Ṁ _ js)
+toROrn (σ S O) = σ[ s ∶ S ] toROrn (O s)
+toROrn (Δ T O) = Δ[ t ∶ T ] toROrn (O t)
+toROrn (∇ s O) = ∇ s (toROrn O)
+
+⌈_⌉ : {I J : Set} {e : J → I} {D : Desc I} → (O : OrnDesc J e D) → Orn e D ⌊ O ⌋
 ⌈ wrap O ⌉ = wrap λ { {._} (ok j) → toROrn (O (ok j)) }
 
+ok-Ṁ : {I : Set} (is : List I) → Ṁ (InvImage id) is
+ok-Ṁ []       = tt
+ok-Ṁ (i ∷ is) = ok i , ok-Ṁ is
+
 idROrnDesc : ∀ {I} (D : RDesc I) → ROrnDesc I id D
-idROrnDesc ∎       = ∎
-idROrnDesc (ṿ i)   = ṿ (ok i)
+idROrnDesc (ṿ is)  = ṿ (ok-Ṁ is)
 idROrnDesc (σ S D) = σ[ s ∶ S ] idROrnDesc (D s)
-idROrnDesc (D * E) = idROrnDesc D * idROrnDesc E
 
 
 --------
 -- singleton ornaments
 
-erode : ∀ {I} (D : RDesc I) → ∀ {J} → ⟦ D ⟧ J → ROrnDesc (Σ I J) proj₁ D
-erode ∎       _          = ∎
-erode (ṿ i)   j          = ṿ (ok (i , j))
+erode : {I : Set} (D : RDesc I) → {J : I → Set} → ⟦ D ⟧ J → ROrnDesc (Σ I J) proj₁ D
+erode (ṿ is)  js         = ṿ (Ṁ-map (λ {i} j → ok (i , j)) is js)
 erode (σ S D) (s , js)   = ∇ s (erode (D s) js)
-erode (D * E) (js , js') = erode D js * erode E js'
 
-singOrn : ∀ {I} (D : Desc I) → OrnDesc (Σ I (μ D)) proj₁ D
-singOrn D = wrap λ { {._} (ok (i , con ds)) → erode (D at i) ds }
+singOrn : {I : Set} (D : Desc I) → OrnDesc (Σ I (μ D)) proj₁ D
+singOrn D = wrap λ { {._} (ok (i , con ds)) → erode (Desc.comp D i) ds }
 
 singleton-aux :
-  ∀ {I} {D : Desc I} (D' : RDesc I)
-  (xs : ⟦ D' ⟧ (μ D)) (all : All D' (λ {i} x → μ ⌊ singOrn D ⌋ (i , x)) xs) → ⟦ toRDesc (erode D' xs) ⟧ (μ ⌊ singOrn D ⌋)
-singleton-aux ∎         xs          all         = tt
-singleton-aux (ṿ i)     xs          all         = all
-singleton-aux (σ S D')  (s , xs)    all         = singleton-aux (D' s) xs all
-singleton-aux (D' * E') (xs , xs') (all , all') = singleton-aux D' xs all , singleton-aux E' xs' all'
+  {I : Set} {D : Desc I} (D' : RDesc I)
+  (xs : ⟦ D' ⟧ (μ D)) (ihs : All D' (λ i x → μ ⌊ singOrn D ⌋ (i , x)) xs) → ⟦ toRDesc (erode D' xs) ⟧ (μ ⌊ singOrn D ⌋)
+singleton-aux (ṿ [])       _        _          = tt
+singleton-aux (ṿ (i ∷ is)) (x , xs) (ih , ihs) = ih , singleton-aux (ṿ is) xs ihs
+singleton-aux (σ S D')     (s , xs) ihs        = singleton-aux (D' s) xs ihs
 
 singleton-alg :
-  ∀ {I} (D : Desc I) {i : I} (xs : Ḟ D (μ D) i) → All (D at i) (λ {i} x → μ ⌊ singOrn D ⌋ (i , x)) xs → μ ⌊ singOrn D ⌋ (i , con xs)
-singleton-alg D {i} xs all = con (singleton-aux (D at i) xs all)
+  {I : Set} (D : Desc I) (i : I) (xs : Ḟ D (μ D) i) → All (Desc.comp D i) (λ i x → μ ⌊ singOrn D ⌋ (i , x)) xs → μ ⌊ singOrn D ⌋ (i , con xs)
+singleton-alg D i xs ihs = con (singleton-aux (Desc.comp D i) xs ihs)
 
-singleton : ∀ {I} {D : Desc I} → ∀ {i} (x : μ D i) → μ ⌊ singOrn D ⌋ (i , x)
-singleton {D = D} = induction D (λ {i} x → μ ⌊ singOrn D ⌋ (i , x)) (singleton-alg D)
+singleton : {I : Set} {D : Desc I} {i : I} (x : μ D i) → μ ⌊ singOrn D ⌋ (i , x)
+singleton {D = D} = induction D (λ i x → μ ⌊ singOrn D ⌋ (i , x)) (singleton-alg D)
 
-singleton-unique : ∀ {I} {D : Desc I} → ∀ {i} (x : μ D i) → Unique (setoid _) (singleton x)
+singleton-unique : {I : Set} {D : Desc I} → {i : I} (x : μ D i) → Unique (setoid _) (singleton x)
 singleton-unique {I} {D} =
-  induction D (λ x → Unique (setoid _) (singleton x)) (λ { {i} xs all (con ys) → cong con (aux (D at i) xs all ys) })
-  where aux : (D' : RDesc I) (xs : ⟦ D' ⟧ (μ D)) (all : All D' (λ x → Unique (setoid _) (singleton x)) xs)
-              (ys : ⟦ toRDesc (erode D' xs) ⟧ (μ ⌊ singOrn D ⌋)) →
-              singleton-aux D' xs (everywhereInduction D D' (λ {i} x → μ ⌊ singOrn D ⌋ (i , x)) (singleton-alg D) xs) ≡ ys
-        aux ∎         xs         all          ys         = refl
-        aux (ṿ i)     x          all          y          = all y
-        aux (σ S D')  (s , xs)   all          ys         = aux (D' s) xs all ys
-        aux (D' * E') (xs , xs') (all , all') (ys , ys') = cong₂ _,_ (aux D' xs all ys) (aux E' xs' all' ys')
+  induction D (λ _ x → Unique (setoid _) (singleton x)) (λ { i xs ihs (con ys) → cong con (aux (Desc.comp D i) xs ihs ys) })
+  where
+    aux : (D' : RDesc I) (xs : ⟦ D' ⟧ (μ D)) → All D' (λ _ x → Unique (setoid _) (singleton x)) xs →
+          (ys : ⟦ toRDesc (erode D' xs) ⟧ (μ ⌊ singOrn D ⌋)) →
+          singleton-aux D' xs (everywhereInduction D D' (λ i x → μ ⌊ singOrn D ⌋ (i , x)) (singleton-alg D) xs) ≡ ys
+    aux (ṿ [])       _        _          _        = refl
+    aux (ṿ (i ∷ is)) (x , xs) (ih , ihs) (y , ys) = cong₂ _,_ (ih y) (aux (ṿ is) xs ihs ys)
+    aux (σ S D')     (s , xs) ihs        ys       = aux (D' s) xs ihs ys
 
 forget-singOrn : ∀ {I} {D : Desc I} → ∀ {i} {x : μ D i} (s : μ ⌊ singOrn D ⌋ (i , x)) → forget ⌈ singOrn D ⌉ s ≡ x
 forget-singOrn {I} {D} =
-  induction ⌊ singOrn D ⌋ (λ { {i , x} s → forget ⌈ singOrn D ⌉ s ≡ x }) (λ { {i , con xs} ss all → cong con (aux (D at i) xs ss all) })
-  where aux : (D' : RDesc I) (xs : ⟦ D' ⟧ (μ D)) (ss : ⟦ toRDesc (erode D' xs) ⟧ (μ ⌊ singOrn D ⌋))
-              (all : All (toRDesc (erode D' xs)) (λ { {i , x} s → forget ⌈ singOrn D ⌉ {i , x} s ≡ x }) ss) →
-              erase (toROrn (erode D' xs)) (mapFold ⌊ singOrn D ⌋ (toRDesc (erode D' xs)) (λ {ix} → ornAlg ⌈ singOrn D ⌉ {ix}) ss) ≡ xs
-        aux ∎         xs         ss         all          = refl
-        aux (ṿ i)     xs         ss         all          = all
-        aux (σ S D')  (s , xs)   ss         all          = cong (_,_ s) (aux (D' s) xs ss all)
-        aux (D' * E') (xs , xs') (ss , ss') (all , all') = cong₂ _,_ (aux D' xs ss all) (aux E' xs' ss' all')
+  induction ⌊ singOrn D ⌋ (λ { (i , x) s → forget ⌈ singOrn D ⌉ s ≡ x }) (λ { (i , con xs) ss ihs → cong con (aux (Desc.comp D i) xs ss ihs) })
+  where
+    aux : (D' : RDesc I) (xs : ⟦ D' ⟧ (μ D)) (ss : ⟦ toRDesc (erode D' xs) ⟧ (μ ⌊ singOrn D ⌋)) →
+          All (toRDesc (erode D' xs)) (λ { (i , x) s → forget ⌈ singOrn D ⌉ {i , x} s ≡ x }) ss →
+          erase (toROrn (erode D' xs)) (mapFold ⌊ singOrn D ⌋ (toRDesc (erode D' xs)) (λ {ix} → ornAlg ⌈ singOrn D ⌉ {ix}) ss) ≡ xs
+    aux (ṿ [])       _        _        _          = refl
+    aux (ṿ (i ∷ is)) (x , xs) (s , ss) (ih , ihs) = cong₂ _,_ ih (aux (ṿ is) xs ss ihs)
+    aux (σ S D')     (s , xs) ss       ihs        = cong (_,_ s) (aux (D' s) xs ss ihs)

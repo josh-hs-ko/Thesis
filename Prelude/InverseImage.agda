@@ -21,6 +21,9 @@ open import Relation.Binary.HeterogeneousEquality using (_≅_; ≅-to-≡) rena
 data _⁻¹_ {A B : Set} (f : A → B) : B → Set where
   ok : (x : A) → f ⁻¹ (f x)
 
+InvImage : {A B : Set} → (A → B) → B → Set
+InvImage = _⁻¹_
+
 und : ∀ {A B} {f : A → B} {y} → f ⁻¹ y → A
 und (ok x) = x
 

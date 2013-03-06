@@ -6,6 +6,7 @@ module Thesis.Description where
 open import Thesis.Prelude.Category.Isomorphism
 open import Thesis.Prelude.Function
 open import Thesis.Prelude.Function.Fam
+open import Thesis.Prelude.Product
 
 open import Function using (id; const)
 open import Data.Unit using (⊤; tt)
@@ -15,7 +16,7 @@ open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; cong
 
 
 data RDesc (I : Set) : Set₁ where
-  ṿ   : List I → RDesc I
+  ṿ   : (is : List I) → RDesc I
   σ   : (S : Set) (D : S → RDesc I) → RDesc I
 
 syntax σ S (λ s → D) = σ[ s ∶ S ] D
@@ -98,19 +99,23 @@ mutual
 reflection : {I : Set} (D : Desc I) → ∀ {i} (x : μ D i) → fold con x ≡ x
 reflection {I} D = induction D (λ _ x → fold con x ≡ x) (λ i xs all → cong con (aux (Desc.comp D i) xs all))
   where
-    aux : (D' : RDesc I) (xs : ⟦ D' ⟧ (μ D)) (all : All D' (λ _ x → fold {D = D} con x ≡ x) xs) → mapFold D D' con xs ≡ xs
-    aux (ṿ [])       _          _            = refl
-    aux (ṿ (i ∷ is)) (x , xs)   (all , alls) = cong₂ _,_ all (aux (ṿ is) xs alls)
-    aux (σ S D')     (s , xs)   all          = cong (_,_ s) (aux (D' s) xs all)
+    aux : (D' : RDesc I) (xs : ⟦ D' ⟧ (μ D)) → All D' (λ _ x → fold {D = D} con x ≡ x) xs → mapFold D D' con xs ≡ xs
+    aux (ṿ [])       _          _          = refl
+    aux (ṿ (i ∷ is)) (x , xs)   (ih , ihs) = cong₂ _,_ ih (aux (ṿ is) xs ihs)
+    aux (σ S D')     (s , xs)   ihs        = cong (_,_ s) (aux (D' s) xs ihs)
 
 -- maps
 
-mapF-Ṁ : {I : Set} {X Y : I → Set} → (X ⇉ Y) → (is : List I) → Ṁ X is → Ṁ Y is
-mapF-Ṁ f []       _        = tt
-mapF-Ṁ f (i ∷ is) (x , xs) = f x , mapF-Ṁ f is xs
+Ṁ-map : {I : Set} {X Y : I → Set} → (X ⇉ Y) → (is : List I) → Ṁ X is → Ṁ Y is
+Ṁ-map f []       _        = tt
+Ṁ-map f (i ∷ is) (x , xs) = f x , Ṁ-map f is xs
+
+Ṁ-comp : {I : Set} {X Y : I → Set} (is : List I) → Ṁ X is → Ṁ Y is → Ṁ (X ×' Y) is
+Ṁ-comp []       _        _        = tt
+Ṁ-comp (i ∷ is) (x , xs) (y , ys) = (x , y) , Ṁ-comp is xs ys
 
 mapF : {I : Set} (D : RDesc I) {X Y : I → Set} → (X ⇉ Y) → ⟦ D ⟧ X → ⟦ D ⟧ Y
-mapF (ṿ is)  f xs         = mapF-Ṁ f is xs
+mapF (ṿ is)  f xs         = Ṁ-map f is xs
 mapF (σ S D) f (s , xs)   = s , mapF (D s) f xs
 
 mapF-preserves-id : {I : Set} (D : RDesc I) {X : I → Set} → mapF D (λ {i} → id {A = X i}) ≐ id
