@@ -76,11 +76,12 @@ forget O = fold (ornAlg O)
 
 forget-idOrn : ∀ {I} {D : Desc I} → ∀ {i} (x : μ D i) → forget (idOrn D) x ≡ x
 forget-idOrn {I} {D} = induction D (λ _ x → forget (idOrn D) x ≡ x) (λ i xs ihs → cong con (aux (Desc.comp D i) xs ihs))
-  where aux : (D' : RDesc I) (xs : ⟦ D' ⟧ (μ D)) → All D' (λ _ x → forget (idOrn D) x ≡ x) xs →
-              erase (idROrn D') (mapFold D D' (ornAlg (idOrn D)) xs) ≡ xs
-        aux (ṿ [])       _        _          = refl
-        aux (ṿ (i ∷ is)) (x , xs) (ih , ihs) = cong₂ _,_ ih (aux (ṿ is) xs ihs)
-        aux (σ S D')     (s , xs) ihs        = cong (_,_ s) (aux (D' s) xs ihs)
+  where
+    aux : (D' : RDesc I) (xs : ⟦ D' ⟧ (μ D)) → All D' (λ _ x → forget (idOrn D) x ≡ x) xs →
+          erase (idROrn D') (mapFold D D' (ornAlg (idOrn D)) xs) ≡ xs
+    aux (ṿ [])       _        _          = refl
+    aux (ṿ (i ∷ is)) (x , xs) (ih , ihs) = cong₂ _,_ ih (aux (ṿ is) xs ihs)
+    aux (σ S D')     (s , xs) ihs        = cong (_,_ s) (aux (D' s) xs ihs)
 
 --------
 -- ornamental descriptions

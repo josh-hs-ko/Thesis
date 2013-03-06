@@ -14,6 +14,7 @@ open import Function using (id; _∘_; flip; type-signature)
 open import Data.Empty using (⊥)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
+open import Data.List using (List; []; _∷_)
 open import Relation.Binary using (Setoid; Preorder)
 import Relation.Binary.PreorderReasoning as PreorderReasoning
 import Relation.Binary.EqReasoning as EqReasoning
@@ -427,11 +428,15 @@ fun⁺-shunting-r-⇐ f R S (wrap R⊆⁺f•⁺S) = wrap λ i → fun-shunting-
 --------
 -- functorial map
 
+Ṁ-mapR : {I : Set} {X Y : I → Set} → (X ↝⁺ Y) → (is : List I) → Ṁ X is ↝ Ṁ Y is
+Ṁ-mapR R []       _        = any
+Ṁ-mapR R (i ∷ is) (x , xs) = (R !!) i x >>= λ y → Ṁ-mapR R is xs >>= λ ys → return (y , ys)
+
 mapR : {I : Set} (D : RDesc I) {X Y : I → Set} → (X ↝⁺ Y) → ⟦ D ⟧ X ↝ ⟦ D ⟧ Y
-mapR ∎       R xs         = any
-mapR (ṿ i)   R x          = (R !!) i x
+mapR (ṿ is)  R xs         = Ṁ-mapR R is xs
 mapR (σ S D) R (s , xs)   = map℘ (_,_ s) (mapR (D s) R xs)
-mapR (D * E) R (xs , xs') = map℘₂ _,_ (mapR D R xs) (mapR E R xs')
+
+{-
 
 mapR-monotonic : {I : Set} (D : RDesc I) {X Y : I → Set} {R S : X ↝⁺ Y} → R ⊆⁺ S → mapR D R ⊆ mapR D S
 mapR-monotonic ∎       R⊆⁺S        = ⊆-refl
@@ -489,24 +494,24 @@ mapR-fun-unique (D * E) f (xs , xs') (ys , ys') (.ys , r , .ys' , r' , refl) = c
 -- relators
 
 Ṙ : {I : Set} (D : Desc I) {X Y : I → Set} → (X ↝⁺ Y) → Ḟ D X ↝⁺ Ḟ D Y
-Ṙ D R = wrap λ i → mapR (D at i) R
+Ṙ D R = wrap λ i → mapR (Desc.comp D i) R
 
 Ṙ-monotonic : {I : Set} (D : Desc I) {X Y : I → Set} {R S : X ↝⁺ Y} → R ⊆⁺ S → Ṙ D R ⊆⁺ Ṙ D S
-Ṙ-monotonic D R⊆⁺S = wrap λ i → mapR-monotonic (D at i) R⊆⁺S
+Ṙ-monotonic D R⊆⁺S = wrap λ i → mapR-monotonic (Desc.comp D i) R⊆⁺S
 
 Ṙ-cong : {I : Set} (D : Desc I) {X Y : I → Set} {R S : X ↝⁺ Y} → R ≃⁺ S → Ṙ D R ≃⁺ Ṙ D S
 Ṙ-cong D (R⊆⁺S , R⊇⁺S) = Ṙ-monotonic D R⊆⁺S , Ṙ-monotonic D R⊇⁺S
 
 Ṙ-preserves-comp : {I : Set} (D : Desc I) {X Y Z : I → Set} (R : Y ↝⁺ Z) (S : X ↝⁺ Y) → Ṙ D (R •⁺ S) ≃⁺ Ṙ D R •⁺ Ṙ D S
-Ṙ-preserves-comp D R S = wrap (λ i → mapR-preserves-comp-⊆ (D at i) R S) , wrap (λ i → mapR-preserves-comp-⊇ (D at i) R S)
+Ṙ-preserves-comp D R S = wrap (λ i → mapR-preserves-comp-⊆ (Desc.comp D i) R S) , wrap (λ i → mapR-preserves-comp-⊇ (Desc.comp D i) R S)
 
 Ṙ-preserves-conv : {I : Set} (D : Desc I) {X Y : I → Set} (R : X ↝⁺ Y) → Ṙ D (R º⁺) ≃⁺ Ṙ D R º⁺
-Ṙ-preserves-conv D R = wrap (λ i → wrap λ ys xs → mapR-preserves-conv (D at i) (R º⁺) ys xs) ,
-                       wrap (λ i → wrap λ ys xs → mapR-preserves-conv (D at i)  R     xs ys)
+Ṙ-preserves-conv D R = wrap (λ i → wrap λ ys xs → mapR-preserves-conv (Desc.comp D i) (R º⁺) ys xs) ,
+                       wrap (λ i → wrap λ ys xs → mapR-preserves-conv (Desc.comp D i)  R     xs ys)
 
 fun-preserves-map : {I : Set} (D : Desc I) {X Y : I → Set} (f : X ⇉ Y) → fun⁺ (Ḟ-map D (λ {i} → f {i})) ≃⁺ Ṙ D (fun⁺ f)
-fun-preserves-map D f = wrap (λ i → wrap λ { xs ._ refl → mapR-fun-computation (D at i) f xs }) ,
-                        wrap (λ i → wrap λ xs → mapR-fun-unique (D at i) f xs)
+fun-preserves-map D f = wrap (λ i → wrap λ { xs ._ refl → mapR-fun-computation (Desc.comp D i) f xs }) ,
+                        wrap (λ i → wrap λ xs → mapR-fun-unique (Desc.comp D i) f xs)
 
 Ṙ-preserves-idR⁺ : {I : Set} (D : Desc I) {X : I → Set} → Ṙ D (idR⁺ {I} {X}) ≃⁺ idR⁺
 Ṙ-preserves-idR⁺ D {X} =
@@ -541,3 +546,5 @@ fun⁺-monotonic-alg-lemma D f R =
     fun⁺ f •⁺ Ṙ D (R º⁺) ⊆⁺ R º⁺ •⁺ fun⁺ f
   □
   where open PreorderReasoning ⇒-Preorder renaming (_∼⟨_⟩_ to _⇒⟨_⟩_; _∎ to _□)
+
+-}
