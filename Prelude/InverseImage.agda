@@ -33,8 +33,8 @@ from≡ {x = x} refl = ok x
 to≡ : ∀ {A B} {f : A → B} {y} → (x : f ⁻¹ y) → f (und x) ≡ y
 to≡ (ok x) = refl
 
-und-from≡ : ∀ {A B} {f : A → B} {x y} → (eq : f x ≡ y) → und (from≡ {f = f} eq) ≡ x
-und-from≡ refl = refl
+und-from≡ : ∀ {A B} (f : A → B) {x y} → (eq : f x ≡ y) → und (from≡ {f = f} eq) ≡ x
+und-from≡ f refl = refl
 
 und≡ : ∀ {A B} {f : A → B} {y} {x x' : f ⁻¹ y} → und x ≡ und x' → x ≡ x'
 und≡ {f = f} {x = ok x} {x'} eq = ≅-to-≡ (aux x' eq)
@@ -82,6 +82,6 @@ decouple {f = f} {g} {ok a , b} {ok .a , b'} refl eq = cong (_,_ {c = f a} (ok a
   (span (slice (f ⋈ g) pull) (sliceMorphism π₁ (λ { (ok a , b) → refl })) (sliceMorphism π₂ (λ { (a , ok b) → refl })) , refl) ,
   (λ s → spanMorphism
            (sliceMorphism (λ t → from≡ (SliceMorphism.triangle (Span.l s) t) , from≡ (SliceMorphism.triangle (Span.r s) t)) frefl)
-           (λ t → und-from≡ {f = f} (SliceMorphism.triangle (Span.l s) t)) (λ t → und-from≡ {f = g} (SliceMorphism.triangle (Span.r s) t)) ,
-         (λ m t → decouple (trans (und-from≡ {f = f} (SliceMorphism.triangle (Span.l s) t)) (sym (SpanMorphism.triangle-l m t)))
-                           (trans (und-from≡ {f = g} (SliceMorphism.triangle (Span.r s) t)) (sym (SpanMorphism.triangle-r m t)))))
+           (λ t → und-from≡ f (SliceMorphism.triangle (Span.l s) t)) (λ t → und-from≡ g (SliceMorphism.triangle (Span.r s) t)) ,
+         (λ m t → decouple (trans (und-from≡ f (SliceMorphism.triangle (Span.l s) t)) (sym (SpanMorphism.triangle-l m t)))
+                           (trans (und-from≡ g (SliceMorphism.triangle (Span.r s) t)) (sym (SpanMorphism.triangle-r m t)))))

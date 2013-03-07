@@ -3,11 +3,13 @@ module Thesis.Everything where
 import Thesis.Prelude.Category
 import Thesis.Prelude.Category.Isomorphism
 import Thesis.Prelude.Category.Isomorphism.Functor
+import Thesis.Prelude.Category.NaturalTransformation
 import Thesis.Prelude.Category.Pullback
 import Thesis.Prelude.Category.Pullback.Midpoint
 import Thesis.Prelude.Category.Slice
 import Thesis.Prelude.Category.Slice.Functor
 import Thesis.Prelude.Category.Span
+import Thesis.Prelude.Category.WCat
 import Thesis.Prelude.Equality
 import Thesis.Prelude.Function
 import Thesis.Prelude.Function.Fam

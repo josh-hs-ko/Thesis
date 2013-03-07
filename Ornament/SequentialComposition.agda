@@ -12,76 +12,70 @@ open import Thesis.Ornament.Equivalence
 open import Function using (_∘_)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_)
-open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; sym; cong; cong₂; module ≡-Reasoning)
+open import Data.List using (List; []; _∷_)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; sym; trans; cong; cong₂; module ≡-Reasoning)
 open import Relation.Binary.HeterogeneousEquality using (_≅_)
 
 
+sc-Ė : ∀ {I J K} {e : J → I} {f : K → J} {is js ks} → Ė e js is → Ė f ks js → Ė (e ∘ f) ks is
+sc-Ė         []           []           = []
+sc-Ė {e = e} (eeq ∷ eeqs) (feq ∷ feqs) = trans (cong e feq) eeq ∷ sc-Ė eeqs feqs
+
 scROrn : ∀ {I J K} {e : J → I} {f : K → J} {D E F} → ROrn e D E → ROrn f E F → ROrn (e ∘ f) D F
-scROrn         ∎        ∎        = ∎
-scROrn {e = e} ∎        (Δ T P)  = Δ[ t ∶ T ] scROrn {e = e} ∎ (P t)
-scROrn         (ṿ refl) (ṿ refl) = ṿ refl
-scROrn {e = e} (ṿ idx)  (Δ T P)  = Δ[ t ∶ T ] scROrn {e = e} (ṿ idx) (P t)
-scROrn         (σ S O)  (σ .S P) = σ S λ s → scROrn (O s) (P s)
-scROrn         (σ S O)  (Δ T P)  = Δ[ t ∶ T ] scROrn (σ S O) (P t)
-scROrn         (σ S O)  (∇ s P)  = ∇ s (scROrn (O s) P)
-scROrn         (Δ T O)  (σ .T P) = Δ[ t ∶ T ] scROrn (O t) (P t)
-scROrn         (Δ T O)  (Δ T' P) = Δ[ t ∶ T' ] scROrn (Δ T O) (P t)
-scROrn         (Δ T O)  (∇ t P)  = scROrn (O t) P
-scROrn         (∇ s O)  P        = ∇ s (scROrn O P)
-scROrn         (O * O') (Δ T P)  = Δ[ t ∶ T ] scROrn (O * O') (P t)
-scROrn         (O * O') (P * P') = scROrn O P * scROrn O' P'
+scROrn (ṿ eeqs) (ṿ feqs) = ṿ (sc-Ė eeqs feqs)
+scROrn (ṿ eeqs) (Δ T P)  = Δ[ t ∶ T ] scROrn (ṿ eeqs) (P t)
+scROrn (σ S O)  (σ .S P) = σ S λ s → scROrn (O s) (P s)
+scROrn (σ S O)  (Δ T P)  = Δ[ t ∶ T ] scROrn (σ S O) (P t)
+scROrn (σ S O)  (∇ s P)  = ∇ s (scROrn (O s) P)
+scROrn (Δ T O)  (σ .T P) = Δ[ t ∶ T ] scROrn (O t) (P t)
+scROrn (Δ T O)  (Δ T' P) = Δ[ t ∶ T' ] scROrn (Δ T O) (P t)
+scROrn (Δ T O)  (∇ t P)  = scROrn (O t) P
+scROrn (∇ s O)  P        = ∇ s (scROrn O P)
 
 _⊙_ : ∀ {I J K} {e : J → I} {f : K → J} {D E F} → Orn e D E → Orn f E F → Orn (e ∘ f) D F
 _⊙_ {f = f} (wrap O) (wrap O') = wrap λ { {._} (ok k) → scROrn (O (ok (f k))) (O' (ok k)) }
 
 shiftΔ : ∀ {I J K T} {e : J → I} {f : K → J} {D E F} → (O : ROrn e D E) (P : (t : T) → ROrn f E (F t)) →
          {X : I → Set} (xs : ⟦ σ T F ⟧ (X ∘ e ∘ f)) → erase (Δ T λ t → scROrn O (P t)) {X} xs ≡ erase (scROrn O (Δ T P)) xs
-shiftΔ ∎        P (t , xs) = refl
-shiftΔ (ṿ refl) P (t , xs) = refl
-shiftΔ (O * O') P (t , xs) = refl
+shiftΔ (ṿ eqs)  P (t , xs) = refl
 shiftΔ (σ S O)  P (t , xs) = refl
 shiftΔ (Δ T O)  P (t , xs) = refl
 shiftΔ (∇ s O)  P (t , xs) = cong (_,_ s) (shiftΔ O P (t , xs))
 
 erase-after-erase : ∀ {I J K} {e : J → I} {f : K → J} {D E F} (O : ROrn e D E) (P : ROrn f E F) →
                     ∀ {X} (xs : ⟦ F ⟧ (X ∘ e ∘ f)) → erase (scROrn O P) {X} xs ≡ erase O {X} (erase P {X ∘ e} xs)
-erase-after-erase         ∎        ∎           xs         = refl
-erase-after-erase {e = e} ∎        (Δ T P) {X} (t , xs)   = erase-after-erase {e = e} ∎ (P t) {X} xs
-erase-after-erase         (ṿ refl) (ṿ refl)    xs         = refl
-erase-after-erase         (ṿ refl) (Δ T P) {X} (t , xs)   = erase-after-erase (ṿ refl) (P t) {X} xs
-erase-after-erase         (σ S O)  (σ .S P)    (s , xs)   = cong (_,_ s) (erase-after-erase (O s) (P s) xs)
-erase-after-erase         (σ S O)  (Δ T P)     (t , xs)   = erase-after-erase (σ S O) (P t) xs
-erase-after-erase         (σ S O)  (∇ s P)     xs         = cong (_,_ s) (erase-after-erase (O s) P xs)
-erase-after-erase         (Δ T O)  (σ .T P)    (t , xs)   = erase-after-erase (O t) (P t) xs
-erase-after-erase         (Δ T O)  (Δ U P)     (u , xs)   = erase-after-erase (Δ T O) (P u) xs
-erase-after-erase         (Δ T O)  (∇ t P)     xs         = erase-after-erase (O t) P xs
-erase-after-erase         (∇ s O)  P           xs         = cong (_,_ s) (erase-after-erase O P xs)
-erase-after-erase         (O * O') (Δ T P)     (t , xs)   = erase-after-erase (O * O') (P t) xs
-erase-after-erase         (O * O') (P * P')    (xs , xs') = cong₂ _,_ (erase-after-erase O P xs) (erase-after-erase O' P' xs')
+erase-after-erase (ṿ [])            (ṿ feqs)          xs       = refl
+erase-after-erase (ṿ (refl ∷ eeqs)) (ṿ (refl ∷ feqs)) (x , xs) = cong₂ _,_ refl (erase-after-erase (ṿ eeqs) (ṿ feqs) xs)
+erase-after-erase (ṿ eeqs)          (Δ T P)           (t , xs) = erase-after-erase (ṿ eeqs) (P t) xs
+erase-after-erase (σ S O)           (σ .S P)          (s , xs) = cong (_,_ s) (erase-after-erase (O s) (P s) xs)
+erase-after-erase (σ S O)           (Δ T P)           (t , xs) = erase-after-erase (σ S O) (P t) xs
+erase-after-erase (σ S O)           (∇ s P)           xs       = cong (_,_ s) (erase-after-erase (O s) P xs)
+erase-after-erase (Δ T O)           (σ .T P)          (t , xs) = erase-after-erase (O t) (P t) xs
+erase-after-erase (Δ T O)           (Δ U P)           (u , xs) = erase-after-erase (Δ T O) (P u) xs
+erase-after-erase (Δ T O)           (∇ t P)           xs       = erase-after-erase (O t) P xs
+erase-after-erase (∇ s O)           P                 xs       = cong (_,_ s) (erase-after-erase O P xs)
 
 forget-after-forget :
   ∀ {I J K} {e : J → I} {f : K → J} {D E F} (O : Orn e D E) (P : Orn f E F) →
   ∀ {k} (x : μ F k) → forget (O ⊙ P) x ≡ forget O (forget P x)
 forget-after-forget {e = e} {f} {D} {E} {F} O P =
-  induction F (λ x → forget (O ⊙ P) x ≡ forget O (forget P x))
-              (λ {i} fs all → cong con (aux (Orn.comp O (ok (f i))) (Orn.comp P (ok i)) fs all))
-  where aux : ∀ {D' E' F'} (O' : ROrn e D' E') (P' : ROrn f E' F') →
-              (fs : ⟦ F' ⟧ (μ F)) (all : All F' (λ x → forget (O ⊙ P) x ≡ forget O (forget P x)) fs) →
-              erase (scROrn O' P') {μ D} (mapFold F F' (ornAlg (O ⊙ P)) fs)
-                ≡ erase O' (mapFold E E' (ornAlg O) (erase P' (mapFold F F' (ornAlg P) fs)))
-        aux ∎          ∎          fs         all          = refl
-        aux ∎          (Δ T P')   (t , fs)   all          = aux ∎ (P' t) fs all
-        aux (ṿ refl)   (ṿ refl)   fs         all          = all
-        aux (ṿ refl)   (Δ T P')   (t , fs)   all          = aux (ṿ refl) (P' t) fs all -- change def'n of scROrn to avoid pattern match on idx
-        aux (σ S O')   (σ .S P')  (s , fs)   all          = cong (_,_ s) (aux (O' s) (P' s) fs all)
-        aux (σ S O')   (Δ T P')   (t , fs)   all          = aux (σ S O') (P' t) fs all
-        aux (σ S O')   (∇ s P')   fs         all          = cong (_,_ s) (aux (O' s) P' fs all)
-        aux (Δ T O')   (σ .T P')  (t , fs)   all          = aux (O' t) (P' t) fs all
-        aux (Δ T O')   (Δ U P')   (u , fs)   all          = aux (Δ T O') (P' u) fs all
-        aux (Δ T O')   (∇ t P')   fs         all          = aux (O' t) P' fs all
-        aux (∇ s O')   P'         fs         all          = cong (_,_ s) (aux O' P' fs all)
-        aux (O' * O'') (Δ T P')   (t , fs)   all          = aux (O' * O'') (P' t) fs all
-        aux (O' * O'') (P' * P'') (fs , fs') (all , all') = cong₂ _,_ (aux O' P' fs all) (aux O'' P'' fs' all')
+  induction F (λ _ x → forget (O ⊙ P) x ≡ forget O (forget P x))
+              (λ i fs all → cong con (aux (Orn.comp O (ok (f i))) (Orn.comp P (ok i)) fs all))
+  where
+    aux : ∀ {D' E' F'} (O' : ROrn e D' E') (P' : ROrn f E' F') →
+          (fs : ⟦ F' ⟧ (μ F)) → All F' (λ _ x → forget (O ⊙ P) x ≡ forget O (forget P x)) fs →
+          erase (scROrn O' P') {μ D} (mapFold F F' (ornAlg (O ⊙ P)) fs)
+            ≡ erase O' (mapFold E E' (ornAlg O) (erase P' (mapFold F F' (ornAlg P) fs)))
+    aux (ṿ [])            (ṿ [])            _        _          = refl
+    aux (ṿ (refl ∷ eeqs)) (ṿ (refl ∷ feqs)) (f , fs) (ih , ihs) = cong₂ _,_ ih (aux (ṿ eeqs) (ṿ feqs) fs ihs)
+    aux (ṿ eeqs)          (Δ T P')          (t , fs) ihs        = aux (ṿ eeqs) (P' t) fs ihs
+    aux (σ S O')          (σ .S P')         (s , fs) ihs        = cong (_,_ s) (aux (O' s) (P' s) fs ihs)
+    aux (σ S O')          (Δ T P')          (t , fs) ihs        = aux (σ S O') (P' t) fs ihs
+    aux (σ S O')          (∇ s P')          fs       ihs        = cong (_,_ s) (aux (O' s) P' fs ihs)
+    aux (Δ T O')          (σ .T P')         (t , fs) ihs        = aux (O' t) (P' t) fs ihs
+    aux (Δ T O')          (Δ U P')          (u , fs) ihs        = aux (Δ T O') (P' u) fs ihs
+    aux (Δ T O')          (∇ t P')          fs       ihs        = aux (O' t) P' fs ihs
+    aux (∇ s O')          P'                fs       ihs        = cong (_,_ s) (aux O' P' fs ihs)
 
 idROrn-id-l : ∀ {I J} {e : J → I} {D E} (O : ROrn e D E) → ROrnEq (scROrn (idROrn D) O) O
 idROrn-id-l {D = D} {E} O X xs xs' heq with HoriEq-to-≡ E xs xs' heq
@@ -168,7 +162,7 @@ scROrn-cong-l {f = f} {D = D} {F = F} refl refl Q Q' O P qeq oeq X xs xs' heq =
 
 scROrn-cong-r : ∀ {I J K} {e e' : J → I} {f : K → J} {D D' E F} → D ≡ D' →
                 (Q : ROrn f E F) (O : ROrn e D E) (P : ROrn e' D' E) → ROrnEq O P → ROrnEq (scROrn O Q) (scROrn P Q)
-scROrn-cong-r {e = e} {e'} {f} {D} {._} {E} {F} refl Q O P oeq X xs xs' heq =
+scROrn-cong-r {I} {J} {K} {e} {e'} {f} {D} {._} {E} {F} refl Q O P oeq X xs xs' heq =
   HoriEq-from-≡ D
     (begin
        erase (scROrn O Q) xs
@@ -181,14 +175,17 @@ scROrn-cong-r {e = e} {e'} {f} {D} {._} {E} {F} refl Q O P oeq X xs xs' heq =
      □)
   where
     open ≡-Reasoning renaming (_∎ to _□)
+    aux' : {js : List J} {ks : List K} →
+           (eqs : Ė f ks js) (xs : Ṁ (X ∘ e ∘ f) ks) (xs' : Ṁ (X ∘ e' ∘ f) ks) →
+           ṀHEq ks xs xs' → ṀHEq js (erase-Ṁ eqs {X ∘ e} xs) (erase-Ṁ eqs {X ∘ e'} xs')
+    aux' []           _        _          _            = tt
+    aux' (refl ∷ eqs) (x , xs) (x' , xs') (heq , heqs) = heq , aux' eqs xs xs' heqs
     aux : ∀ {E F} (Q : ROrn f E F) (xs : ⟦ F ⟧ (X ∘ e ∘ f)) (xs' : ⟦ F ⟧ (X ∘ e' ∘ f)) →
           HoriEq F xs F xs' → HoriEq E (erase Q {X ∘ e} xs) E (erase Q {X ∘ e'} xs')
-    aux ∎        xs        xs'         heq          = ∎
-    aux (ṿ refl) xs        xs'         (ṿ heq)      = ṿ heq
-    aux (σ S Q)  (.s , xs) (.s , xs')  (σ s heq)    = σ s (aux (Q s) xs xs' heq)
-    aux (Δ T Q)  (.t , xs) (.t , xs')  (σ t heq)    = aux (Q t) xs xs' heq
-    aux (∇ s Q)  xs        xs'         heq          = σ s (aux Q xs xs' heq)
-    aux (Q * R)  (xs , ys) (xs' , ys') (heq * heq') = aux Q xs xs' heq * aux R ys ys' heq'
+    aux (ṿ eqs) xs        xs'         (ṿ heq)      = ṿ (aux' eqs xs xs' heq)
+    aux (σ S Q) (.s , xs) (.s , xs')  (σ s heq)    = σ s (aux (Q s) xs xs' heq)
+    aux (Δ T Q) (.t , xs) (.t , xs')  (σ t heq)    = aux (Q t) xs xs' heq
+    aux (∇ s Q) xs        xs'         heq          = σ s (aux Q xs xs' heq)
 
 ⊙-cong-r : ∀ {I J K} {e e' : J → I} {f : K → J} {D E F}
            (Q : Orn f E F) (O : Orn e D E) (P : Orn e' D E) → OrnEq O P → OrnEq (O ⊙ Q) (P ⊙ Q)

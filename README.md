@@ -9,7 +9,7 @@ See [the author's homepage](http://www.cs.ox.ac.uk/people/hsiang-shang.ko/) for 
 ## Module descriptions
 
 #### Thesis.Prelude.Category
-Basic definitions of categories and functors, including definitions of terminal object and functor composition.
+Basic definitions of categories, functors, and natural transformations.
 The collection of objects in a category is an Agda set, i.e., equality on objects is definitional equality,
 whereas the collection of arrows is a setoid, i.e., a set equipped with an equivalence relation.
 All operations on morphisms must respect the equivalence relation, including the morphism maps of functors.
@@ -22,6 +22,9 @@ A predicate saying that a morphism is part of an isomorphism is also provided.
 
 #### Thesis.Prelude.Category.Isomorphism.Functor
 Isomorphisms are preserved by functors.
+
+#### Thesis.Prelude.Category.NaturalTransformation
+If each of the components of a natural transformation from `F` to `G` is part of an isomorphism, then `F` and `G` are naturally isomorphic.
 
 #### Thesis.Prelude.Category.Pullback
 A pullback is defined to be a terminal object in the category of spans over a slice category.
@@ -41,6 +44,10 @@ The forgetful functor from a slice category to its underlying category is pullba
 
 #### Thesis.Prelude.Category.Span
 Definition of span categories. Products and product preservation are also defined here.
+
+#### Thesis.Prelude.Category.WCat
+"Weak" category of categories, in which morphisms (i.e., functors) are considered equal if they are naturally isomorphic.
+An equivalence of categories is an isomorphism in this weak category of categories.
 
 #### Thesis.Prelude.Equality
 This module defines the J rule for propositional equality, a generalised K rule for heterogeneous equality,
