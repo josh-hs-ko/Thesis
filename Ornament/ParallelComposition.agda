@@ -13,8 +13,8 @@ open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst)
 
 
 pc-Ė : ∀ {I J K} {e : J → I} {f : K → I} {is js ks} → Ė e js is → Ė f ks is → Ṁ (InvImage (pull {J} {K} {I} {e} {f})) is
-pc-Ė []           _            = tt
-pc-Ė (eeq ∷ eeqs) (feq ∷ feqs) = ok (from≡ eeq , from≡ feq) , pc-Ė eeqs feqs
+pc-Ė             []           _            = tt
+pc-Ė {e = e} {f} (eeq ∷ eeqs) (feq ∷ feqs) = ok (from≡ e eeq , from≡ f feq) , pc-Ė eeqs feqs
 
 mutual
 

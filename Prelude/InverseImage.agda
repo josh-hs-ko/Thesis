@@ -27,13 +27,13 @@ InvImage = _⁻¹_
 und : ∀ {A B} {f : A → B} {y} → f ⁻¹ y → A
 und (ok x) = x
 
-from≡ : ∀ {A B} {f : A → B} {x y} → f x ≡ y → f ⁻¹ y
-from≡ {x = x} refl = ok x
+from≡ : ∀ {A B} (f : A → B) {x y} → f x ≡ y → f ⁻¹ y
+from≡ f {x} refl = ok x
 
 to≡ : ∀ {A B} {f : A → B} {y} → (x : f ⁻¹ y) → f (und x) ≡ y
 to≡ (ok x) = refl
 
-und-from≡ : ∀ {A B} (f : A → B) {x y} → (eq : f x ≡ y) → und (from≡ {f = f} eq) ≡ x
+und-from≡ : ∀ {A B} (f : A → B) {x y} → (eq : f x ≡ y) → und (from≡ f eq) ≡ x
 und-from≡ f refl = refl
 
 und≡ : ∀ {A B} {f : A → B} {y} {x x' : f ⁻¹ y} → und x ≡ und x' → x ≡ x'
@@ -81,7 +81,7 @@ decouple {f = f} {g} {ok a , b} {ok .a , b'} refl eq = cong (_,_ {c = f a} (ok a
 ⋈-is-Pullback {A} {B} {C} f g =
   (span (slice (f ⋈ g) pull) (sliceMorphism π₁ (λ { (ok a , b) → refl })) (sliceMorphism π₂ (λ { (a , ok b) → refl })) , refl) ,
   (λ s → spanMorphism
-           (sliceMorphism (λ t → from≡ (SliceMorphism.triangle (Span.l s) t) , from≡ (SliceMorphism.triangle (Span.r s) t)) frefl)
+           (sliceMorphism (λ t → from≡ f (SliceMorphism.triangle (Span.l s) t) , from≡ g (SliceMorphism.triangle (Span.r s) t)) frefl)
            (λ t → und-from≡ f (SliceMorphism.triangle (Span.l s) t)) (λ t → und-from≡ g (SliceMorphism.triangle (Span.r s) t)) ,
          (λ m t → decouple (trans (und-from≡ f (SliceMorphism.triangle (Span.l s) t)) (sym (SpanMorphism.triangle-l m t)))
                            (trans (und-from≡ g (SliceMorphism.triangle (Span.r s) t)) (sym (SpanMorphism.triangle-r m t)))))

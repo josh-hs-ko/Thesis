@@ -18,6 +18,10 @@ cong₂-pair refl hrefl = refl
 cong-proj₂ : ∀ {a b} {A : Set a} {B : A → Set b} {x : A} {y y' : B x} → (x , y ∶ Σ A B) ≡ (x , y') → y ≡ y'
 cong-proj₂ refl = refl
 
+cong-split : ∀ {a b} {A A' : Set a} {B : Set b} {B' : Set b} →
+             A ≡ A' → B ≡ B' → ∀ {x y x' y'} → (x , y ∶ A × B) ≅ (x' , y' ∶ A' × B') → x ≅ x' × y ≅ y'
+cong-split refl refl hrefl = hrefl , hrefl
+
 Σ' : {A : Set} (B : A → Set) (C : Σ A B → Set) → A → Set
 Σ' B C x = Σ (B x) (curry C x)
 

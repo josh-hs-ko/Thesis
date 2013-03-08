@@ -33,8 +33,8 @@ syntax σ S (λ s → O) = σ[ s ∶ S ] O
 syntax Δ T (λ t → O) = Δ[ t ∶ T ] O
 
 erase-Ṁ : {I J : Set} {e : J → I} {js : List J} {is : List I} → Ė e js is → {X : I → Set} → Ṁ (X ∘ e) js → Ṁ X is
-erase-Ṁ []           _        = tt
-erase-Ṁ (refl ∷ eqs) (x , xs) = x , erase-Ṁ eqs xs
+erase-Ṁ []             _        = tt
+erase-Ṁ (eq ∷ eqs) {X} (x , xs) = subst X eq x , erase-Ṁ eqs xs
 
 erase : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} → ROrn e D E → {X : I → Set} → ⟦ E ⟧ (X ∘ e) → ⟦ D ⟧ X
 erase (ṿ eqs)  xs       = erase-Ṁ eqs xs
