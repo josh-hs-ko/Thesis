@@ -90,36 +90,36 @@ module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (
   integrate-aux₀ :
     ∀ {j} (y : μ E j) → ∀ {k} (z : μ F k) → ∀ {i} (eeq : e j ≡ i) → ∀ {i'} (feq : f k ≡ i') → i ≡ i' →
     ∀ {is js ks} (ys : Ṁ (μ E) js) (zs : Ṁ (μ F) ks) (eeqs : Ė e js is) (feqs : Ė f ks is) →
-    erase-Ṁ (eeq ∷ eeqs) {μ D} (forget O y , mapFold-Ṁ E js (ornAlg O) ys)
-      ≅ erase-Ṁ (feq ∷ feqs) {μ D} (forget P z , mapFold-Ṁ F ks (ornAlg P) zs) →
-    forget O y ≅ forget P z × erase-Ṁ eeqs {μ D} (mapFold-Ṁ E js (ornAlg O) ys) ≡ erase-Ṁ feqs {μ D} (mapFold-Ṁ F ks (ornAlg P) zs)
+    erase-Ṁ (eeq ∷ eeqs) {μ D} (forget O y , mapFold-Ṁ E (ornAlg O) js ys)
+      ≅ erase-Ṁ (feq ∷ feqs) {μ D} (forget P z , mapFold-Ṁ F (ornAlg P) ks zs) →
+    forget O y ≅ forget P z × erase-Ṁ eeqs {μ D} (mapFold-Ṁ E (ornAlg O) js ys) ≡ erase-Ṁ feqs {μ D} (mapFold-Ṁ F (ornAlg P) ks zs)
   integrate-aux₀ y z refl refl ieq ys zs eeqs feqs eq = (id ** ≅-to-≡) (cong-split (cong (μ D) ieq) refl eq)
 
   integrate-aux₁ :
     ∀ {i j k} (y : μ E j) (eeq : e j ≡ i) (feq : f k ≡ i) (p : μ ⌊ O ⊗ P ⌋ (from≡ e eeq , from≡ f feq)) → forget (diffOrn-l O P) p ≅ y →
     ∀ {is js ks} (eeqs : Ė e js is) (feqs : Ė f ks is) (ps : Ṁ (μ ⌊ O ⊗ P ⌋) (und-Ṁ is (pc-Ė eeqs feqs))) →
     {ys : Ṁ (μ E) js} →
-    erase-Ṁ (diff-Ė-l eeqs feqs) (mapFold-Ṁ ⌊ O ⊗ P ⌋ (und-Ṁ is (pc-Ė eeqs feqs)) (λ {jk} → ornAlg (diffOrn-l O P) {jk}) ps) ≡ ys →
+    erase-Ṁ (diff-Ė-l eeqs feqs) (mapFold-Ṁ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-l O P) {jk}) (und-Ṁ is (pc-Ė eeqs feqs)) ps) ≡ ys →
     erase-Ṁ (_∷_ {j = from≡ e eeq , from≡ f feq} (und-from≡ e eeq) (diff-Ė-l eeqs feqs))
-      (forget (diffOrn-l O P) p , mapFold-Ṁ ⌊ O ⊗ P ⌋ (und-Ṁ is (pc-Ė eeqs feqs)) (λ {jk} → ornAlg (diffOrn-l O P) {jk}) ps) ≡ (y , ys)
+      (forget (diffOrn-l O P) p , mapFold-Ṁ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-l O P) {jk}) (und-Ṁ is (pc-Ė eeqs feqs)) ps) ≡ (y , ys)
   integrate-aux₁ y refl feq p heq eeqs feqs ps eq = cong₂ _,_ (≅-to-≡ heq) eq
 
   integrate-aux₂ :
     ∀ {i j k} (z : μ F k) (eeq : e j ≡ i) (feq : f k ≡ i) (p : μ ⌊ O ⊗ P ⌋ (from≡ e eeq , from≡ f feq)) → forget (diffOrn-r O P) p ≅ z →
     ∀ {is js ks} (eeqs : Ė e js is) (feqs : Ė f ks is) (ps : Ṁ (μ ⌊ O ⊗ P ⌋) (und-Ṁ is (pc-Ė eeqs feqs))) →
     {zs : Ṁ (μ F) ks} →
-    erase-Ṁ (diff-Ė-r eeqs feqs) (mapFold-Ṁ ⌊ O ⊗ P ⌋ (und-Ṁ is (pc-Ė eeqs feqs)) (λ {jk} → ornAlg (diffOrn-r O P) {jk}) ps) ≡ zs →
+    erase-Ṁ (diff-Ė-r eeqs feqs) (mapFold-Ṁ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-r O P) {jk}) (und-Ṁ is (pc-Ė eeqs feqs)) ps) ≡ zs →
     erase-Ṁ (_∷_ {j = from≡ e eeq , from≡ f feq} (und-from≡ f feq) (diff-Ė-r eeqs feqs))
-      (forget (diffOrn-r O P) p , mapFold-Ṁ ⌊ O ⊗ P ⌋ (und-Ṁ is (pc-Ė eeqs feqs)) (λ {jk} → ornAlg (diffOrn-r O P) {jk}) ps) ≡ (z , zs)
+      (forget (diffOrn-r O P) p , mapFold-Ṁ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-r O P) {jk}) (und-Ṁ is (pc-Ė eeqs feqs))  ps) ≡ (z , zs)
   integrate-aux₂ z eeq refl p heq eeqs feqs ps eq = cong₂ _,_ (≅-to-≡ heq) eq
 
   integrate-aux-Ṁ :
     {is : List I} {js : List J} {ks : List K}
     (eeqs : Ė e js is) (feqs : Ė f ks is) → (ys : Ṁ (μ E) js) → All-Ṁ integrate-Ind js ys → (zs : Ṁ (μ F) ks) →
-    erase-Ṁ eeqs {μ D} (mapFold-Ṁ E js (ornAlg O) ys) ≡ erase-Ṁ feqs (mapFold-Ṁ F ks (ornAlg P) zs) →
+    erase-Ṁ eeqs {μ D} (mapFold-Ṁ E (ornAlg O) js ys) ≡ erase-Ṁ feqs (mapFold-Ṁ F (ornAlg P) ks zs) →
     Σ[ ps ∶ Ṁ (μ ⌊ O ⊗ P ⌋) (und-Ṁ is (pc-Ė eeqs feqs)) ]
-      erase-Ṁ (diff-Ė-l eeqs feqs) (mapFold-Ṁ ⌊ O ⊗ P ⌋ (und-Ṁ is (pc-Ė eeqs feqs)) (λ {jk} → ornAlg (diffOrn-l O P) {jk}) ps) ≡ ys
-    × erase-Ṁ (diff-Ė-r eeqs feqs) (mapFold-Ṁ ⌊ O ⊗ P ⌋ (und-Ṁ is (pc-Ė eeqs feqs)) (λ {jk} → ornAlg (diffOrn-r O P) {jk}) ps) ≡ zs
+      erase-Ṁ (diff-Ė-l eeqs feqs) (mapFold-Ṁ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-l O P) {jk}) (und-Ṁ is (pc-Ė eeqs feqs)) ps) ≡ ys
+    × erase-Ṁ (diff-Ė-r eeqs feqs) (mapFold-Ṁ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-r O P) {jk}) (und-Ṁ is (pc-Ė eeqs feqs)) ps) ≡ zs
   integrate-aux-Ṁ []           []           _        _          _        _  = tt , refl , refl
   integrate-aux-Ṁ (eeq ∷ eeqs) (feq ∷ feqs) (y , ys) (ih , ihs) (z , zs) eq =
     let (heq , eq') = integrate-aux₀ y z eeq feq refl ys zs eeqs feqs (≡-to-≅ eq)
@@ -203,9 +203,9 @@ module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (
                                 (subst (μ F) (und-from≡ f feq) (forget (diffOrn-r O P) p))
                                 eeq feq refl
                                 (erase-Ṁ (diff-Ė-l eeqs feqs)
-                                         (mapFold-Ṁ ⌊ O ⊗ P ⌋ (und-Ṁ is (pc-Ė eeqs feqs)) (λ {jk} → ornAlg (diffOrn-l O P) {jk}) ps))
+                                         (mapFold-Ṁ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-l O P) {jk}) (und-Ṁ is (pc-Ė eeqs feqs)) ps))
                                 (erase-Ṁ (diff-Ė-r eeqs feqs)
-                                         (mapFold-Ṁ ⌊ O ⊗ P ⌋ (und-Ṁ is (pc-Ė eeqs feqs)) (λ {jk} → ornAlg (diffOrn-r O P) {jk}) ps))
+                                         (mapFold-Ṁ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-r O P) {jk}) (und-Ṁ is (pc-Ė eeqs feqs)) ps))
                                 eeqs feqs heq))
                       (j , from≡ f feq) refl (und-from≡ f feq)) ≡ p
       aux' j eeq refl p ih heq eeqs feqs ps = ih _ refl refl

@@ -68,7 +68,7 @@ OrnEq-forget {I} {J} {e} {e'} {D} {E} O O' (eeq , eraseeq) =
   induction E (λ _ x → forget O x ≅ forget O' x) (λ j es ihs → aux j es ihs refl refl)
   where
     aux''' : (js : List J) (es : Ṁ (μ E) js) → All-Ṁ (λ _ x → forget O x ≅ forget O' x) js es →
-             ṀHEq js (mapFold-Ṁ E js (ornAlg O) es) (mapFold-Ṁ E js (ornAlg O') es)
+             ṀHEq js (mapFold-Ṁ E (ornAlg O) js es) (mapFold-Ṁ E (ornAlg O') js es)
     aux''' []       _        _          = tt
     aux''' (j ∷ js) (e , es) (ih , ihs) = ih , aux''' js es ihs
     aux'' : (E' : RDesc J) (es : ⟦ E' ⟧ (μ E)) → All E' (λ _ x → forget O x ≅ forget O' x) es →

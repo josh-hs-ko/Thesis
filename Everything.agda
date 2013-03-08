@@ -19,7 +19,6 @@ import Thesis.Prelude.Preorder
 import Thesis.Prelude.Product
 import Thesis.Refinement
 import Thesis.Refinement.Category
-import Thesis.Refinement.Isomorphism
 import Thesis.Description
 import Thesis.Description.HorizontalEquivalence
 import Thesis.Ornament
@@ -28,7 +27,6 @@ import Thesis.Ornament.Algebraic.FundamentalTheorems
 import Thesis.Ornament.Algebraic.Fusion
 import Thesis.Ornament.Category
 import Thesis.Ornament.Equivalence
-import Thesis.Ornament.Isomorphism
 import Thesis.Ornament.ParallelComposition
 import Thesis.Ornament.ParallelComposition.Pullback
 import Thesis.Ornament.ParallelComposition.Swap

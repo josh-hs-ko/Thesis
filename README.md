@@ -83,9 +83,6 @@ Definition of refinements, swaps, and upgrades.
 #### Thesis.Refinement.Category
 Families of refinements form a category `FRef`.
 
-#### Thesis.Refinement.Isomorphism
-A sufficient condition for establishing an isomorphism between the two types related by a refinement.
-
 #### Thesis.Description
 Definition of datatype descriptions, i.e., a universe for functors on families of sets.
 Datatype-generic fold and induction are defined on top of descriptions.
@@ -117,9 +114,6 @@ extends ornaments to forgetful maps on those least fixed points.
 
 #### Thesis.Ornament.Equivalence
 An extensional equivalence relation on ornaments, which extends to extensional equivalence on ornamental forgetful maps.
-
-#### Thesis.Ornament.Isomorphism
-A sufficient condition for establishing an isomorphism between the two types related by a ornament.
 
 #### Thesis.Ornament.ParallelComposition
 Parallel composition of ornaments.

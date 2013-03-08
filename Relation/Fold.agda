@@ -12,6 +12,7 @@ open import Thesis.Relation.CompChain
 open import Function using (id; _∘_)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
+open import Data.List using (List; []; _∷_)
 open import Relation.Binary using (module Setoid)
 import Relation.Binary.EqReasoning as EqReasoning
 import Relation.Binary.PreorderReasoning as PreorderReasoning
@@ -21,39 +22,39 @@ open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; cong
 mutual
 
   foldR' : {I : Set} {D : Desc I} {X : I → Set} → (Ḟ D X ↝⁺ X) → ∀ i → μ D i ↝ X i
-  foldR' {I} {D} {X} R i (con ds) = mapFoldR D (D at i) R ds >>= (R !!) i
+  foldR' {I} {D} {X} R i (con ds) = mapFoldR D (Desc.comp D i) R ds >>= (R !!) i
 
   mapFoldR : {I : Set} (D : Desc I) (E : RDesc I) {X : I → Set} → (Ḟ D X ↝⁺ X) → ⟦ E ⟧ (μ D) ↝ ⟦ E ⟧ X
-  mapFoldR D ∎        R _          = any
-  mapFoldR D (ṿ i)    R d          = foldR' R i d
-  mapFoldR D (σ S E)  R (s , ds)   = map℘ (_,_ s) (mapFoldR D (E s) R ds)
-  mapFoldR D (E * E') R (ds , ds') = map℘₂ _,_ (mapFoldR D E R ds) (mapFoldR D E' R ds')
+  mapFoldR D (ṿ is)   R ds       = mapFoldR-Ṁ D R is ds
+  mapFoldR D (σ S E)  R (s , ds) = map℘ (_,_ s) (mapFoldR D (E s) R ds)
+
+  mapFoldR-Ṁ : {I : Set} (D : Desc I) {X : I → Set} → (Ḟ D X ↝⁺ X) → (is : List I) → Ṁ (μ D) is ↝ Ṁ X is
+  mapFoldR-Ṁ D R []       _        = any
+  mapFoldR-Ṁ D R (i ∷ is) (d , ds) = map℘₂ _,_ (foldR' R i d) (mapFoldR-Ṁ D R is ds)
 
 foldR : {I : Set} {D : Desc I} {X : I → Set} → (Ḟ D X ↝⁺ X) → μ D ↝⁺ X
 foldR R = wrap (foldR' R)
 
 foldR'-fun⁺-computation : {I : Set} {D : Desc I} {X : I → Set} (f : Ḟ D X ⇉ X) → ∀ {i} (d : μ D i) → foldR' (fun⁺ f) i d (fold f d)
 foldR'-fun⁺-computation {I} {D} {X} f =
-  induction D (λ {i} d → foldR' (fun⁺ f) i d (fold f d)) (λ {i} ds all → mapFold D (D at i) f ds , aux (D at i) ds all , refl)
+  induction D (λ i d → foldR' (fun⁺ f) i d (fold f d)) (λ i ds ihs → mapFold D (Desc.comp D i) f ds , aux (Desc.comp D i) ds ihs , refl)
   where
-    aux : (D' : RDesc I) (ds : ⟦ D' ⟧ (μ D)) (all : All D' (λ {i} d → foldR' (fun⁺ f) i d (fold f d)) ds) →
+    aux : (D' : RDesc I) (ds : ⟦ D' ⟧ (μ D)) → All D' (λ i d → foldR' (fun⁺ f) i d (fold f d)) ds →
           mapFoldR D D' (fun⁺ f) ds (mapFold D D' f ds)
-    aux ∎         ds        all          = tt
-    aux (ṿ i)     d         all          = all
-    aux (σ S D')  (s , ds)  all          = mapFold D (D' s) f ds , aux (D' s) ds all , refl
-    aux (D' * E') (ds , es) (all , all') = mapFold D D' f ds , aux D' ds all , mapFold D E' f es , aux E' es all' , refl
+    aux (ṿ [])       _        _          = tt
+    aux (ṿ (i ∷ is)) (d , ds) (ih , ihs) = fold f d , ih , mapFold-Ṁ D f is ds , aux (ṿ is) ds ihs , refl
+    aux (σ S D')     (s , ds) ihs        = mapFold D (D' s) f ds , aux (D' s) ds ihs , refl
 
 foldR'-fun⁺-unique : {I : Set} {D : Desc I} {X : I → Set} (f : Ḟ D X ⇉ X) → ∀ {i} (d : μ D i) (x : X i) → foldR' (fun⁺ f) i d x → fold f d ≡ x
 foldR'-fun⁺-unique {I} {D} {X} f =
-  induction D (λ {i} d → (x : X i) → foldR' (fun⁺ f) i d x → fold f d ≡ x)
-              (λ { {i} ds all .(f xs) (xs , mf , refl) → cong f (aux (D at i) ds all xs mf) })
+  induction D (λ i d → (x : X i) → foldR' (fun⁺ f) i d x → fold f d ≡ x)
+              (λ { i ds ihs .(f xs) (xs , mf , refl) → cong f (aux (Desc.comp D i) ds ihs xs mf) })
   where
-    aux : (D' : RDesc I) (ds : ⟦ D' ⟧ (μ D)) (all : All D' (λ {i} d → (x : X i) → foldR' (fun⁺ f) i d x → fold f d ≡ x) ds)
-          (xs : ⟦ D' ⟧ X) (mf : mapFoldR D D' (fun⁺ f) ds xs) → mapFold D D' f ds ≡ xs
-    aux ∎         ds        all          xs        mf                            = refl
-    aux (ṿ i)     ds        all          x         mf                            = all x mf
-    aux (σ S D')  (s , ds)  all          (.s , xs) (.xs , mf , refl)             = cong (_,_ s) (aux (D' s) ds all xs mf)
-    aux (D' * E') (ds , es) (all , all') (xs , ys) (.xs , mf , .ys , mf' , refl) = cong₂ _,_ (aux D' ds all xs mf) (aux E' es all' ys mf')
+    aux : (D' : RDesc I) (ds : ⟦ D' ⟧ (μ D)) → All D' (λ i d → (x : X i) → foldR' (fun⁺ f) i d x → fold f d ≡ x) ds →
+          (xs : ⟦ D' ⟧ X) → mapFoldR D D' (fun⁺ f) ds xs → mapFold D D' f ds ≡ xs
+    aux (ṿ [])       _        _          _         _                         = refl
+    aux (ṿ (i ∷ is)) (d , ds) (ih , ihs) (x , xs)  (._ , r , ._ , rs , refl) = cong₂ _,_ (ih x r) (aux (ṿ is) ds ihs xs rs)
+    aux (σ S D')     (s , ds) ihs        (.s , xs) (.xs , eqs , refl)        = cong (_,_ s) (aux (D' s) ds ihs xs eqs)
 
 fun⁺-preserves-fold : {I : Set} (D : Desc I) {X : I → Set} (f : Ḟ D X ⇉ X) → fun⁺ (fold f) ≃⁺ foldR {D = D} (fun⁺ f)
 fun⁺-preserves-fold D f = wrap (λ i → wrap λ { d ._ refl → foldR'-fun⁺-computation f d }) , wrap (λ i → wrap (foldR'-fun⁺-unique f))
@@ -74,48 +75,44 @@ foldR-α-lemma {I} {D} {X} R =
 
 foldR-least : {I : Set} (D : Desc I) {X : I → Set} (R : Ḟ D X ↝⁺ X) (S : μ D ↝⁺ X) → R •⁺ Ṙ D S •⁺ α º⁺ ⊆⁺ S → foldR R ⊆⁺ S
 foldR-least {I} D {X} R S prefix-point =
-  wrap λ _ → wrap (induction D (λ {i} d → (x : X i) → foldR' R i d x → (S !!) i d x)
-                               (λ { {i} ds all x (xs , rs , r) →
-                                    modus-ponens-⊆⁺ prefix-point i (con ds) x (xs , (ds , refl , aux (D at i) ds all xs rs) , r)}))
+  wrap λ _ → wrap (induction D (λ i d → (x : X i) → foldR' R i d x → (S !!) i d x)
+                               (λ { i ds ihs x (xs , rs , r) →
+                                    modus-ponens-⊆⁺ prefix-point i (con ds) x (xs , (ds , refl , aux (Desc.comp D i) ds ihs xs rs) , r)}))
   where
-    aux : (D' : RDesc I) (ds : ⟦ D' ⟧ (μ D)) (all : All D' (λ {i} d → (x : X i) → foldR' R i d x → (S !!) i d x) ds)
+    aux : (D' : RDesc I) (ds : ⟦ D' ⟧ (μ D)) (ihs : All D' (λ i d → (x : X i) → foldR' R i d x → (S !!) i d x) ds)
           (xs : ⟦ D' ⟧ X) (rs : mapFoldR D D' R ds xs) → mapR D' S ds xs
-    aux ∎         ds        all          xs         rs                             = tt
-    aux (ṿ i)     d         all          x          r                              = all x r
-    aux (σ T D')  (t , ds)  all          (.t , xs)  (.xs , rs , refl)              = xs , aux (D' t) ds all xs rs , refl
-    aux (D' * E') (ds , es) (all , all') (xs , xs') (.xs , rs , .xs' , rs' , refl) = xs , aux D' ds all xs rs , xs' , aux E' es all' xs' rs' , refl
+    aux (ṿ [])       _        _          _         _                         = tt
+    aux (ṿ (i ∷ is)) (d , ds) (ih , ihs) (x , xs)  (._ , r , ._ , rs , refl) = x , ih x r , xs , aux (ṿ is) ds ihs xs rs , refl
+    aux (σ T D')     (t , ds) ihs        (.t , xs) (.xs , rs , refl)         = xs , aux (D' t) ds ihs xs rs , refl
 
 foldR-greatest : {I : Set} (D : Desc I) {X : I → Set} (R : Ḟ D X ↝⁺ X) (S : μ D ↝⁺ X) → S ⊆⁺ R •⁺ Ṙ D S •⁺ α º⁺ → S ⊆⁺ foldR R
-foldR-greatest {I} D {X} R S postfix-point = wrap λ _ → wrap (induction D (λ {i} d → (x : X i) → (S !!) i d x → foldR' R i d x) alg)
+foldR-greatest {I} D {X} R S postfix-point = wrap λ _ → wrap (induction D (λ i d → (x : X i) → (S !!) i d x → foldR' R i d x) alg)
   where
-    aux : (D' : RDesc I) (ds : ⟦ D' ⟧ (μ D)) (all : All D' (λ {i} d → (x : X i) → (S !!) i d x → foldR' R i d x) ds)
+    aux : (D' : RDesc I) (ds : ⟦ D' ⟧ (μ D)) → All D' (λ i d → (x : X i) → (S !!) i d x → foldR' R i d x) ds →
           (xs : ⟦ D' ⟧ X) → mapR D' S ds xs → mapFoldR D D' R ds xs
-    aux ∎         ds        all          xs         ss                             = tt
-    aux (ṿ i)     d         all          x          s                              = all x s
-    aux (σ T D')  (t , ds)  all          (.t , xs)  (.xs , ss , refl)              = xs , aux (D' t) ds all xs ss , refl
-    aux (D' * E') (ds , es) (all , all') (xs , xs') (.xs , ss , .xs' , ss' , refl) = xs , aux D' ds all xs ss , xs' , aux E' es all' xs' ss' , refl
-    alg : {i : I} (ds : Ḟ D (μ D) i) → All (D at i) (λ {i} d → (x : X i) → (S !!) i d x → foldR' R i d x) ds →
+    aux (ṿ [])       _        _          _         _                         = tt
+    aux (ṿ (i ∷ is)) (d , ds) (ih , ihs) (x , xs)  (._ , s , ._ , ss , refl) = x , ih x s , xs , aux (ṿ is) ds ihs xs ss , refl
+    aux (σ T D')     (t , ds) ihs        (.t , xs) (.xs , ss , refl)         = xs , aux (D' t) ds ihs xs ss , refl
+    alg : (i : I) (ds : Ḟ D (μ D) i) → All (Desc.comp D i) (λ i d → (x : X i) → (S !!) i d x → foldR' R i d x) ds →
           (x : X i) → (S !!) i (con ds) x → foldR' R i (con {D = D} ds) x
-    alg {i} ds all x s with modus-ponens-⊆⁺ postfix-point i (con ds) x s
-    alg {i} ds all x s | xs , (.ds , refl , ss) , r = xs , aux (D at i) ds all xs ss , r
+    alg i ds ihs x s with modus-ponens-⊆⁺ postfix-point i (con ds) x s
+    alg i ds ihs x s | xs , (.ds , refl , ss) , r = xs , aux (Desc.comp D i) ds ihs xs ss , r
 
 foldR-computation-⊆⁺ : {I : Set} (D : Desc I) {X : I → Set} (R : Ḟ D X ↝⁺ X) → foldR {D = D} R •⁺ α ⊆⁺ R •⁺ Ṙ D (foldR R)
-foldR-computation-⊆⁺ {I} D {X} R = wrap λ i → wrap λ { ds x (.(con ds) , refl , xs , rs , r) → xs , aux (D at i) ds xs rs , r }
+foldR-computation-⊆⁺ {I} D {X} R = wrap λ i → wrap λ { ds x (.(con ds) , refl , xs , rs , r) → xs , aux (Desc.comp D i) ds xs rs , r }
   where
     aux : (D' : RDesc I) (ds : ⟦ D' ⟧ (μ D)) (xs : ⟦ D' ⟧ X) → mapFoldR D D' R ds xs → mapR D' (foldR R) ds xs
-    aux ∎         ds        xs         rs                             = tt
-    aux (ṿ i)     d         x          r                              = r
-    aux (σ S D')  (s , ds)  (.s , xs)  (.xs , rs , refl)              = xs , aux (D' s) ds xs rs , refl
-    aux (D' * E') (ds , es) (xs , xs') (.xs , rs , .xs' , rs' , refl) = xs , aux D' ds xs rs , xs' , aux E' es xs' rs' , refl
+    aux (ṿ [])       _        _         _                         = tt
+    aux (ṿ (i ∷ is)) (d , ds) (x , xs)  (._ , r , ._ , rs , refl) = x , r , xs , aux (ṿ is) ds xs rs , refl
+    aux (σ S D')     (s , ds) (.s , xs) (.xs , rs , refl)         = xs , aux (D' s) ds xs rs , refl
 
 foldR-computation-⊇⁺ : {I : Set} (D : Desc I) {X : I → Set} (R : Ḟ D X ↝⁺ X) → foldR {D = D} R •⁺ α ⊇⁺ R •⁺ Ṙ D (foldR R)
-foldR-computation-⊇⁺ {I} D {X} R = wrap λ i → wrap λ { ds x (xs , rs , r) → con ds , refl , xs , aux (D at i) ds xs rs , r }
+foldR-computation-⊇⁺ {I} D {X} R = wrap λ i → wrap λ { ds x (xs , rs , r) → con ds , refl , xs , aux (Desc.comp D i) ds xs rs , r }
   where
     aux : (D' : RDesc I) (ds : ⟦ D' ⟧ (μ D)) (xs : ⟦ D' ⟧ X) → mapR D' (foldR R) ds xs → mapFoldR D D' R ds xs
-    aux ∎         ds        xs         rs                             = tt
-    aux (ṿ i)     d         x          r                              = r
-    aux (σ S D')  (s , ds)  (.s , xs)  (.xs , rs , refl)              = xs , aux (D' s) ds xs rs , refl
-    aux (D' * E') (ds , es) (xs , xs') (.xs , rs , .xs' , rs' , refl) = xs , aux D' ds xs rs , xs' , aux E' es xs' rs' , refl
+    aux (ṿ [])       _        _         _                         = tt
+    aux (ṿ (i ∷ is)) (d , ds) (x , xs)  (._ , r , ._ , rs , refl) = x , r , xs , aux (ṿ is) ds xs rs , refl
+    aux (σ S D')     (s , ds) (.s , xs) (.xs , rs , refl)         = xs , aux (D' s) ds xs rs , refl
 
 foldR-computation : {I : Set} (D : Desc I) {X : I → Set} (R : Ḟ D X ↝⁺ X) → foldR {D = D} R •⁺ α ≃⁺ R •⁺ Ṙ D (foldR R)
 foldR-computation D R = foldR-computation-⊆⁺ D R , foldR-computation-⊇⁺ D R

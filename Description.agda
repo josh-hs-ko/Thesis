@@ -57,12 +57,12 @@ mutual
   fold {D = D} f {i} (con ds) = f (mapFold D (Desc.comp D i) f ds)
 
   mapFold : {I : Set} (D : Desc I) (D' : RDesc I) → {X : I → Set} → (Ḟ D X ⇉ X) → ⟦ D' ⟧ (μ D) → ⟦ D' ⟧ X
-  mapFold D (ṿ is)   f ds         = mapFold-Ṁ D is f ds
+  mapFold D (ṿ is)   f ds         = mapFold-Ṁ D f is ds
   mapFold D (σ S D') f (s , ds)   = s , mapFold D (D' s) f ds
 
-  mapFold-Ṁ : {I : Set} (D : Desc I) (is : List I) {X : I → Set} → (Ḟ D X ⇉ X) → Ṁ (μ D) is → Ṁ X is
-  mapFold-Ṁ D []       f _        = tt
-  mapFold-Ṁ D (i ∷ is) f (d , ds) = fold f d , mapFold-Ṁ D is f ds
+  mapFold-Ṁ : {I : Set} (D : Desc I) {X : I → Set} → (Ḟ D X ⇉ X) → (is : List I) → Ṁ (μ D) is → Ṁ X is
+  mapFold-Ṁ D f []       _        = tt
+  mapFold-Ṁ D f (i ∷ is) (d , ds) = fold f d , mapFold-Ṁ D f is ds
 
 -- induction
 
@@ -122,9 +122,6 @@ mapF-preserves-id : {I : Set} (D : RDesc I) {X : I → Set} → mapF D (λ {i} �
 mapF-preserves-id (ṿ [])       _        = refl
 mapF-preserves-id (ṿ (i ∷ is)) (x , xs) = cong₂ _,_ refl (mapF-preserves-id (ṿ is) xs)
 mapF-preserves-id (σ S D)      (s , xs) = cong (_,_ s) (mapF-preserves-id (D s) xs)
-
-remove-recursive-objects : {I : Set} (D : RDesc I) {X : I → Set} → ⟦ D ⟧ X → ⟦ D ⟧ (const ⊤)
-remove-recursive-objects D = mapF D !
 
 Ḟ-map : {I : Set} (D : Desc I) {X Y : I → Set} → (X ⇉ Y) → Ḟ D X ⇉ Ḟ D Y
 Ḟ-map D f {i} = mapF (Desc.comp D i) f
