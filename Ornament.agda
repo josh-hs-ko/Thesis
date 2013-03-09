@@ -98,8 +98,8 @@ record OrnDesc {I : Set} (J : Set) (e : J → I) (D : Desc I) : Set₁ where
     comp : ∀ {i} (j : e ⁻¹ i) → ROrnDesc J e (Desc.comp D i)
 
 und-Ṁ : {I J : Set} {e : J → I} (is : List I) → Ṁ (InvImage e) is → List J
-und-Ṁ []        _           = []
-und-Ṁ (._ ∷ is) (ok j , js) = j ∷ und-Ṁ is js
+und-Ṁ []       _        = []
+und-Ṁ (i ∷ is) (j , js) = und j ∷ und-Ṁ is js
 
 toRDesc : {I J : Set} {e : J → I} {D : RDesc I} → ROrnDesc J e D → RDesc J
 toRDesc (ṿ js)  = ṿ (und-Ṁ _ js)
@@ -111,8 +111,8 @@ toRDesc (∇ s O) = toRDesc O
 ⌊ wrap O ⌋ = wrap λ j → toRDesc (O (ok j))
 
 to≡-Ṁ : {I J : Set} {e : J → I} (is : List I) (js : Ṁ (InvImage e) is) → Ė e (und-Ṁ is js) is
-to≡-Ṁ []        _           = []
-to≡-Ṁ (._ ∷ is) (ok j , js) = refl ∷ to≡-Ṁ is js
+to≡-Ṁ []       _        = []
+to≡-Ṁ (i ∷ is) (j , js) = to≡ j ∷ to≡-Ṁ is js
 
 toROrn : {I J : Set} {e : J → I} {D : RDesc I} → (O : ROrnDesc J e D) → ROrn e D (toRDesc O)
 toROrn (ṿ js)  = ṿ (to≡-Ṁ _ js)
