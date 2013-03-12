@@ -21,13 +21,24 @@ data RDesc (I : Set) : Set₁ where
 
 syntax σ S (λ s → D) = σ[ s ∶ S ] D
 
+Hori : {I : Set} → RDesc I → (List I → Set) → Set
+Hori (ṿ is)  X = X is
+Hori (σ S D) X = Σ[ s ∶ S ] Hori (D s) X
+
+strip : {I : Set} (D : RDesc I) {X : List I → Set} → Hori D X → Σ (List I) X
+strip (ṿ is)  xs       = is , xs
+strip (σ S D) (s , hs) = strip (D s) hs
+
 Ṁ : {I : Set} → (I → Set) → List I → Set
 Ṁ X []       = ⊤
 Ṁ X (i ∷ is) = X i × Ṁ X is
 
+generate-Ṁ : {I : Set} {X : I → Set} → ((i : I) → X i) → (is : List I) → Ṁ X is
+generate-Ṁ f []       = tt
+generate-Ṁ f (i ∷ is) = f i , generate-Ṁ f is
+
 ⟦_⟧ : {I : Set} → RDesc I → (I → Set) → Set
-⟦ ṿ is  ⟧ X = Ṁ X is
-⟦ σ S D ⟧ X = Σ[ s ∶ S ] ⟦ D s ⟧ X
+⟦ D ⟧ X = Hori D (Ṁ X)
 
 record Desc (I : Set) : Set₁ where
   constructor wrap

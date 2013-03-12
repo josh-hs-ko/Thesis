@@ -19,7 +19,7 @@ open import Thesis.Relation.Fold
 
 open import Function using (id; type-signature)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; curry; uncurry)
+open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; curry)
 open import Data.List using (List; []; _∷_)
 open import Relation.Binary using (module Setoid)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; trans; sym; cong; subst)
@@ -29,15 +29,11 @@ open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅) rena
 --------
 -- algebraic ornaments
 
-algROrn-Ṁ : {I : Set} {J : I → Set} (is : List I) → Ṁ J is → Ṁ (InvImage (proj₁ {B = J})) is
-algROrn-Ṁ []       _        = tt
-algROrn-Ṁ (i ∷ is) (j , js) = ok (i , j) , algROrn-Ṁ is js
-
-algROrn : {I : Set} (D : RDesc I) → {J : I → Set} {i : I} (j : J i) → (⟦ D ⟧ J ↝ J i) → ROrnDesc (Σ I J) proj₁ D
-algROrn (ṿ is)  {J} j R = Δ[ js ∶ Ṁ J is ] Δ[ r ∶ R js j ] ṿ (algROrn-Ṁ is js)
+algROrn : {I : Set} (D : RDesc I) {J : I → Set} {i : I} (j : J i) → (⟦ D ⟧ J ↝ J i) → ROrnDesc (Σ I J) proj₁ D
+algROrn (ṿ is)  {J} j R = Δ[ js ∶ Ṁ J is ] Δ[ r ∶ R js j ] ṿ (Ṁ-map (λ {i} j → ok (i , j)) is js)
 algROrn (σ S D)     j R = σ[ s ∶ S ] algROrn (D s) j (curry R s)
 
-algOrn : ∀ {I} (D : Desc I) → ∀ {J} → (Ḟ D J ↝⁺ J) → OrnDesc (Σ I J) proj₁ D
+algOrn : ∀ {I} (D : Desc I) {J : I → Set} → (Ḟ D J ↝⁺ J) → OrnDesc (Σ I J) proj₁ D
 algOrn D R = wrap (λ { {._} (ok (i , j)) → algROrn (Desc.comp D i) j ((R !!) i) })
 
 algOrn-iso : {I : Set} (D : Desc I) {J : I → Set} (R : Ḟ D J ↝⁺ J) →
@@ -50,7 +46,8 @@ algOrn-iso {I} D {J} R =
   where
     aux' : (is : List I) (js : Ṁ J is) (ds : Ṁ (μ D) is) →
            All-Ṁ (λ i x → (j : J i) → Iso Fun (OptP ⌈ algOrn D R ⌉ (ok (i , j)) x) (foldR' R i x j)) is ds →
-           Iso Fun (Ṁ (μ (OptPD ⌈ algOrn D R ⌉)) (und-Ṁ is (pc-Ė (to≡-Ṁ is (algROrn-Ṁ is js)) (to≡-Ṁ is (Ṁ-map (λ {i} j → ok (i , j)) is ds)))))
+           Iso Fun (Ṁ (μ (OptPD ⌈ algOrn D R ⌉))
+                      (und-Ṁ is (pc-Ė (to≡-Ṁ is (Ṁ-map (λ {i} j → ok (i , j)) is js)) (to≡-Ṁ is (Ṁ-map (λ {i} j → ok (i , j)) is ds)))))
                    (mapFoldR-Ṁ D R is ds js)
     aux' []       _        _        _          = Setoid.refl (IsoSetoid Fun)
     aux' (i ∷ is) (j , js) (d , ds) (ih , ihs) =

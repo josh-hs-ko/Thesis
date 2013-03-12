@@ -5,13 +5,14 @@
 module Thesis.Ornament where
 
 open import Thesis.Prelude.Equality
+open import Thesis.Prelude.Function
 open import Thesis.Prelude.InverseImage
 open import Thesis.Prelude.Function.Fam
 open import Thesis.Description
 
-open import Function using (id; _∘_)
+open import Function using (id; const; _∘_)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; proj₁)
+open import Data.Product using (Σ; _,_; proj₁; curry)
 open import Data.List using (List; []; _∷_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; cong; cong₂; setoid)
 
@@ -123,12 +124,8 @@ toROrn (∇ s O) = ∇ s (toROrn O)
 ⌈_⌉ : {I J : Set} {e : J → I} {D : Desc I} → (O : OrnDesc J e D) → Orn e D ⌊ O ⌋
 ⌈ wrap O ⌉ = wrap λ { {._} (ok j) → toROrn (O (ok j)) }
 
-ok-Ṁ : {I : Set} (is : List I) → Ṁ (InvImage id) is
-ok-Ṁ []       = tt
-ok-Ṁ (i ∷ is) = ok i , ok-Ṁ is
-
 idROrnDesc : ∀ {I} (D : RDesc I) → ROrnDesc I id D
-idROrnDesc (ṿ is)  = ṿ (ok-Ṁ is)
+idROrnDesc (ṿ is)  = ṿ (generate-Ṁ ok is)
 idROrnDesc (σ S D) = σ[ s ∶ S ] idROrnDesc (D s)
 
 
@@ -177,3 +174,18 @@ forget-singOrn {I} {D} =
     aux (ṿ [])       _        _        _          = refl
     aux (ṿ (i ∷ is)) (x , xs) (s , ss) (ih , ihs) = cong₂ _,_ ih (aux (ṿ is) xs ss ihs)
     aux (σ S D')     (s , xs) ss       ihs        = cong (_,_ s) (aux (D' s) xs ss ihs)
+
+
+--------
+-- ornament from horizontal data
+
+horiROrn-∇ :
+  {I J : Set} {e : J → I} (D : RDesc I) {js : List J} → Σ[ hs ∶ Hori D (const ⊤) ] Ė e js (proj₁ (strip D hs)) → ROrn e D (ṿ js)
+horiROrn-∇ (ṿ is)  (hs       , eqs) = ṿ eqs
+horiROrn-∇ (σ S D) ((s , hs) , eqs) = ∇ s (horiROrn-∇ (D s) (hs , eqs))
+
+horiROrn :
+  {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} →
+  (f : (hs : Hori E (const ⊤)) → Σ[ hs' ∶ Hori D (const ⊤) ] Ė e (proj₁ (strip E hs)) (proj₁ (strip D hs'))) → ROrn e D E
+horiROrn {D = D} {E = ṿ js } f = horiROrn-∇ D (f tt)
+horiROrn         {E = σ S E} f = Δ[ s ∶ S ] horiROrn {E = E s} (curry f s)
