@@ -42,18 +42,18 @@ shiftΔ (σ S O)  P (t , xs) = refl
 shiftΔ (Δ T O)  P (t , xs) = refl
 shiftΔ (∇ s O)  P (t , xs) = cong (_,_ s) (shiftΔ O P (t , xs))
 
-erase-after-erase : ∀ {I J K} {e : J → I} {f : K → J} {D E F} (O : ROrn e D E) (P : ROrn f E F) →
-                    ∀ {X} (xs : ⟦ F ⟧ (X ∘ e ∘ f)) → erase (scROrn O P) {X} xs ≡ erase O {X} (erase P {X ∘ e} xs)
-erase-after-erase (ṿ [])            (ṿ feqs)          xs       = refl
-erase-after-erase (ṿ (refl ∷ eeqs)) (ṿ (refl ∷ feqs)) (x , xs) = cong₂ _,_ refl (erase-after-erase (ṿ eeqs) (ṿ feqs) xs)
-erase-after-erase (ṿ eeqs)          (Δ T P)           (t , xs) = erase-after-erase (ṿ eeqs) (P t) xs
-erase-after-erase (σ S O)           (σ .S P)          (s , xs) = cong (_,_ s) (erase-after-erase (O s) (P s) xs)
-erase-after-erase (σ S O)           (Δ T P)           (t , xs) = erase-after-erase (σ S O) (P t) xs
-erase-after-erase (σ S O)           (∇ s P)           xs       = cong (_,_ s) (erase-after-erase (O s) P xs)
-erase-after-erase (Δ T O)           (σ .T P)          (t , xs) = erase-after-erase (O t) (P t) xs
-erase-after-erase (Δ T O)           (Δ U P)           (u , xs) = erase-after-erase (Δ T O) (P u) xs
-erase-after-erase (Δ T O)           (∇ t P)           xs       = erase-after-erase (O t) P xs
-erase-after-erase (∇ s O)           P                 xs       = cong (_,_ s) (erase-after-erase O P xs)
+erase-scROrn : ∀ {I J K} {e : J → I} {f : K → J} {D E F} (O : ROrn e D E) (P : ROrn f E F) →
+               ∀ {X} (xs : ⟦ F ⟧ (X ∘ e ∘ f)) → erase (scROrn O P) {X} xs ≡ erase O {X} (erase P {X ∘ e} xs)
+erase-scROrn (ṿ [])            (ṿ feqs)          xs       = refl
+erase-scROrn (ṿ (refl ∷ eeqs)) (ṿ (refl ∷ feqs)) (x , xs) = cong₂ _,_ refl (erase-scROrn (ṿ eeqs) (ṿ feqs) xs)
+erase-scROrn (ṿ eeqs)          (Δ T P)           (t , xs) = erase-scROrn (ṿ eeqs) (P t) xs
+erase-scROrn (σ S O)           (σ .S P)          (s , xs) = cong (_,_ s) (erase-scROrn (O s) (P s) xs)
+erase-scROrn (σ S O)           (Δ T P)           (t , xs) = erase-scROrn (σ S O) (P t) xs
+erase-scROrn (σ S O)           (∇ s P)           xs       = cong (_,_ s) (erase-scROrn (O s) P xs)
+erase-scROrn (Δ T O)           (σ .T P)          (t , xs) = erase-scROrn (O t) (P t) xs
+erase-scROrn (Δ T O)           (Δ U P)           (u , xs) = erase-scROrn (Δ T O) (P u) xs
+erase-scROrn (Δ T O)           (∇ t P)           xs       = erase-scROrn (O t) P xs
+erase-scROrn (∇ s O)           P                 xs       = cong (_,_ s) (erase-scROrn O P xs)
 
 forget-after-forget :
   ∀ {I J K} {e : J → I} {f : K → J} {D E F} (O : Orn e D E) (P : Orn f E F) →
@@ -83,7 +83,7 @@ idROrn-id-l {D = D} {E} O X xs .xs heq | refl =
   HoriEq-from-≡ D
     (begin
        erase (scROrn (idROrn D) O) xs
-         ≡⟨ erase-after-erase (idROrn D) O xs ⟩
+         ≡⟨ erase-scROrn (idROrn D) O xs ⟩
        erase (idROrn D) (erase O xs)
          ≡⟨ erase-idROrn D ⟩
        erase O xs
@@ -99,7 +99,7 @@ idROrn-id-r {D = D} {E} O X xs .xs heq | refl =
   HoriEq-from-≡ D
     (begin
        erase (scROrn O (idROrn E)) xs
-         ≡⟨ erase-after-erase O (idROrn E) xs ⟩
+         ≡⟨ erase-scROrn O (idROrn E) xs ⟩
        erase O (erase (idROrn E) xs)
          ≡⟨ cong (erase O) (erase-idROrn E) ⟩
        erase O xs
@@ -116,13 +116,13 @@ scROrn-assoc {e = e} {f} {g} {D = D} {G = G} O P Q X xs xs' heq =
   HoriEq-from-≡ D
     (begin
        erase (scROrn (scROrn O P) Q) xs
-         ≡⟨ erase-after-erase (scROrn O P) Q xs ⟩
+         ≡⟨ erase-scROrn (scROrn O P) Q xs ⟩
        erase (scROrn O P) (erase Q xs)
-         ≡⟨ erase-after-erase O P (erase Q xs) ⟩
+         ≡⟨ erase-scROrn O P (erase Q xs) ⟩
        erase O (erase P (erase Q xs))
-         ≡⟨ cong (erase O) (sym (erase-after-erase P Q xs)) ⟩
+         ≡⟨ cong (erase O) (sym (erase-scROrn P Q xs)) ⟩
        erase O (erase (scROrn P Q) xs)
-         ≡⟨ sym (erase-after-erase O (scROrn P Q) xs) ⟩
+         ≡⟨ sym (erase-scROrn O (scROrn P Q) xs) ⟩
        erase (scROrn O (scROrn P Q)) xs
          ≡⟨ cong (erase (scROrn O (scROrn P Q))) (HoriEq-to-≡ G xs xs' heq) ⟩
        erase (scROrn O (scROrn P Q)) xs'
@@ -141,13 +141,13 @@ scROrn-cong-l {f = f} {D = D} {F = F} refl refl Q Q' O P qeq oeq X xs xs' heq =
   HoriEq-from-≡ F
     (begin
        erase (scROrn Q O) xs
-         ≡⟨ erase-after-erase Q O xs ⟩
+         ≡⟨ erase-scROrn Q O xs ⟩
        erase Q (erase O xs)
          ≡⟨ cong (erase Q) (HoriEq-to-≡ D (erase O xs) (erase P xs') (oeq (X ∘ f) xs xs' heq)) ⟩
        erase Q (erase P xs')
          ≡⟨ HoriEq-to-≡ F (erase Q (erase P xs')) (erase Q' (erase P xs')) (qeq X (erase P xs') (erase P xs') (HoriEq-from-≡ D refl)) ⟩
        erase Q' (erase P xs')
-         ≡⟨ sym (erase-after-erase Q' P xs') ⟩
+         ≡⟨ sym (erase-scROrn Q' P xs') ⟩
        erase (scROrn Q' P) xs'
      □)
   where open ≡-Reasoning renaming (_∎ to _□)
@@ -166,11 +166,11 @@ scROrn-cong-r {I} {J} {K} {e} {e'} {f} {D} {._} {E} {F} refl Q O P oeq X xs xs' 
   HoriEq-from-≡ D
     (begin
        erase (scROrn O Q) xs
-         ≡⟨ erase-after-erase O Q xs ⟩
+         ≡⟨ erase-scROrn O Q xs ⟩
        erase O (erase Q xs)
          ≡⟨ HoriEq-to-≡ D (erase O (erase Q xs)) (erase P (erase Q xs')) (oeq X (erase Q xs) (erase Q xs') (aux Q xs xs' heq)) ⟩
        erase P (erase Q xs')
-         ≡⟨ sym (erase-after-erase P Q xs') ⟩
+         ≡⟨ sym (erase-scROrn P Q xs') ⟩
        erase (scROrn P Q) xs'
      □)
   where

@@ -72,8 +72,8 @@ module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) 
   toAlgOrn-hori (∇ s O') j R' (.s , hs)     (refl , ps) = toAlgOrn-hori O' j (curry R' s) hs ps
 
   toAlgOrn : Orn (und ∘ proj₂) E ⌊ algOrn D (clsAlg O) ⌋
-  toAlgOrn = wrap λ { {._} (ok (i , j)) → horiROrn (λ hs → toAlgOrn-hori (Orn.comp O j) j ((clsAlg O !!) i) hs
-                                                                         (proj₂ (toAlgOrn-decomp (Desc.comp D i) j ((clsAlg O !!) i) hs))) }
+  toAlgOrn = wrap λ { {._} (ok (i , j)) → horiROrn (wrap λ hs → toAlgOrn-hori (Orn.comp O j) j ((clsAlg O !!) i) hs
+                                                                              (proj₂ (toAlgOrn-decomp (Desc.comp D i) j ((clsAlg O !!) i) hs))) }
 
   fromAlgOrn-decomp-ṿ : {is : List I} {js : List J} (eqs : Ė e js is) → Σ (Ṁ (InvImage e) is) (clsP-ṿ eqs)
   fromAlgOrn-decomp-ṿ []           = tt , tt
@@ -102,8 +102,8 @@ module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) 
   fromAlgOrn-hori (∇ s O') j R' hs       r = (_,_ s ** id) (fromAlgOrn-hori O' j (curry R' s) hs r)
 
   fromAlgOrn : Orn (λ j → e j , ok j) ⌊ algOrn D (clsAlg O) ⌋ E
-  fromAlgOrn = wrap (λ { {._} (ok j) → horiROrn (λ hs → fromAlgOrn-hori (Orn.comp O (ok j)) (ok j) ((clsAlg O !!) (e j)) hs
-                                                                        (proj₂ (fromAlgOrn-decomp (Orn.comp O (ok j)) hs))) })
+  fromAlgOrn = wrap (λ { {._} (ok j) → horiROrn (wrap λ hs → fromAlgOrn-hori (Orn.comp O (ok j)) (ok j) ((clsAlg O !!) (e j)) hs
+                                                                             (proj₂ (fromAlgOrn-decomp (Orn.comp O (ok j)) hs))) })
 
 {-
 

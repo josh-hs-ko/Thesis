@@ -8,9 +8,9 @@ open import Thesis.Prelude.Function
 open import Thesis.Prelude.Function.Fam
 open import Thesis.Prelude.Product
 
-open import Function using (id; const)
+open import Function using (id)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; _×_)
+open import Data.Product using (Σ; _,_; proj₁; _×_)
 open import Data.List using (List; []; _∷_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; cong₂)
 
@@ -24,10 +24,6 @@ syntax σ S (λ s → D) = σ[ s ∶ S ] D
 Hori : {I : Set} → RDesc I → (List I → Set) → Set
 Hori (ṿ is)  X = X is
 Hori (σ S D) X = Σ[ s ∶ S ] Hori (D s) X
-
-strip : {I : Set} (D : RDesc I) {X : List I → Set} → Hori D X → Σ (List I) X
-strip (ṿ is)  xs       = is , xs
-strip (σ S D) (s , hs) = strip (D s) hs
 
 Ṁ : {I : Set} → (I → Set) → List I → Set
 Ṁ X []       = ⊤

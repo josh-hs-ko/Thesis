@@ -12,9 +12,9 @@ open import Thesis.Description
 
 open import Function using (id; const; _∘_)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; proj₁; curry)
+open import Data.Product using (Σ; _,_; proj₁; proj₂; curry)
 open import Data.List using (List; []; _∷_)
-open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; cong; cong₂; setoid)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; trans; cong; cong₂; setoid)
 
 
 --------
@@ -43,15 +43,19 @@ erase (σ S O)  (s , xs) = s , erase (O s) xs
 erase (Δ T O)  (t , xs) = erase (O t) xs
 erase (∇ s O)  xs       = s , erase O xs
 
-Ė-id : {I : Set} (is : List I) → Ė id is is
-Ė-id []       = []
-Ė-id (i ∷ is) = refl ∷ Ė-id is
+Ė-refl : {I : Set} {is : List I} → Ė id is is
+Ė-refl {is = []    } = []
+Ė-refl {is = i ∷ is} = refl ∷ Ė-refl {is = is}
+
+Ė-trans : {I J K : Set} {e : J → I} {f : K → J} {is : List I} {js : List J} {ks : List K} → Ė e js is → Ė f ks js → Ė (e ∘ f) ks is
+Ė-trans         []           []           = []
+Ė-trans {e = e} (eeq ∷ eeqs) (feq ∷ feqs) = trans (cong e feq) eeq ∷ Ė-trans eeqs feqs
 
 idROrn : {I : Set} (D : RDesc I) → ROrn id D D
-idROrn (ṿ is)  = ṿ (Ė-id is)
+idROrn (ṿ is)  = ṿ Ė-refl
 idROrn (σ S D) = σ[ s ∶ S ] idROrn (D s)
 
-erase-idROrn-Ṁ : {I : Set} {X : I → Set} (is : List I) (xs : Ṁ X is) → erase-Ṁ (Ė-id is) xs ≡ xs
+erase-idROrn-Ṁ : {I : Set} {X : I → Set} (is : List I) (xs : Ṁ X is) → erase-Ṁ Ė-refl xs ≡ xs
 erase-idROrn-Ṁ []       _        = refl
 erase-idROrn-Ṁ (i ∷ is) (x , xs) = cong₂ _,_ refl (erase-idROrn-Ṁ is xs)
 
@@ -174,18 +178,3 @@ forget-singOrn {I} {D} =
     aux (ṿ [])       _        _        _          = refl
     aux (ṿ (i ∷ is)) (x , xs) (s , ss) (ih , ihs) = cong₂ _,_ ih (aux (ṿ is) xs ss ihs)
     aux (σ S D')     (s , xs) ss       ihs        = cong (_,_ s) (aux (D' s) xs ss ihs)
-
-
---------
--- ornament from horizontal data
-
-horiROrn-∇ :
-  {I J : Set} {e : J → I} (D : RDesc I) {js : List J} → Σ[ hs ∶ Hori D (const ⊤) ] Ė e js (proj₁ (strip D hs)) → ROrn e D (ṿ js)
-horiROrn-∇ (ṿ is)  (hs       , eqs) = ṿ eqs
-horiROrn-∇ (σ S D) ((s , hs) , eqs) = ∇ s (horiROrn-∇ (D s) (hs , eqs))
-
-horiROrn :
-  {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} →
-  (f : (hs : Hori E (const ⊤)) → Σ[ hs' ∶ Hori D (const ⊤) ] Ė e (proj₁ (strip E hs)) (proj₁ (strip D hs'))) → ROrn e D E
-horiROrn {D = D} {E = ṿ js } f = horiROrn-∇ D (f tt)
-horiROrn         {E = σ S E} f = Δ[ s ∶ S ] horiROrn {E = E s} (curry f s)
