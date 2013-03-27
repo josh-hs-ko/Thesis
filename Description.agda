@@ -21,9 +21,9 @@ data RDesc (I : Set) : Set₁ where
 
 syntax σ S (λ s → D) = σ[ s ∶ S ] D
 
-Hori : {I : Set} → RDesc I → (List I → Set) → Set
-Hori (ṿ is)  X = X is
-Hori (σ S D) X = Σ[ s ∶ S ] Hori (D s) X
+Ḣ : {I : Set} → RDesc I → (List I → Set) → Set
+Ḣ (ṿ is)  X = X is
+Ḣ (σ S D) X = Σ[ s ∶ S ] Ḣ (D s) X
 
 Ṁ : {I : Set} → (I → Set) → List I → Set
 Ṁ X []       = ⊤
@@ -34,7 +34,7 @@ generate-Ṁ f []       = tt
 generate-Ṁ f (i ∷ is) = f i , generate-Ṁ f is
 
 ⟦_⟧ : {I : Set} → RDesc I → (I → Set) → Set
-⟦ D ⟧ X = Hori D (Ṁ X)
+⟦ D ⟧ X = Ḣ D (Ṁ X)
 
 record Desc (I : Set) : Set₁ where
   constructor wrap
