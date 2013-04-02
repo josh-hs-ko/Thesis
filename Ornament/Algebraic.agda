@@ -17,7 +17,7 @@ open import Thesis.Ornament.RefinementSemantics
 open import Thesis.Relation
 open import Thesis.Relation.Fold
 
-open import Function using (id; type-signature)
+open import Function using (id; flip; type-signature)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; curry)
 open import Data.List using (List; []; _∷_)
@@ -29,12 +29,12 @@ open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅) rena
 --------
 -- algebraic ornaments
 
-algROrn : {I : Set} (D : RDesc I) {J : I → Set} {i : I} (j : J i) → (⟦ D ⟧ J ↝ J i) → ROrnDesc (Σ I J) proj₁ D
-algROrn (ṿ is)  {J} j R = Δ[ js ∶ Ṁ J is ] Δ[ r ∶ R js j ] ṿ (Ṁ-map (λ {i} j → ok (i , j)) is js)
-algROrn (σ S D)     j R = σ[ s ∶ S ] algROrn (D s) j (curry R s)
+algROrn : {I : Set} (D : RDesc I) {J : I → Set} → ℘ (⟦ D ⟧ J) → ROrnDesc (Σ I J) proj₁ D
+algROrn (ṿ is)  {J} P = Δ[ js ∶ Ṁ J is ] Δ[ r ∶ P js ] ṿ (Ṁ-map (λ {i} j → ok (i , j)) is js)
+algROrn (σ S D)     P = σ[ s ∶ S ] algROrn (D s) (curry P s)
 
 algOrn : ∀ {I} (D : Desc I) {J : I → Set} → (Ḟ D J ↝⁺ J) → OrnDesc (Σ I J) proj₁ D
-algOrn D R = wrap (λ { {._} (ok (i , j)) → algROrn (Desc.comp D i) j ((R !!) i) })
+algOrn D R = wrap (λ { {._} (ok (i , j)) → algROrn (Desc.comp D i) (((R !!) i º) j) })
 
 algOrn-iso : {I : Set} (D : Desc I) {J : I → Set} (R : Ḟ D J ↝⁺ J) →
              {i : I} (x : μ D i) (j : J i) → Iso Fun (OptP ⌈ algOrn D R ⌉ (ok (i , j)) x) (foldR' R i x j)
@@ -42,7 +42,7 @@ algOrn-iso {I} D {J} R =
   induction D (λ i x → (j : J i) → Iso Fun (OptP ⌈ algOrn D R ⌉ (ok (i , j)) x) (foldR' R i x j))
               (λ i ds ihs j → Setoid.trans (IsoSetoid Fun)
                                (μ-iso (OptPD ⌈ algOrn D R ⌉) (ok (i , j) , ok (i , con ds)))
-                               (aux (Desc.comp D i) ds ihs ((R !!) i) j))
+                               (aux (Desc.comp D i) ds ihs (((R !!) i º) j)))
   where
     aux' : (is : List I) (js : Ṁ J is) (ds : Ṁ (μ D) is) →
            All-Ṁ (λ i x → (j : J i) → Iso Fun (OptP ⌈ algOrn D R ⌉ (ok (i , j)) x) (foldR' R i x j)) is ds →
@@ -61,22 +61,22 @@ algOrn-iso {I} D {J} R =
                 ; from-to-inverse = frefl
                 ; to-from-inverse = λ { (.j , r , .js , rs , refl) → refl } })
     aux : (D' : RDesc I) (ds : ⟦ D' ⟧ (μ D)) → All D' (λ i x → (j : J i) → Iso Fun (OptP ⌈ algOrn D R ⌉ (ok (i , j)) x) (foldR' R i x j)) ds →
-          {i : I} (R' : ⟦ D' ⟧ J ↝ J i) (j : J i) →
-          Iso Fun (⟦ OptPRD (toROrn (algROrn D' j R')) ds ⟧ (μ (OptPD ⌈ algOrn D R ⌉))) (Σ[ js ∶ ⟦ D' ⟧ J ] mapFoldR D D' R ds js × R' js j)
-    aux (ṿ is)   ds       ihs R' j =
+          (P : ℘ (⟦ D' ⟧ J)) →
+          Iso Fun (⟦ OptPRD (toROrn (algROrn D' P)) ds ⟧ (μ (OptPD ⌈ algOrn D R ⌉))) (Σ[ js ∶ ⟦ D' ⟧ J ] mapFoldR D D' R ds js × P js)
+    aux (ṿ is)   ds       ihs P =
       iso-preserving FamF
         (compIso-inv (Setoid.refl (IsoSetoid Fun))
                      (λ js → Setoid.trans (IsoSetoid Fun)
                                (iso-preserving FamF (compIso-inv (Setoid.refl (IsoSetoid Fun)) (λ _ → aux' is js ds ihs)))
                                commIso))
-    aux (σ S D') (s , ds) ihs R' j =
+    aux (σ S D') (s , ds) ihs P =
       Setoid.trans (IsoSetoid Fun)
-        (aux (D' s) ds ihs (curry R' s) j)
+        (aux (D' s) ds ihs (curry P s))
         (record { to   = λ { (js , rs , r) → (s , js) , (js , rs , refl) , r }
                 ; from = (λ { ((.s , js) , (.js , rs , refl) , r) → js , rs , r }) ∶
                            (Σ[ s'js ∶ (Σ[ s' ∶ S ] ⟦ D' s' ⟧ J) ]
-                              (Σ[ js' ∶ ⟦ D' s ⟧ J ] mapFoldR D (D' s) R ds js' × (s , js') ≡ s'js) × R' s'js j →
-                            Σ[ js ∶ ⟦ D' s ⟧ J ] mapFoldR D (D' s) R ds js × R' (s , js) j)
+                              (Σ[ js' ∶ ⟦ D' s ⟧ J ] mapFoldR D (D' s) R ds js' × (s , js') ≡ s'js) × P s'js →
+                            Σ[ js ∶ ⟦ D' s ⟧ J ] mapFoldR D (D' s) R ds js × P (s , js))
                 ; from-to-inverse = frefl
                 ; to-from-inverse = λ { ((.s , js) , (.js , rs , refl) , r) → refl } })
    
