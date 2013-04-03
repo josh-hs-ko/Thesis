@@ -14,7 +14,7 @@ open import Function using (id; const; _∘_)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; curry)
 open import Data.List using (List; []; _∷_)
-open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; trans; cong; cong₂; setoid)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; trans; sym; cong; cong₂; setoid)
 
 
 --------
@@ -23,6 +23,18 @@ open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; tra
 data Ė {I J : Set} (e : J → I) : List J → List I → Set where
   []  : Ė e [] []
   _∷_ : {j : J} {i : I} (eq : e j ≡ i) {js : List J} {is : List I} (eqs : Ė e js is) → Ė e (j ∷ js) (i ∷ is)
+
+Ė-refl : {I : Set} {is : List I} → Ė id is is
+Ė-refl {is = []    } = []
+Ė-refl {is = i ∷ is} = refl ∷ Ė-refl {is = is}
+
+Ė-trans : {I J K : Set} {e : J → I} {f : K → J} {is : List I} {js : List J} {ks : List K} → Ė e js is → Ė f ks js → Ė (e ∘ f) ks is
+Ė-trans         []           []           = []
+Ė-trans {e = e} (eeq ∷ eeqs) (feq ∷ feqs) = trans (cong e feq) eeq ∷ Ė-trans eeqs feqs
+
+Ė-subst : {I J : Set} {e e' : J → I} {is : List I} {js : List J} → e ≐ e' → Ė e js is → Ė e' js is
+Ė-subst eeq []               = []
+Ė-subst eeq (_∷_ {j} eq eqs) = trans (sym (eeq j)) eq ∷ Ė-subst eeq eqs
 
 data ROrn {I J : Set} (e : J → I) : RDesc I → RDesc J → Set₁ where
   ṿ   : {js : List J} {is : List I} (eqs : Ė e js is) → ROrn e (ṿ is) (ṿ js)
@@ -33,6 +45,10 @@ data ROrn {I J : Set} (e : J → I) : RDesc I → RDesc J → Set₁ where
 syntax σ S (λ s → O) = σ[ s ∶ S ] O
 syntax Δ T (λ t → O) = Δ[ t ∶ T ] O
 
+idROrn : {I : Set} (D : RDesc I) → ROrn id D D
+idROrn (ṿ is)  = ṿ Ė-refl
+idROrn (σ S D) = σ[ s ∶ S ] idROrn (D s)
+
 erase-Ṁ : {I J : Set} {e : J → I} {js : List J} {is : List I} → Ė e js is → {X : I → Set} → Ṁ (X ∘ e) js → Ṁ X is
 erase-Ṁ []             _        = tt
 erase-Ṁ (eq ∷ eqs) {X} (x , xs) = subst X eq x , erase-Ṁ eqs xs
@@ -42,18 +58,6 @@ erase (ṿ eqs)  xs       = erase-Ṁ eqs xs
 erase (σ S O)  (s , xs) = s , erase (O s) xs
 erase (Δ T O)  (t , xs) = erase (O t) xs
 erase (∇ s O)  xs       = s , erase O xs
-
-Ė-refl : {I : Set} {is : List I} → Ė id is is
-Ė-refl {is = []    } = []
-Ė-refl {is = i ∷ is} = refl ∷ Ė-refl {is = is}
-
-Ė-trans : {I J K : Set} {e : J → I} {f : K → J} {is : List I} {js : List J} {ks : List K} → Ė e js is → Ė f ks js → Ė (e ∘ f) ks is
-Ė-trans         []           []           = []
-Ė-trans {e = e} (eeq ∷ eeqs) (feq ∷ feqs) = trans (cong e feq) eeq ∷ Ė-trans eeqs feqs
-
-idROrn : {I : Set} (D : RDesc I) → ROrn id D D
-idROrn (ṿ is)  = ṿ Ė-refl
-idROrn (σ S D) = σ[ s ∶ S ] idROrn (D s)
 
 erase-idROrn-Ṁ : {I : Set} {X : I → Set} (is : List I) (xs : Ṁ X is) → erase-Ṁ Ė-refl xs ≡ xs
 erase-idROrn-Ṁ []       _        = refl

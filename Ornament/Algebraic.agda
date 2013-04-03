@@ -30,7 +30,7 @@ open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅) rena
 -- algebraic ornaments
 
 algROrn : {I : Set} (D : RDesc I) {J : I → Set} → ℘ (⟦ D ⟧ J) → ROrnDesc (Σ I J) proj₁ D
-algROrn (ṿ is)  {J} P = Δ[ js ∶ Ṁ J is ] Δ[ r ∶ P js ] ṿ (Ṁ-map (λ {i} j → ok (i , j)) is js)
+algROrn (ṿ is)  {J} P = Δ[ js ∶ Ṁ J is ] Δ[ _ ∶ P js ] ṿ (Ṁ-map (λ {i} j → ok (i , j)) is js)
 algROrn (σ S D)     P = σ[ s ∶ S ] algROrn (D s) (curry P s)
 
 algOrn : ∀ {I} (D : Desc I) {J : I → Set} → (Ḟ D J ↝⁺ J) → OrnDesc (Σ I J) proj₁ D

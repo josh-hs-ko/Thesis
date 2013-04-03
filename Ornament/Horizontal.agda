@@ -15,11 +15,11 @@ open import Thesis.Ornament.Equivalence
 
 open import Function using (id; _∘_)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; <_,_>; curry; uncurry) renaming (map to _**_)
+open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; <_,_>; curry; uncurry) renaming (map to _**_)
 open import Data.List using (List; []; _∷_)
 import Relation.Binary.EqReasoning as EqReasoning
-open import Relation.Binary.PropositionalEquality using (_≡_; refl; sym; cong) renaming (setoid to ≡-Setoid)
-open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅; ≅-to-≡)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl; sym; trans; cong; subst) renaming (setoid to ≡-Setoid)
+open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅; ≅-to-≡) renaming (refl to hrefl; cong to hcong; cong₂ to hcong₂)
 
 
 record ḢTrans {I J : Set} (e : J → I) (D : RDesc I) (E : RDesc J) : Set where
@@ -34,15 +34,19 @@ record ḢTrans {I J : Set} (e : J → I) (D : RDesc I) (E : RDesc J) : Set wher
 ḢTrans-app' t (hs , xs) = ḢTrans.s t hs , erase-Ṁ (ḢTrans.c t hs) xs
 
 cong-erase-Ṁ :
-  {I J : Set} {e : J → I} {is is' : List I} {js : List J} (eqs : Ė e js is) (eqs' : Ė e js is') → is ≡ is' →
-  {X : I → Set} (xs : Ṁ (X ∘ e) js) → erase-Ṁ eqs {X} xs ≅ erase-Ṁ eqs' {X} xs
-cong-erase-Ṁ []           []            refl _        = ≡-to-≅ refl
-cong-erase-Ṁ (refl ∷ eqs) (refl ∷ eqs') refl (x , xs) = ≡-to-≅ (cong (_,_ x) (≅-to-≡ (cong-erase-Ṁ eqs eqs' refl xs)))
+  {I J : Set} {e e' : J → I} {is is' : List I} {js : List J} (eqs : Ė e js is) (eqs' : Ė e' js is') → is ≡ is' →
+  {X : I → Set} (xs : Ṁ (X ∘ e) js) (xs' : Ṁ (X ∘ e') js) → ṀHEq js xs xs' → erase-Ṁ eqs {X} xs ≅ erase-Ṁ eqs' {X} xs'
+cong-erase-Ṁ         []                 []            refl _        _          _                     = hrefl
+cong-erase-Ṁ {e = e} (_∷_ {j} refl eqs) (refl ∷ eqs') iseq (x , xs) (x' , xs') (heq , heqs) with e j
+cong-erase-Ṁ {e = e} (_∷_ {j} refl eqs) (refl ∷ eqs') refl (x , xs) (.x , xs') (hrefl , heqs) | ._   =
+  ≡-to-≅ (cong (_,_ x) (≅-to-≡ (cong-erase-Ṁ eqs eqs' refl xs xs' heqs)))
 
 cong-ḢTrans-app' :
-  {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (t u : ḢTrans e D E) →
-  ḢTrans.s t ≐ ḢTrans.s u → {X : I → Set} → ḢTrans-app' t {X} ≐ ḢTrans-app' u {X}
-cong-ḢTrans-app' {D = D} t u t≐u (hs , xs) = cong₂-pair (t≐u hs) (cong-erase-Ṁ (ḢTrans.c t hs) (ḢTrans.c u hs) (cong (next D) (t≐u hs)) xs)
+  {I J : Set} {e e' : J → I} {D : RDesc I} {E : RDesc J} (t : ḢTrans e D E) (u : ḢTrans e' D E) →
+  e ≐ e' → ḢTrans.s t ≐ ḢTrans.s u → (hs : Ṡ E) {X : I → Set} (xs : Ṁ (X ∘ e) (next E hs)) (xs' : Ṁ (X ∘ e') (next E hs)) →
+  ṀHEq (next E hs) xs xs' → ḢTrans-app' t {X} (hs , xs) ≡ ḢTrans-app' u {X} (hs , xs')
+cong-ḢTrans-app' {D = D} t u e≐e' t≐u hs xs xs' heq =
+  cong₂-pair (t≐u hs) (cong-erase-Ṁ (ḢTrans.c t hs) (ḢTrans.c u hs) (cong (next D) (t≐u hs)) xs xs' heq)
 
 ḢTrans-app : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (f : ḢTrans e D E) {X : I → Set} → ⟦ E ⟧ (X ∘ e) → ⟦ D ⟧ X
 ḢTrans-app {e = e} {D} {E} t {X} = Ḣ-comp D (Ṁ X) ∘ ḢTrans-app' t ∘ Ḣ-decomp E (Ṁ (X ∘ e))
@@ -138,21 +142,32 @@ erase-ḢROrn {D = D} {σ S E} t (s , xs) = erase-ḢROrn {D = D} {E s} (curry (
      ∎)
   where open EqReasoning (≡-Setoid _)
 
-ḢROrn-≐ : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (t u : ḢTrans e D E) → ḢTrans.s t ≐ ḢTrans.s u → ROrnEq (ḢROrn t) (ḢROrn u)
-ḢROrn-≐ {e = e} {D} {E} t u t≐u X xs xs' heq with HoriEq-to-≡ E xs xs' heq
-ḢROrn-≐ {e = e} {D} {E} t u t≐u X xs .xs heq | refl =
+ḢROrn-≐ : {I J : Set} {e e' : J → I} {D : RDesc I} {E : RDesc J} (t : ḢTrans e D E) (u : ḢTrans e' D E) →
+          e ≐ e' → ḢTrans.s t ≐ ḢTrans.s u → ROrnEq (ḢROrn t) (ḢROrn u)
+ḢROrn-≐ {e = e} {e'} {D} {E} t u e≐e' t≐u X xs xs' heq =
   HoriEq-from-≡ D
     (begin
-       erase(ḢROrn t) xs
+       erase (ḢROrn t) xs
          ≡⟨ erase-ḢROrn t xs ⟩
        ḢTrans-app t xs
          ≡⟨ refl ⟩
        (Ḣ-comp D (Ṁ X) ∘ ḢTrans-app' t ∘ Ḣ-decomp E (Ṁ (X ∘ e))) xs
-         ≡⟨ cong (Ḣ-comp D (Ṁ X)) (cong-ḢTrans-app' t u t≐u (Ḣ-decomp E (Ṁ (X ∘ e)) xs)) ⟩
-       (Ḣ-comp D (Ṁ X) ∘ ḢTrans-app' u ∘ Ḣ-decomp E (Ṁ (X ∘ e))) xs
+         ≡⟨ cong (Ḣ-comp D (Ṁ X)) see-below ⟩
+       (Ḣ-comp D (Ṁ X) ∘ ḢTrans-app' u ∘ Ḣ-decomp E (Ṁ (X ∘ e'))) xs'
          ≡⟨ refl ⟩
-       ḢTrans-app u xs
-         ≡⟨ sym (erase-ḢROrn u xs) ⟩
-       erase (ḢROrn u) xs
+       ḢTrans-app u xs'
+         ≡⟨ sym (erase-ḢROrn u xs') ⟩
+       erase (ḢROrn u) xs'
      ∎)
-  where open EqReasoning (≡-Setoid _)
+  where
+    open EqReasoning (≡-Setoid _)
+    lemma : {I : Set} (D : RDesc I) (X Y : I → Set) (xs : ⟦ D ⟧ X) (ys : ⟦ D ⟧ Y) → HoriEq D xs D ys →
+            Σ[ hs ∶ Ṡ D ] Σ[ xs' ∶ Ṁ X (next D hs) ] Σ[ ys' ∶ Ṁ Y (next D hs) ]
+               Ḣ-decomp D (Ṁ X) xs ≡ (hs , xs')  ×  Ḣ-decomp D (Ṁ Y) ys ≡ (hs , ys')  ×  ṀHEq (next D hs) xs' ys'
+    lemma .(ṿ is)  X Y xs        ys        (ṿ {is} heq)                     = tt , xs , ys , refl , refl , heq
+    lemma .(σ S D) X Y .(s , xs) .(s , ys) (σ {S} s {D} {.D} {xs} {ys} heq) =
+      (_,_ s ** (id ** (id ** (cong (_,_ s ** id) ** (cong (_,_ s ** id) ** id))))) (lemma (D s) X Y xs ys heq)
+    see-below : ḢTrans-app' t {X} (Ḣ-decomp E (Ṁ (X ∘ e)) xs) ≡ ḢTrans-app' u {X} (Ḣ-decomp E (Ṁ (X ∘ e')) xs')
+    see-below with lemma E (X ∘ e) (X ∘ e') xs xs' heq
+    see-below | hs , xs'' , xs''' , eq , eq' , heq' =
+      trans (cong (ḢTrans-app' t {X}) eq) (trans (cong-ḢTrans-app' t u e≐e' t≐u hs xs'' xs''' heq') (sym (cong (ḢTrans-app' u {X}) eq')))
