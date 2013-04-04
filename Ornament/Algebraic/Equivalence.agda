@@ -232,8 +232,34 @@ module CAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝⁺ J) where
   gh-iso : ∀ i → Iso Fun (J i) (proj₁ {B = J} ⁻¹ i)
   gh-iso i = record { to = g; from = h; to-from-inverse = gh-inverse; from-to-inverse = hg-inverse }
 
+  CAAO-computation-ṿ : (is : List I) (js : Ṁ J is) → clsP-ṿ (to≡-Ṁ is (Ṁ-map g is js)) (Ṁ-map g is js)
+  CAAO-computation-ṿ []       _        = tt
+  CAAO-computation-ṿ (i ∷ is) (j , js) = refl , CAAO-computation-ṿ is js
+
+  CAAO-computation : (D' : RDesc I) (P : ℘ (⟦ D' ⟧ J)) (js : ⟦ D' ⟧ J) → P js → clsP (toROrn (algROrn D' P)) (mapF D' g js)
+  CAAO-computation (ṿ is)   P js       p = js , p , CAAO-computation-ṿ is js
+  CAAO-computation (σ S D') P (s , js) p = CAAO-computation (D' s) (curry P s) js p
+
+  CAAO-extraction-ṿ : (is : List I) (js js' : Ṁ J is) → clsP-ṿ (to≡-Ṁ is (Ṁ-map g is js')) (Ṁ-map g is js) → js ≡ js'
+  CAAO-extraction-ṿ []       _        _          _            = refl
+  CAAO-extraction-ṿ (i ∷ is) (j , js) (.j , js') (refl , eqs) = cong (_,_ j) (CAAO-extraction-ṿ is js js' eqs)
+
+  CAAO-extraction : (D' : RDesc I) (P : ℘ (⟦ D' ⟧ J)) (js : ⟦ D' ⟧ J) → clsP (toROrn (algROrn D' P)) (mapF D' g js) → P js
+  CAAO-extraction (ṿ is)   P js       (js' , p , eqs) with CAAO-extraction-ṿ is js js' eqs
+  CAAO-extraction (ṿ is)   P js       (.js , p , eqs) | refl = p
+  CAAO-extraction (σ S D') P (s , js) p                      = CAAO-extraction (D' s) (curry P s) js p
+
   R-to-clsAlg : fun⁺ g •⁺ R ≃⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g)
-  R-to-clsAlg = {!!}
+  R-to-clsAlg = wrap (λ i → wrap λ { js ._ (j , r , refl) →
+                                       Ḟ-map D g js ,
+                                       mapR-fun-computation (Desc.comp D i) g js ,
+                                       CAAO-computation (Desc.comp D i) (((R !!) i º) j) js r }) ,
+                wrap (λ i → wrap λ { js ij (ijs , rs , q) → aux js ij ijs rs q })
+    where
+      aux : ∀ {i} (js : Ḟ D J i) (ij : proj₁ {B = J} ⁻¹ i) (ijs : Ḟ D (_⁻¹_ proj₁) i) (rs : mapR (Desc.comp D i) (fun⁺ g) js ijs) →
+            (q : (clsAlg ⌈ algOrn D R ⌉ !!) i ijs ij) → ((fun⁺ g •⁺ R) !!) i js ij
+      aux js (ok (i , j)) ijs rs p with mapR-fun-unique (Desc.comp D i) g js ijs rs
+      aux js (ok (i , j)) ._  rs p | refl = j , CAAO-extraction (Desc.comp D i) (((R !!) i º) j) js p , refl
 
   clsAlg-to-R : fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ ≃⁺ R •⁺ Ṙ D (fun⁺ h)
   clsAlg-to-R =
