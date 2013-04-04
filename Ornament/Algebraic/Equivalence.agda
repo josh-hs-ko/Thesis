@@ -5,6 +5,7 @@ module Thesis.Ornament.Algebraic.Equivalence where
 
 open import Thesis.Prelude.Equality
 open import Thesis.Prelude.Category.Isomorphism
+open import Thesis.Prelude.Preorder
 open import Thesis.Prelude.Function
 open import Thesis.Prelude.Function.Fam
 open import Thesis.Prelude.Product
@@ -19,12 +20,16 @@ open import Thesis.Ornament.Equivalence
 open import Thesis.Ornament.RefinementSemantics
 open import Thesis.Ornament.Algebraic
 open import Thesis.Relation
+open import Thesis.Relation.CompChain
 open import Thesis.Relation.Fold
 
-open import Function using (id; const; _∘_)
+open import Function using (id; const; flip; _∘_)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; curry; uncurry) renaming (map to _**_)
 open import Data.List using (List; []; _∷_; map)
+open import Relation.Binary using (module Setoid)
+import Relation.Binary.PreorderReasoning as PreorderReasoning
+import Relation.Binary.EqReasoning as EqReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; cong; cong₂) renaming (setoid to ≡-Setoid)
 
 
@@ -50,6 +55,8 @@ mutual
 clsAlg : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → Ḟ D (InvImage e) ↝⁺ InvImage e
 clsAlg O = wrap λ i js j → clsP (Orn.comp O j) js
 
+
+{-------
 -- algebraic ornamentation by a classifying algebra produces an isomorphic datatype
 
 module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) where
@@ -202,47 +209,66 @@ module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) 
                          (fromAlgOrn-comp-toAlgOrn-decomp-inverse (Desc.comp D (e j)) (((clsAlg O !!) (e j) º) (ok j))))))
            (ḢROrn-id {Σ I (InvImage e)} {Desc.comp ⌊ algOrn D (clsAlg O) ⌋ (e j , ok j)}) })
 
-{-
+-}
 
+
+--------
 -- classifying algebra derived from an algebraic ornament is isomorphic to the algebra of the ornament
 
 module CAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝⁺ J) where
 
-  h : J ⇉ InvImage proj₁
-  h {i} = ok ∘ _,_ i
+  g : J ⇉ InvImage proj₁
+  g {i} = ok ∘ _,_ i
 
-  CAAO-theorem-aux-computation : (D : RDesc I) (js : ⟦ D ⟧ J) → clsP (toROrn (erode D js)) (mapF D h js)
-  CAAO-theorem-aux-computation ∎       js         = tt
-  CAAO-theorem-aux-computation (ṿ i)   j          = refl
-  CAAO-theorem-aux-computation (σ S D) (s , js)   = refl , CAAO-theorem-aux-computation (D s) js
-  CAAO-theorem-aux-computation (D * E) (js , js') = CAAO-theorem-aux-computation D js , CAAO-theorem-aux-computation E js'
+  h : InvImage proj₁ ⇉ J
+  h (ok (i , j)) = j
 
-  CAAO-theorem-aux-unique : (D : RDesc I) (js js' : ⟦ D ⟧ J) → clsP (toROrn (erode D js')) (mapF D h js) → js ≡ js'
-  CAAO-theorem-aux-unique ∎       js        js'         p          = refl
-  CAAO-theorem-aux-unique (ṿ i)   j         j'          p          = cong-proj₂ p
-  CAAO-theorem-aux-unique (σ S D) (s , js)  (.s , js')  (refl , p) = cong (_,_ s) (CAAO-theorem-aux-unique (D s) js js' p)
-  CAAO-theorem-aux-unique (D * E) (js , ks) (js' , ks') (p , p')   = cong₂ _,_ (CAAO-theorem-aux-unique D js js' p)
-                                                                               (CAAO-theorem-aux-unique E ks ks' p')
+  gh-inverse : ∀ {i} (ij : proj₁ ⁻¹ i) → g (h ij) ≡ ij
+  gh-inverse (ok (i , j)) = refl
 
-  CAAO-theorem : fun⁺ h •⁺ R ≃⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ h)
-  CAAO-theorem =
-    wrap (λ i → wrap λ { js ._ (j , r , refl) →
-                         Ḟ-map D h js , mapR-fun-computation (D at i) h js , js , r , CAAO-theorem-aux-computation (D at i) js }) ,
-    wrap (λ i → wrap λ { js ij (ijs , rs , q) → aux js ij ijs rs q })
-    where
-      aux : ∀ {i} (js : Ḟ D J i) (ij : proj₁ {B = J} ⁻¹ i) (ijs : Ḟ D (_⁻¹_ proj₁) i) (rs : mapR (D at i) (fun⁺ h) js ijs) →
-            (q : (clsAlg ⌈ algOrn D R ⌉ !!) i ijs ij) → ((fun⁺ h •⁺ R) !!) i js ij
-      aux js (ok (i , j)) ijs rs (js' , r , p) with mapR-fun-unique (D at i) h js ijs rs
-      aux js (ok (i , j)) ._  rs (js' , r , p) | refl with CAAO-theorem-aux-unique (D at i) js js' p
-      aux js (ok (i , j)) ._  rs (.js , r , p) | refl | refl = j , r , refl
+  hg-inverse : ∀ {i} (j : J i) → h (g j) ≡ j
+  hg-inverse = frefl
 
-  g : InvImage proj₁ ⇉ J
-  g (ok (i , j)) = j
+  gh-iso : ∀ i → Iso Fun (J i) (proj₁ {B = J} ⁻¹ i)
+  gh-iso i = record { to = g; from = h; to-from-inverse = gh-inverse; from-to-inverse = hg-inverse }
 
-  hg-inverse : ∀ {i} (ij : proj₁ ⁻¹ i) → h (g ij) ≡ ij
-  hg-inverse (ok (i , j)) = refl
+  R-to-clsAlg : fun⁺ g •⁺ R ≃⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g)
+  R-to-clsAlg = {!!}
 
-  hg-iso : ∀ i → Iso Fun (J i) (proj₁ {B = J} ⁻¹ i)
-  hg-iso i = record { to = h; from = g; to-from-inverse = hg-inverse; from-to-inverse = frefl }
-
--}
+  clsAlg-to-R : fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ ≃⁺ R •⁺ Ṙ D (fun⁺ h)
+  clsAlg-to-R =
+    (begin
+       fun⁺ g •⁺ R ≃⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g)
+         ⇒⟨ •⁺-cong-l (fun⁺ h) ⟩
+       fun⁺ h •⁺ fun⁺ g •⁺ R ≃⁺ fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g)
+         ⇒⟨ ≃⁺-trans (≃⁺-chain (fun⁺ h ◇⁺) (fun⁺ h º⁺ ◇⁺) (fun⁺ g ◇⁺) (iso⁺-conv (Setoid.sym (IsoSetoid Fun) ∘ gh-iso))) ⟩
+       fun⁺ h •⁺ fun⁺ h º⁺ •⁺ R ≃⁺ fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g)
+         ⇒⟨ ≃⁺-trans (≃⁺-sym (≃⁺-chain-r (fun⁺ h ▪⁺ fun⁺ h º⁺ ◇⁺) (idR⁺ ◇⁺) (iso⁺-idR⁺ (Setoid.sym (IsoSetoid Fun) ∘ gh-iso)))) ⟩
+       idR⁺ •⁺ R ≃⁺ fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g)
+         ⇒⟨ ≃⁺-trans (≃⁺-sym (idR⁺-l R)) ⟩
+       R ≃⁺ fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g)
+         ⇒⟨ •⁺-cong-r (Ṙ D (fun⁺ h)) ⟩
+       R •⁺ Ṙ D (fun⁺ h) ≃⁺ (fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g)) •⁺ Ṙ D (fun⁺ h)
+         ⇒⟨ flip ≃⁺-trans
+              (begin′
+                 (fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g)) •⁺ Ṙ D (fun⁺ h)
+                   ≃⁺⟨ ≃⁺-sym (•⁺-cong-l (fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g)) (Ṙ-cong D (iso⁺-conv gh-iso))) ⟩
+                 (fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g)) •⁺ Ṙ D (fun⁺ g º⁺)
+                   ≃⁺⟨ chain-normalise⁺ (([ fun⁺ h ]⁺ ▪⁺ [ clsAlg ⌈ algOrn D R ⌉ ]⁺ ▪⁺ [ Ṙ D (fun⁺ g) ]⁺) ▪⁺ [ Ṙ D (fun⁺ g º⁺) ]⁺) ⟩
+                 fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g) •⁺ Ṙ D (fun⁺ g º⁺)
+                   ≃⁺⟨ ≃⁺-sym (≃⁺-chain-l (fun⁺ h ▪⁺ clsAlg ⌈ algOrn D R ⌉ ◇⁺) (Ṙ-preserves-comp D (fun⁺ g) (fun⁺ g º⁺))) ⟩
+                 fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g •⁺ fun⁺ g º⁺)
+                   ≃⁺⟨ ≃⁺-chain-l (fun⁺ h ▪⁺ clsAlg ⌈ algOrn D R ⌉ ◇⁺) (Ṙ-cong D (iso⁺-idR⁺ gh-iso)) ⟩
+                 fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D idR⁺
+                   ≃⁺⟨ ≃⁺-chain-l (fun⁺ h ▪⁺ clsAlg ⌈ algOrn D R ⌉ ◇⁺) (Ṙ-preserves-idR⁺ D) ⟩
+                 fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ idR⁺
+                   ≃⁺⟨ •⁺-cong-l (fun⁺ h) (idR⁺-r (clsAlg ⌈ algOrn D R ⌉)) ⟩
+                 fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉
+              ∎′) ⟩
+       R •⁺ Ṙ D (fun⁺ h) ≃⁺ fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉
+         ⇒⟨ ≃⁺-sym ⟩
+       fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ ≃⁺ R •⁺ Ṙ D (fun⁺ h)
+    ∎) R-to-clsAlg
+    where open PreorderReasoning (⇒-Preorder) renaming (_∼⟨_⟩_ to _⇒⟨_⟩_)
+          setoid = ≃⁺-Setoid (Ḟ D (InvImage proj₁)) J
+          open EqReasoning setoid renaming (begin_ to begin′_; _≈⟨_⟩_ to _≃⁺⟨_⟩_; _∎ to _∎′)
