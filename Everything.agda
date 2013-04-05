@@ -36,6 +36,7 @@ import Thesis.Ornament.RefinementSemantics
 import Thesis.Ornament.SequentialComposition
 import Thesis.Ornament.SequentialComposition.Swap
 import Thesis.Relation
+import Thesis.Relation.AlgCategory
 import Thesis.Relation.CompChain
 import Thesis.Relation.Division
 import Thesis.Relation.Fold

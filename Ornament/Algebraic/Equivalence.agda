@@ -363,3 +363,4 @@ module CAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝⁺ J) where
     where open PreorderReasoning (⇒-Preorder) renaming (_∼⟨_⟩_ to _⇒⟨_⟩_)
           setoid = ≃⁺-Setoid (Ḟ D (InvImage proj₁)) J
           open EqReasoning setoid renaming (begin_ to begin′_; _≈⟨_⟩_ to _≃⁺⟨_⟩_; _∎ to _∎′)
+

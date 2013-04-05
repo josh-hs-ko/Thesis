@@ -149,6 +149,10 @@ Basic definitions of subsets and relations, combinators for specifying nondeterm
 relational inclusion wrapped up as preorder and setoid, combinators for reasoning with relations,
 componentwise relations between families of sets, and definition and properties of relators.
 
+#### Thesis.Relation.AlgCategory
+Let `D : Desc I` be a description.
+The category `RAlg' D` is the wide subcategory of the category of relational `D`-algebras where the morphisms are restricted to be functions.
+
 #### Thesis.Relation.CompChain
 Combinators that help avoiding explicit applications of monotonicity and associativity of relational composition
 and preservation of composition by relators and converse.
