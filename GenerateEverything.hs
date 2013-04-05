@@ -17,11 +17,12 @@ everything_header =
 
 readme_header :: [String]
 readme_header =
-  [ "# Composable structures for dependently typed programming (TBD)",
+  [ "# Analysis and synthesis of inductive families", 
     "",
     "This implements, in Agda, a framework of " ++
-		"composable datatype refinements " ++
-    "based on [McBride's datatype ornamentation]" ++
+		"composable datatype refinements and " ++
+    "relational algebraic ornamentation " ++
+    "based on [McBride's work on ornaments]" ++
 		"(http://personal.cis.strath.ac.uk/~conor/pub/OAAO/LitOrn.pdf).",
     "",
 		"All files typecheck with Agda 2.3.3, but note that " ++

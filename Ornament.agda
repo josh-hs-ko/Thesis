@@ -49,15 +49,19 @@ idROrn : {I : Set} (D : RDesc I) → ROrn id D D
 idROrn (ṿ is)  = ṿ Ė-refl
 idROrn (σ S D) = σ[ s ∶ S ] idROrn (D s)
 
-erase-Ṁ : {I J : Set} {e : J → I} {js : List J} {is : List I} → Ė e js is → {X : I → Set} → Ṁ (X ∘ e) js → Ṁ X is
-erase-Ṁ []             _        = tt
-erase-Ṁ (eq ∷ eqs) {X} (x , xs) = subst X eq x , erase-Ṁ eqs xs
+erase' : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} → ROrn e D E →
+         {X : List I → Set} {Y : List J → Set} → ({is : List I} {js : List J} → Ė e js is → Y js → X is) → Ḣ E Y → Ḣ D X
+erase' (ṿ eqs) f y        = f eqs y
+erase' (σ S O) f (s , ys) = s , erase' (O s) f ys
+erase' (Δ T O) f (t , ys) = erase' (O t) f ys
+erase' (∇ s O) f ys       = s , erase' O f ys
+
+erase-Ṁ : {I J : Set} {e : J → I} {js : List J} {is : List I} {X : I → Set} → Ė e js is → Ṁ (X ∘ e) js → Ṁ X is
+erase-Ṁ         []         _        = tt
+erase-Ṁ {X = X} (eq ∷ eqs) (x , xs) = subst X eq x , erase-Ṁ eqs xs
 
 erase : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} → ROrn e D E → {X : I → Set} → ⟦ E ⟧ (X ∘ e) → ⟦ D ⟧ X
-erase (ṿ eqs)  xs       = erase-Ṁ eqs xs
-erase (σ S O)  (s , xs) = s , erase (O s) xs
-erase (Δ T O)  (t , xs) = erase (O t) xs
-erase (∇ s O)  xs       = s , erase O xs
+erase O = erase' O erase-Ṁ
 
 erase-idROrn-Ṁ : {I : Set} {X : I → Set} (is : List I) (xs : Ṁ X is) → erase-Ṁ Ė-refl xs ≡ xs
 erase-idROrn-Ṁ []       _        = refl

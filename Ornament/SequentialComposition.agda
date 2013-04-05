@@ -177,7 +177,7 @@ scROrn-cong-r {I} {J} {K} {e} {e'} {f} {D} {._} {E} {F} refl Q O P oeq X xs xs' 
     open ≡-Reasoning renaming (_∎ to _□)
     aux' : {js : List J} {ks : List K} →
            (eqs : Ė f ks js) (xs : Ṁ (X ∘ e ∘ f) ks) (xs' : Ṁ (X ∘ e' ∘ f) ks) →
-           ṀHEq ks xs xs' → ṀHEq js (erase-Ṁ eqs {X ∘ e} xs) (erase-Ṁ eqs {X ∘ e'} xs')
+           ṀHEq ks xs xs' → ṀHEq js (erase-Ṁ {X = X ∘ e} eqs xs) (erase-Ṁ {X = X ∘ e'} eqs xs')
     aux' []           _        _          _            = tt
     aux' (refl ∷ eqs) (x , xs) (x' , xs') (heq , heqs) = heq , aux' eqs xs xs' heqs
     aux : ∀ {E F} (Q : ROrn f E F) (xs : ⟦ F ⟧ (X ∘ e ∘ f)) (xs' : ⟦ F ⟧ (X ∘ e' ∘ f)) →

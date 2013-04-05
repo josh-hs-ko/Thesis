@@ -121,9 +121,12 @@ reflection {I} D = induction D (λ _ x → fold con x ≡ x) (λ i xs all → co
 Ṁ-comp []       _        _        = tt
 Ṁ-comp (i ∷ is) (x , xs) (y , ys) = (x , y) , Ṁ-comp is xs ys
 
+Ḣ-map : {I : Set} (D : RDesc I) {X Y : List I → Set} → (X ⇉ Y) → Ḣ D X → Ḣ D Y
+Ḣ-map (ṿ is)  f x        = f x
+Ḣ-map (σ S D) f (s , xs) = s , Ḣ-map (D s) f xs
+
 mapF : {I : Set} (D : RDesc I) {X Y : I → Set} → (X ⇉ Y) → ⟦ D ⟧ X → ⟦ D ⟧ Y
-mapF (ṿ is)  f xs         = Ṁ-map f is xs
-mapF (σ S D) f (s , xs)   = s , mapF (D s) f xs
+mapF D f = Ḣ-map D (λ {is} → Ṁ-map f is)
 
 mapF-preserves-id : {I : Set} (D : RDesc I) {X : I → Set} → mapF D (λ {i} → id {A = X i}) ≐ id
 mapF-preserves-id (ṿ [])       _        = refl

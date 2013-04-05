@@ -1,6 +1,6 @@
-# Composable structures for dependently typed programming (TBD)
+# Analysis and synthesis of inductive families
 
-This implements, in Agda, a framework of composable datatype refinements based on [McBride's datatype ornamentation](http://personal.cis.strath.ac.uk/~conor/pub/OAAO/LitOrn.pdf).
+This implements, in Agda, a framework of composable datatype refinements and relational algebraic ornamentation based on [McBride's work on ornaments](http://personal.cis.strath.ac.uk/~conor/pub/OAAO/LitOrn.pdf).
 
 All files typecheck with Agda 2.3.3, but note that some files can take a very long time to typecheck. (The module Thesis.Ornament.SequentialComposition would bump into [an error of Agda 2.3.2](http://code.google.com/p/agda/issues/detail?id=754).)
 
@@ -87,6 +87,9 @@ Families of refinements form a category `FRef`.
 Definition of datatype descriptions, i.e., a universe for functors on families of sets.
 Datatype-generic fold and induction are defined on top of descriptions.
 
+#### Thesis.Description.Horizontal
+Horizontal data, which can be separated into "shape" and "core" (cf. containers).
+
 #### Thesis.Description.HorizontalEquivalence
 An inductively defined equivalence between description-based data that poses little restriction on their actual types.
 
@@ -99,10 +102,9 @@ Singleton ornaments are also defined, which create as many singleton types as th
 Definition of (relational) algebraic ornaments and classifying algebras.
 The optimised predicate of an algebraic ornament can be swapped for a relational fold with the algebra of the ornament.
 
-#### Thesis.Ornament.Algebraic.FundamentalTheorems
-Two fundamental theorems about algebraic ornaments and classifying algebras.
-*The AOCA Theorem:* Algebraic ornamentation by a classifying algebra produces an isomorphic datatype.
-*The CAAO Theorem:* A classifying algebra derived from an algebraic ornament is isomorphic to the algebra of the ornament.
+#### Thesis.Ornament.Algebraic.Equivalence
+Let `D : Desc I` be a description.
+The category of relational `D`-algebras and the slice category of ornaments over `D` are equivalent.
 
 #### Thesis.Ornament.Algebraic.Fusion
 Fold fusion theorems for algebraic ornamentation.
@@ -114,6 +116,10 @@ extends ornaments to forgetful maps on those least fixed points.
 
 #### Thesis.Ornament.Equivalence
 An extensional equivalence relation on ornaments, which extends to extensional equivalence on ornamental forgetful maps.
+
+#### Thesis.Ornament.Horizontal
+Horizontal transformations, i.e., shape-altering morphisms between horizontal data (cf. container morphisms).
+Ornaments can be derived from horizontal transformations.
 
 #### Thesis.Ornament.ParallelComposition
 Parallel composition of ornaments.

@@ -37,7 +37,7 @@ triangle-l {I} {J} {K} {e} {f} O P = (λ { (ok j , k) → refl }) , (λ { (ok j 
     aux' : {is : List I} {js : List J} {ks : List K} (eeqs : Ė e js is) (feqs : Ė f ks is)
            (X : I → Set) (xs : Ṁ (X ∘ e ∘ π₁) (und-Ṁ is (pc-Ė eeqs feqs))) (xs' : Ṁ (X ∘ pull) (und-Ṁ is (pc-Ė eeqs feqs))) →
            ṀHEq (und-Ṁ is (pc-Ė eeqs feqs)) xs xs' →
-           ṀHEq is (erase-Ṁ (sc-Ė eeqs (diff-Ė-l eeqs feqs)) {X} xs) (erase-Ṁ (to≡-Ṁ is (pc-Ė eeqs feqs)) {X} xs')
+           ṀHEq is (erase-Ṁ {X = X} (sc-Ė eeqs (diff-Ė-l eeqs feqs)) xs) (erase-Ṁ {X = X} (to≡-Ṁ is (pc-Ė eeqs feqs)) xs')
     aux' []            _          X _        _          _            = tt
     aux' (refl ∷ eeqs) (_ ∷ feqs) X (x , xs) (x' , xs') (heq , heqs) = heq , aux' eeqs feqs X xs xs' heqs
     aux : ∀ {D' E' F'} (O' : ROrn e D' E') (P' : ROrn f D' F') → ROrnEq (scROrn O' (diffROrn-l O' P')) (toROrn (pcROrn O' P'))
@@ -63,7 +63,7 @@ triangle-r {I} {J} {K} {e} {f} O P = (λ { (j , ok k) → refl }) , (λ { (j , o
     aux' : {is : List I} {js : List J} {ks : List K} (eeqs : Ė e js is) (feqs : Ė f ks is)
            (X : I → Set) (xs : Ṁ (X ∘ f ∘ π₂) (und-Ṁ is (pc-Ė eeqs feqs))) (xs' : Ṁ (X ∘ pull) (und-Ṁ is (pc-Ė eeqs feqs))) →
            ṀHEq (und-Ṁ is (pc-Ė eeqs feqs)) xs xs' →
-           ṀHEq is (erase-Ṁ (sc-Ė feqs (diff-Ė-r eeqs feqs)) {X} xs) (erase-Ṁ (to≡-Ṁ is (pc-Ė eeqs feqs)) {X} xs')
+           ṀHEq is (erase-Ṁ {X = X} (sc-Ė feqs (diff-Ė-r eeqs feqs)) xs) (erase-Ṁ {X = X} (to≡-Ṁ is (pc-Ė eeqs feqs)) xs')
     aux' _          []            X _        _          _            = tt
     aux' (_ ∷ eeqs) (refl ∷ feqs) X (x , xs) (x' , xs') (heq , heqs) = heq , aux' eeqs feqs X xs xs' heqs
     aux : ∀ {D' E' F'} (O' : ROrn e D' E') (P' : ROrn f D' F') → ROrnEq (scROrn P' (diffROrn-r O' P')) (toROrn (pcROrn O' P'))
@@ -90,9 +90,9 @@ module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (
   integrate-aux₀ :
     ∀ {j} (y : μ E j) → ∀ {k} (z : μ F k) → ∀ {i} (eeq : e j ≡ i) → ∀ {i'} (feq : f k ≡ i') → i ≡ i' →
     ∀ {is js ks} (ys : Ṁ (μ E) js) (zs : Ṁ (μ F) ks) (eeqs : Ė e js is) (feqs : Ė f ks is) →
-    erase-Ṁ (eeq ∷ eeqs) {μ D} (forget O y , mapFold-Ṁ E (ornAlg O) js ys)
-      ≅ erase-Ṁ (feq ∷ feqs) {μ D} (forget P z , mapFold-Ṁ F (ornAlg P) ks zs) →
-    forget O y ≅ forget P z × erase-Ṁ eeqs {μ D} (mapFold-Ṁ E (ornAlg O) js ys) ≡ erase-Ṁ feqs {μ D} (mapFold-Ṁ F (ornAlg P) ks zs)
+    erase-Ṁ {X = μ D} (eeq ∷ eeqs) (forget O y , mapFold-Ṁ E (ornAlg O) js ys)
+      ≅ erase-Ṁ {X = μ D} (feq ∷ feqs) (forget P z , mapFold-Ṁ F (ornAlg P) ks zs) →
+    forget O y ≅ forget P z × erase-Ṁ {X = μ D} eeqs (mapFold-Ṁ E (ornAlg O) js ys) ≡ erase-Ṁ {X = μ D} feqs (mapFold-Ṁ F (ornAlg P) ks zs)
   integrate-aux₀ y z refl refl ieq ys zs eeqs feqs eq = (id ** ≅-to-≡) (cong-split (cong (μ D) ieq) refl eq)
 
   integrate-aux₁ :
@@ -116,7 +116,7 @@ module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (
   integrate-aux-Ṁ :
     {is : List I} {js : List J} {ks : List K}
     (eeqs : Ė e js is) (feqs : Ė f ks is) → (ys : Ṁ (μ E) js) → All-Ṁ integrate-Ind js ys → (zs : Ṁ (μ F) ks) →
-    erase-Ṁ eeqs {μ D} (mapFold-Ṁ E (ornAlg O) js ys) ≡ erase-Ṁ feqs (mapFold-Ṁ F (ornAlg P) ks zs) →
+    erase-Ṁ {X = μ D} eeqs (mapFold-Ṁ E (ornAlg O) js ys) ≡ erase-Ṁ feqs (mapFold-Ṁ F (ornAlg P) ks zs) →
     Σ[ ps ∶ Ṁ (μ ⌊ O ⊗ P ⌋) (und-Ṁ is (pc-Ė eeqs feqs)) ]
       erase-Ṁ (diff-Ė-l eeqs feqs) (mapFold-Ṁ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-l O P) {jk}) (und-Ṁ is (pc-Ė eeqs feqs)) ps) ≡ ys
     × erase-Ṁ (diff-Ė-r eeqs feqs) (mapFold-Ṁ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-r O P) {jk}) (und-Ṁ is (pc-Ė eeqs feqs)) ps) ≡ zs
