@@ -12,8 +12,8 @@ open import Thesis.Relation
 open import Thesis.Relation.CompChain
 
 open import Function using (id; _∘_)
-open import Data.Product using (Σ; _,_)
-import Relation.Binary.EqReasoning as EqReasoning
+open import Data.Product using (Σ; _,_; proj₁; proj₂)
+import Relation.Binary.PreorderReasoning as PreorderReasoning
 
 record RAlgebra : Set₁ where
   constructor _,_
@@ -25,39 +25,37 @@ record RAlg'Morphism (R S : RAlgebra) : Set₁ where
   constructor _,_
   field
     h : RAlgebra.Carrier R ⇉ RAlgebra.Carrier S
-    c : fun⁺ h •⁺ RAlgebra.R R ≃⁺ RAlgebra.R S •⁺ Ṙ D (fun⁺ h)
+    c : fun⁺ h •⁺ RAlgebra.R R ⊆⁺ RAlgebra.R S •⁺ Ṙ D (fun⁺ h)
 
 RAlg'Morphism-id : {R : RAlgebra} → RAlg'Morphism R R
 RAlg'Morphism-id {X , R} =
   id , (begin
           idR⁺ •⁺ R
-            ≃⁺⟨ idR⁺-l R ⟩
+            ⊆⁺⟨ proj₁ (idR⁺-l R) ⟩
           R
-            ≃⁺⟨ ≃⁺-sym (idR⁺-r R) ⟩
+            ⊆⁺⟨ proj₂ (idR⁺-r R) ⟩
           R •⁺ idR⁺
-            ≃⁺⟨ ≃⁺-sym (•⁺-cong-l R (Ṙ-preserves-idR⁺ D)) ⟩
+            ⊆⁺⟨ •⁺-monotonic-l R (proj₂ (Ṙ-preserves-idR⁺ D)) ⟩
           R •⁺ Ṙ D idR⁺
         ∎)
-  where setoid = ≃⁺-Setoid (Ḟ D X) X
-        open EqReasoning setoid renaming (_≈⟨_⟩_ to _≃⁺⟨_⟩_)
+  where open PreorderReasoning (⊆⁺-Preorder (Ḟ D X) X) renaming (_∼⟨_⟩_ to _⊆⁺⟨_⟩_)
 
 RAlg'Morphism-comp : {R S T : RAlgebra} → RAlg'Morphism S T → RAlg'Morphism R S → RAlg'Morphism R T
 RAlg'Morphism-comp {X , R} {Y , S} {Z , T} (h , ch) (g , cg) =
   h ∘ g , (begin
              fun⁺ (h ∘ g) •⁺ R
-               ≃⁺⟨ ≃⁺-chain-r (fun⁺ (h ∘ g) ◇⁺) (fun⁺ h ▪⁺ fun⁺ g ◇⁺) (fun⁺-preserves-comp h g) ⟩
+               ⊆⁺⟨ ⊆⁺-chain-r (fun⁺ (h ∘ g) ◇⁺) (fun⁺ h ▪⁺ fun⁺ g ◇⁺) (proj₁ (fun⁺-preserves-comp h g)) ⟩
              fun⁺ h •⁺ fun⁺ g •⁺ R
-               ≃⁺⟨ •⁺-cong-l (fun⁺ h) cg ⟩
+               ⊆⁺⟨ •⁺-monotonic-l (fun⁺ h) cg ⟩
              fun⁺ h •⁺ S •⁺ Ṙ D (fun⁺ g)
-               ≃⁺⟨ ≃⁺-chain-r (fun⁺ h ▪⁺ S ◇⁺) (T ▪⁺ Ṙ D (fun⁺ h) ◇⁺) ch ⟩
+               ⊆⁺⟨ ⊆⁺-chain-r (fun⁺ h ▪⁺ S ◇⁺) (T ▪⁺ Ṙ D (fun⁺ h) ◇⁺) ch ⟩
              T •⁺ Ṙ D (fun⁺ h) •⁺ Ṙ D (fun⁺ g)
-               ≃⁺⟨ ≃⁺-sym (•⁺-cong-l T (Ṙ-preserves-comp D (fun⁺ h) (fun⁺ g))) ⟩
+               ⊆⁺⟨ •⁺-monotonic-l T (proj₂ (Ṙ-preserves-comp D (fun⁺ h) (fun⁺ g))) ⟩
              T •⁺ Ṙ D (fun⁺ h •⁺ fun⁺ g)
-               ≃⁺⟨ ≃⁺-sym (•⁺-cong-l T (Ṙ-cong D (fun⁺-preserves-comp h g))) ⟩
+               ⊆⁺⟨ •⁺-monotonic-l T (Ṙ-monotonic D (proj₂ (fun⁺-preserves-comp h g))) ⟩
              T •⁺ Ṙ D (fun⁺ (h ∘ g))
            ∎)
-  where setoid = ≃⁺-Setoid (Ḟ D X) Z
-        open EqReasoning setoid renaming (_≈⟨_⟩_ to _≃⁺⟨_⟩_)
+  where open PreorderReasoning (⊆⁺-Preorder (Ḟ D X) Z) renaming (_∼⟨_⟩_ to _⊆⁺⟨_⟩_)
 
 record RAlg'MorphismEq {R S : RAlgebra} (f g : RAlg'Morphism R S) : Set₁ where
   constructor wrap
