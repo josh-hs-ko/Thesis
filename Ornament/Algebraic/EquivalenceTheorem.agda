@@ -1,7 +1,7 @@
 -- Let `D : Desc I` be a description.
 -- The category of relational `D`-algebras and the slice category of ornaments over `D` are equivalent.
 
-module Thesis.Ornament.Algebraic.Equivalence where
+module Thesis.Ornament.Algebraic.EquivalenceTheorem where
 
 open import Thesis.Prelude.Equality
 open import Thesis.Prelude.Category.Isomorphism

@@ -1,4 +1,4 @@
--- Horizontal data, which can be separated into "shape" and "core" (cf. containers).
+-- Horizontal data, which can be separated into "shape" and "core" (cf. containers), and shape equivalence.
 
 module Thesis.Description.Horizontal where
 
@@ -49,3 +49,29 @@ core (σ S D) (s , hs) = core (D s) hs
     decomp-comp-inverse (ṿ is)  X (_        , x) = refl
     decomp-comp-inverse (σ S D) X ((s , hs) , x) = cong₂-pair (cong (_,_ s) (cong proj₁ (decomp-comp-inverse (D s) X (hs , x))))
                                                               (hcong proj₂ (≡-to-≅ (decomp-comp-inverse (D s) X (hs , x))))
+
+data ṠEq {I : Set} : (D : RDesc I) → Ṡ D → (E : RDesc I) → Ṡ E → Set₁ where
+  ṿ : {is is' : List I} → ṠEq (ṿ is) tt (ṿ is') tt
+  σ : {S : Set} (s : S) {D : S → RDesc I} {hs : Ṡ (D s)} {E : S → RDesc I} {hs' : Ṡ (E s)} →
+      ṠEq (D s) hs (E s) hs' → ṠEq (σ S D) (s , hs) (σ S E) (s , hs')
+
+ṠEq-refl : {I : Set} {D : RDesc I} {hs : Ṡ D} → ṠEq D hs D hs
+ṠEq-refl {I} {D = ṿ is }          = ṿ
+ṠEq-refl {I} {D = σ S D} {s , hs} = σ s (ṠEq-refl)
+
+ṠEq-sym : {I : Set} {D E : RDesc I} {hs : Ṡ D} {hs' : Ṡ E} → ṠEq D hs E hs' → ṠEq E hs' D hs
+ṠEq-sym ṿ         = ṿ
+ṠEq-sym (σ s seq) = σ s (ṠEq-sym seq)
+
+ṠEq-trans : {I : Set} {D E F : RDesc I} {hs : Ṡ D} {hs' : Ṡ E} {hs'' : Ṡ F} → ṠEq D hs E hs' → ṠEq E hs' F hs'' → ṠEq D hs F hs''
+ṠEq-trans ṿ         ṿ           = ṿ
+ṠEq-trans (σ s seq) (σ .s seq') = σ s (ṠEq-trans seq seq')
+
+ṠEq-to-≡ : {I : Set} {D : RDesc I} {xs xs' : Ṡ D} → ṠEq D xs D xs' → xs ≡ xs'
+ṠEq-to-≡ ṿ         = refl
+ṠEq-to-≡ (σ s seq) = cong (_,_ s) (ṠEq-to-≡ seq)
+
+ṠEq-from-≡ : {I : Set} {D : RDesc I} {xs xs' : Ṡ D} → xs ≡ xs' → ṠEq D xs D xs'
+ṠEq-from-≡ {I} {ṿ is }                     eq        = ṿ
+ṠEq-from-≡ {I} {σ S D} {s , xs} {s' , xs'} eq with cong proj₁ eq
+ṠEq-from-≡ {I} {σ S D} {s , xs} {.s , xs'} eq | refl = σ s (ṠEq-from-≡ (cong-proj₂ eq))

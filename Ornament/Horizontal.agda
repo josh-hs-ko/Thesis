@@ -9,10 +9,7 @@ open import Thesis.Prelude.Function
 open import Thesis.Prelude.Product
 open import Thesis.Description
 open import Thesis.Description.Horizontal
-open import Thesis.Description.HorizontalEquivalence
 open import Thesis.Ornament
-open import Thesis.Ornament.SequentialComposition
-open import Thesis.Ornament.Equivalence
 
 open import Function using (id; const; _∘_)
 open import Data.Unit using (⊤; tt)
@@ -32,6 +29,9 @@ record ḢTrans {I J : Set} (e : J → I) (D : RDesc I) (E : RDesc J) : Set wher
   {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (t : ḢTrans e D E) {X : I → Set} →
   Σ (Ṡ E) (Ṁ (X ∘ e) ∘ next E) → Σ (Ṡ D) (Ṁ X ∘ next D)
 ḢTrans-app' t (hs , xs) = ḢTrans.s t hs , erase-Ṁ (ḢTrans.c t hs) xs
+
+ṀHEq : {I : Set} {X Y : I → Set} (is : List I) → Ṁ X is → Ṁ Y is → Set
+ṀHEq is xs ys = All-Ṁ (λ _ xy → proj₁ xy ≅ proj₂ xy) is (Ṁ-comp is xs ys)
 
 cong-erase-Ṁ :
   {I J : Set} {e e' : J → I} {is is' : List I} {js : List J} (eqs : Ė e js is) (eqs' : Ė e' js is') → is ≡ is' →
@@ -95,6 +95,8 @@ erase-ḢROrn :
   erase (ḢROrn t) {X} xs ≡ ḢTrans-app t xs
 erase-ḢROrn {D = D} {ṿ js } t xs       = uncurry (erase-ḢROrn-∇ D) (ḢTrans.s t tt , ḢTrans.c t tt) xs
 erase-ḢROrn {D = D} {σ S E} t (s , xs) = erase-ḢROrn {D = D} {E s} (curry (ḢTrans.s t) s , curry (ḢTrans.c t) s) xs
+
+{-
 
 ḢROrn-id : {I : Set} {D : RDesc I} → ROrnEq (ḢROrn (ḢTrans-id {I} {D})) (idROrn D)
 ḢROrn-id {I} {D} X xs xs' heq with HoriEq-to-≡ D xs xs' heq
@@ -170,6 +172,8 @@ erase-ḢROrn {D = D} {σ S E} t (s , xs) = erase-ḢROrn {D = D} {E s} (curry (
     see-below | hs , xs'' , xs''' , eq , eq' , heq' =
       trans (cong (ḢTrans-app' t {X}) eq) (trans (cong-ḢTrans-app' t u e≐e' t≐u hs xs'' xs''' heq') (sym (cong (ḢTrans-app' u {X}) eq')))
 
+-}
+
 normal-coherence :
   {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (O : ROrn e D E) {X : List J → Set} {Y : List I → Set}
   (f : {is : List I} {js : List J} → Ė e js is → X js → Y is) (hs : Ḣ E X) → Ė e (next E hs) (next D (erase' O f hs))
@@ -191,6 +195,8 @@ normROrn O = ḢROrn (ḢTrans-normal O)
 ḢTrans-app-normal (Δ T O) (t , xs) = ḢTrans-app-normal (O t) xs
 ḢTrans-app-normal (∇ s O) xs       = cong (_,_ s) (ḢTrans-app-normal O xs)
 
+{-
+
 ROrnEq-normal : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (O : ROrn e D E) → ROrnEq (normROrn O) O
 ROrnEq-normal {D = D} {E} O X xs xs' heq with HoriEq-to-≡ E xs xs' heq
 ROrnEq-normal {D = D} {E} O X xs .xs heq | refl =
@@ -209,3 +215,5 @@ normOrn (wrap O) = wrap (normROrn ∘ O)
 
 OrnEq-normal : {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) → OrnEq (normOrn O) O
 OrnEq-normal (wrap O) = frefl , (λ j → ROrnEq-normal (O (ok j)))
+
+-}

@@ -4,90 +4,79 @@ module Thesis.Ornament.Equivalence where
 
 open import Thesis.Prelude.Equality
 open import Thesis.Prelude.Function
+open import Thesis.Prelude.Product
 open import Thesis.Prelude.InverseImage
 open import Thesis.Description
-open import Thesis.Description.HorizontalEquivalence
+open import Thesis.Description.Horizontal
 open import Thesis.Ornament
+open import Thesis.Ornament.Horizontal
 
 open import Function using (id; const; _∘_; type-signature)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; _×_) renaming (map to _**_)
+open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_) renaming (map to _**_)
 open import Data.List using (List; []; _∷_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; cong; trans; sym)
-open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-subst-removable)
+open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅; ≡-subst-removable)
                                                   renaming (refl to hrefl; cong to hcong; sym to hsym; trans to htrans)
 
 
-ROrnEq : ∀ {I J} {e e' : J → I} {D E} → ROrn e D E → ∀ {D' E'} → ROrn e' D' E' → Set₁
-ROrnEq {I} {J} {e} {e'} {D} {E} O {D'} {E'} O' =
-  (X : I → Set) (xs : ⟦ E ⟧ (X ∘ e)) (xs' : ⟦ E' ⟧ (X ∘ e')) → HoriEq E xs E' xs' → HoriEq D (erase O {X} xs) D' (erase O' {X} xs')
+ROrnEq : {I J : Set} {e e' : J → I} {D D' : RDesc I} {E E' : RDesc J} → ROrn e D E → ROrn e' D' E' → Set₁
+ROrnEq {D = D} {D'} {E} {E'} O P = (hs : Ṡ E) (hs' : Ṡ E') → ṠEq E hs E' hs' → ṠEq D (erase' O (const !) hs) D' (erase' P (const !) hs')
 
-ROrnEq-refl : ∀ {I J} {e : J → I} {D E} (O : ROrn e D E) → ROrnEq O O
-ROrnEq-refl {E = E} O X xs xs' heq with HoriEq-to-≡ E xs xs' heq
-ROrnEq-refl {E = E} O X xs .xs heq | refl = HoriEq-refl
+ROrnEq-refl : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (O : ROrn e D E) → ROrnEq O O
+ROrnEq-refl O hs hs' seq = ṠEq-from-≡ (cong (erase' O (const !)) (ṠEq-to-≡ seq))
 
-ROrnEq-sym : ∀ {I J} {e e' : J → I} {D E} (O : ROrn e D E) {D' E'} (P : ROrn e' D' E') → ROrnEq O P → ROrnEq P O
-ROrnEq-sym O P oeq X xs xs' heq = HoriEq-sym (oeq X xs' xs (HoriEq-sym heq))
+ROrnEq-sym : {I J : Set} {e e' : J → I} {D D' : RDesc I} {E E' : RDesc J} (O : ROrn e D E) (P : ROrn e' D' E') → ROrnEq O P → ROrnEq P O
+ROrnEq-sym O P oeq hs hs' seq = ṠEq-sym (oeq hs' hs (ṠEq-sym seq))
 
-ROrnEq-trans-aux :
-  {J : Set} (X Y Z : J → Set) → X ≐ Y →
-  {E : RDesc J} (xs : ⟦ E ⟧ X) (zs : ⟦ E ⟧ Z) → HoriEq E xs E zs → Σ[ ys ∶ ⟦ E ⟧ Y ] HoriEq E xs E ys × HoriEq E ys E zs
-ROrnEq-trans-aux {J} X Y Z XYeq xs zs (ṿ heqs) = Ṁ-map (λ {j} → subst id (XYeq j)) _ xs , ṿ (aux _ xs) , ṿ (aux' _ xs zs heqs)
-  where
-    aux : (js : List J) (xs : Ṁ X js) → ṀHEq js xs (Ṁ-map (λ {j} → subst id (XYeq j)) js xs)
-    aux []       _        = tt
-    aux (j ∷ js) (x , xs) = hsym (≡-subst-removable id (XYeq j) x) , aux js xs
-    aux' : (js : List J) (xs : Ṁ X js) (zs : Ṁ Z js) → ṀHEq js xs zs → ṀHEq js (Ṁ-map (λ {j} → subst id (XYeq j)) js xs) zs
-    aux' []       _        _        _            = tt
-    aux' (j ∷ js) (x , xs) (z , zs) (heq , heqs) = htrans (≡-subst-removable id (XYeq j) x) heq , aux' js xs zs heqs
-ROrnEq-trans-aux {J} X Y Z XYeq .(s , xs) .(s , zs) (σ s {xs = xs} {zs} heq) =
-  let (ys , xsheq , zsheq) = ROrnEq-trans-aux X Y Z XYeq xs zs heq in (s , ys) , σ s xsheq , σ s zsheq
-
-ROrnEq-trans :
-  ∀ {I J} {e e' e'' : J → I} → e ≐ e' →
-  ∀ {D E} (O : ROrn e D E) {D'} (P : ROrn e' D' E) {D''} (Q : ROrn e'' D'' E) → ROrnEq O P → ROrnEq P Q → ROrnEq O Q
-ROrnEq-trans {e = e} {e'} {e''} eeq O P Q oeq oeq' X xs xs'' heq =
-  let (xs' , xsheq , xsheq'') = ROrnEq-trans-aux (X ∘ e) (X ∘ e') (X ∘ e'') (cong X ∘ eeq) xs xs'' heq
-  in  HoriEq-trans (oeq X xs xs' xsheq) (oeq' X xs' xs'' xsheq'')
+ROrnEq-trans : {I J : Set} {e e' e'' : J → I} {D D' D'' : RDesc I} {E E' : RDesc J}
+               (O : ROrn e D E) (P : ROrn e' D' E) (Q : ROrn e'' D'' E') → ROrnEq O P → ROrnEq P Q → ROrnEq O Q
+ROrnEq-trans O P Q OPeq PQeq hs hs' seq = ṠEq-trans (OPeq hs hs ṠEq-refl) (PQeq hs hs' seq)
 
 OrnEq : ∀ {I J} {e e' : J → I} {D E} → Orn e D E → Orn e' D E → Set₁
-OrnEq {I} {J} {e} {e'} (wrap O) (wrap O') = (e ≐ e') × (∀ j → ROrnEq (O (ok j)) (O' (ok j)))
+OrnEq {I} {J} {e} {e'} O P = (e ≐ e') × ((j : J) → ROrnEq (Orn.comp O (ok j)) (Orn.comp P (ok j)))
 
-OrnEq-refl : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → OrnEq O O
-OrnEq-refl (wrap O) = frefl , λ j → ROrnEq-refl (O (ok j))
+OrnEq-refl : {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) → OrnEq O O
+OrnEq-refl O = frefl , λ j → ROrnEq-refl (Orn.comp O (ok j))
 
-OrnEq-sym : ∀ {I J} {e f : J → I} {D E} (O : Orn e D E) (P : Orn f D E) → OrnEq O P → OrnEq P O
-OrnEq-sym (wrap O) (wrap P) (eeq , oeq) = fsym eeq , λ j → ROrnEq-sym (O (ok j)) (P (ok j)) (oeq j)
+OrnEq-sym : {I J : Set} {e e' : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) (P : Orn e' D E) → OrnEq O P → OrnEq P O
+OrnEq-sym O P (eeq , oeq) = fsym eeq , λ j → ROrnEq-sym (Orn.comp O (ok j)) (Orn.comp P (ok j)) (oeq j)
 
-OrnEq-trans : ∀ {I J} {e f g : J → I} {D E} (O : Orn e D E) (P : Orn f D E) (Q : Orn g D E) → OrnEq O P → OrnEq P Q → OrnEq O Q
-OrnEq-trans (wrap O) (wrap P) (wrap Q) (eeq , oeq) (eeq' , oeq') =
-  ftrans eeq eeq' , λ j → ROrnEq-trans eeq (O (ok j)) (P (ok j)) (Q (ok j)) (oeq j) (oeq' j)
+OrnEq-trans : {I J : Set} {e e' e'' : J → I} {D : Desc I} {E : Desc J}
+              (O : Orn e D E) (P : Orn e' D E) (Q : Orn e'' D E) → OrnEq O P → OrnEq P Q → OrnEq O Q
+OrnEq-trans O P Q (eeq , OPeq) (eeq' , PQeq) =
+  ftrans eeq eeq' , λ j → ROrnEq-trans (Orn.comp O (ok j)) (Orn.comp P (ok j)) (Orn.comp Q (ok j)) (OPeq j) (PQeq j)
 
-OrnEq-forget : ∀ {I J} {e e' : J → I} {D E} (O : Orn e D E) (O' : Orn e' D E) → OrnEq O O' → ∀ {j} (x : μ E j) → forget O x ≅ forget O' x
-OrnEq-forget {I} {J} {e} {e'} {D} {E} O O' (eeq , eraseeq) =
-  induction E (λ _ x → forget O x ≅ forget O' x) (λ j es ihs → aux j es ihs refl refl)
+OrnEq-forget : ∀ {I J} {e e' : J → I} {D E} (O : Orn e D E) (P : Orn e' D E) → OrnEq O P → ∀ {j} (x : μ E j) → forget O x ≅ forget P x
+OrnEq-forget {I} {J} {e} {e'} {D} {E} O P (eeq , oeq) = induction E (λ _ x → forget O x ≅ forget P x) (λ j xs ihs → aux j xs ihs refl refl)
   where
-    aux''' : (js : List J) (es : Ṁ (μ E) js) → All-Ṁ (λ _ x → forget O x ≅ forget O' x) js es →
-             ṀHEq js (mapFold-Ṁ E (ornAlg O) js es) (mapFold-Ṁ E (ornAlg O') js es)
+    aux''' : (js : List J) (xs : Ṁ (μ E) js) → All-Ṁ (λ _ x → forget O x ≅ forget P x) js xs →
+             ṀHEq js (mapFold-Ṁ E (ornAlg O) js xs) (mapFold-Ṁ E (ornAlg P) js xs)
     aux''' []       _        _          = tt
-    aux''' (j ∷ js) (e , es) (ih , ihs) = ih , aux''' js es ihs
-    aux'' : (E' : RDesc J) (es : ⟦ E' ⟧ (μ E)) → All E' (λ _ x → forget O x ≅ forget O' x) es →
-            HoriEq E' (mapFold E E' (ornAlg O) es) E' (mapFold E E' (ornAlg O') es)
-    aux'' (ṿ js)   es       ihs = ṿ (aux''' js es ihs)
-    aux'' (σ S E') (s , es) ihs = σ s (aux'' (E' s) es ihs)
-    aux' : ∀ {i'} j → (es : ⟦ Desc.comp E j ⟧ (μ E)) → All (Desc.comp E j) (λ _ x → forget O x ≅ forget O' x) es →
-           (eq' : e' j ≡ i') →
-           erase (Orn.comp O (ok j)) {μ D} (mapFold E (Desc.comp E j) (ornAlg O) es)
-             ≅ subst (Ḟ D (μ D)) eq' (erase (Orn.comp O' (ok j)) (mapFold E (Desc.comp E j) (ornAlg O') es))
-    aux' j es ihs refl = HoriEq-to-≅ (Desc.comp D (e j)) (Desc.comp D (e' j)) (cong (Desc.comp D) (eeq j))
-                                     (erase (Orn.comp O (ok j)) {μ D} (mapFold E (Desc.comp E j) (ornAlg O) es))
-                                     (erase (Orn.comp O' (ok j)) (mapFold E (Desc.comp E j) (ornAlg O') es))
-                                     (eraseeq j (μ D) (mapFold E (Desc.comp E j) (ornAlg O) es)
-                                                      (mapFold E (Desc.comp E j) (ornAlg O') es)
-                                                      (aux'' (Desc.comp E j) es ihs))
-    aux : (j : J) (es : ⟦ Desc.comp E j ⟧ (μ E)) → All (Desc.comp E j) (λ _ x → forget O x ≅ forget O' x) es →
-          ∀ {i} (eq : e j ≡ i) → ∀ {i'} (eq' : e' j ≡ i') →
-          con {D = D} (subst (Ḟ D (μ D)) eq (erase (Orn.comp O (ok j)) (mapFold E (Desc.comp E j) (ornAlg O) es)))
-            ≅ con {D = D} (subst (Ḟ D (μ D)) eq' (erase (Orn.comp O' (ok j)) (mapFold E (Desc.comp E j) (ornAlg O') es)))
-    aux j es all eq eq' with trans (trans (sym eq) (eeq j)) eq'
-    aux j es all refl eq' | refl = hcong con (aux' j es all eq')
+    aux''' (j ∷ js) (x , xs) (ih , ihs) = ih , aux''' js xs ihs
+    aux'' : (E' : RDesc J) (xs : ⟦ E' ⟧ (μ E)) → All E' (λ _ x → forget O x ≅ forget P x) xs →
+            Σ[ hs ∶ Ṡ E' ] Σ[ xs' ∶ Ṁ (μ D ∘ e) (next E' hs) ] Σ[ xs'' ∶ Ṁ (μ D ∘ e') (next E' hs) ]
+              Ḣ-decomp E' (Ṁ (μ D ∘ e )) (mapFold E E' (ornAlg O) xs) ≡ (hs , xs' )  ×
+              (hs , xs'') ≡ Ḣ-decomp E' (Ṁ (μ D ∘ e')) (mapFold E E' (ornAlg P) xs)  ×  ṀHEq (next E' hs) xs' xs''
+    aux'' (ṿ js)   xs       ihs = tt , mapFold-Ṁ E (ornAlg O) js xs , mapFold-Ṁ E (ornAlg P) js xs , refl , refl , aux''' js xs ihs
+    aux'' (σ S E') (s , xs) ihs = (_,_ s ** (id ** (id ** (cong (_,_ s ** id) ** (cong (_,_ s ** id) ** id))))) (aux'' (E' s) xs ihs)
+    aux' : {D' D'' : RDesc I} {E' : RDesc J} (O' : ROrn e D' E') (P' : ROrn e' D'' E') → D' ≡ D'' → ROrnEq O' P' →
+           (xs : ⟦ E' ⟧ (μ E)) → All E' (λ _ x → forget O x ≅ forget P x) xs →
+           ḢTrans-app (ḢTrans-normal O') (mapFold E E' (ornAlg O) xs) ≅ ḢTrans-app (ḢTrans-normal P') (mapFold E E' (ornAlg P) xs)
+    aux' {._} {D'} {E'} O' P' refl roeq xs ihs =
+      let (hs , xs' , xs'' , eq , eq' , heq) = aux'' E' xs ihs
+      in  ≡-to-≅ (cong (Ḣ-comp D' (Ṁ (μ D)))
+                       (trans (cong (ḢTrans-app' (ḢTrans-normal O')) eq)
+                              (trans (cong-ḢTrans-app' (ḢTrans-normal O') (ḢTrans-normal P') eeq
+                                        (λ hs' → ṠEq-to-≡ (roeq hs' hs' (ṠEq-from-≡ refl))) hs xs' xs'' heq)
+                                     (cong (ḢTrans-app' (ḢTrans-normal P')) eq'))))
+    aux : (j : J) (xs : Ḟ E (μ E) j) → All (Desc.comp E j) (λ _ x → forget O x ≅ forget P x) xs →
+          {i : I} (eq : e j ≡ i) {i' : I} (eq' : e' j ≡ i') →
+          con {D = D} (subst (Ḟ D (μ D)) eq (erase' (Orn.comp O (ok j)) erase-Ṁ (mapFold E (Desc.comp E j) (ornAlg O) xs)))
+            ≅ con {D = D} (subst (Ḟ D (μ D)) eq' (erase' (Orn.comp P (ok j)) erase-Ṁ (mapFold E (Desc.comp E j) (ornAlg P) xs)))
+    aux j xs ihs eq eq'  with trans (trans (sym eq) (eeq j)) eq'
+    aux j xs ihs eq refl | refl =
+      hcong con (htrans (≡-subst-removable (Ḟ D (μ D)) eq (erase' (Orn.comp O (ok j)) erase-Ṁ (mapFold E (Desc.comp E j) (ornAlg O) xs)))
+                        (htrans (≡-to-≅ (sym (ḢTrans-app-normal (Orn.comp O (ok j)) (mapFold E (Desc.comp E j) (ornAlg O) xs))))
+                                (htrans (aux' (Orn.comp O (ok j)) (Orn.comp P (ok j)) (cong (Desc.comp D) (eeq j)) (oeq j) xs ihs)
+                                        (≡-to-≅ (ḢTrans-app-normal (Orn.comp P (ok j)) (mapFold E (Desc.comp E j) (ornAlg P) xs))))))
