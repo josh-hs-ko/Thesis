@@ -17,10 +17,8 @@ open import Thesis.Prelude.InverseImage
 open import Thesis.Refinement
 open import Thesis.Refinement.Category
 open import Thesis.Description
-open import Thesis.Description.HorizontalEquivalence
 open import Thesis.Ornament
 open import Thesis.Ornament.Category
-open import Thesis.Ornament.Equivalence
 open import Thesis.Ornament.SequentialComposition
 open import Thesis.Ornament.ParallelComposition
 open import Thesis.Ornament.ParallelComposition.Pullback

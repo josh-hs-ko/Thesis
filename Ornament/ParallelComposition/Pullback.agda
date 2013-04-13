@@ -13,14 +13,14 @@ open import Thesis.Prelude.Function.Fam
 open import Thesis.Prelude.InverseImage
 open import Thesis.Prelude.Product
 open import Thesis.Description
-open import Thesis.Description.HorizontalEquivalence
+open import Thesis.Description.Horizontal
 open import Thesis.Ornament
 open import Thesis.Ornament.ParallelComposition
 open import Thesis.Ornament.SequentialComposition
 open import Thesis.Ornament.Equivalence
 open import Thesis.Ornament.Category
 
-open import Function using (id; _∘_)
+open import Function using (id; _∘_; const)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_) renaming (map to _**_)
 open import Data.List using (List; []; _∷_)
@@ -32,54 +32,35 @@ open import Relation.Binary.HeterogeneousEquality
 
 
 triangle-l : ∀ {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P : Orn f D F) → OrnEq (O ⊙ diffOrn-l O P) ⌈ O ⊗ P ⌉
-triangle-l {I} {J} {K} {e} {f} O P = (λ { (ok j , k) → refl }) , (λ { (ok j , k) → aux (Orn.comp O (ok j)) (Orn.comp P k) })
+triangle-l {I} {J} {K} {e} {f} O P = (λ { (ok j , k) → refl }) , (λ { (ok j , k) hs → ≡-to-≅ (aux (Orn.comp O (ok j)) (Orn.comp P k) hs) })
   where
-    aux' : {is : List I} {js : List J} {ks : List K} (eeqs : Ė e js is) (feqs : Ė f ks is)
-           (X : I → Set) (xs : Ṁ (X ∘ e ∘ π₁) (und-Ṁ is (pc-Ė eeqs feqs))) (xs' : Ṁ (X ∘ pull) (und-Ṁ is (pc-Ė eeqs feqs))) →
-           ṀHEq (und-Ṁ is (pc-Ė eeqs feqs)) xs xs' →
-           ṀHEq is (erase-Ṁ {X = X} (sc-Ė eeqs (diff-Ė-l eeqs feqs)) xs) (erase-Ṁ {X = X} (to≡-Ṁ is (pc-Ė eeqs feqs)) xs')
-    aux' []            _          X _        _          _            = tt
-    aux' (refl ∷ eeqs) (_ ∷ feqs) X (x , xs) (x' , xs') (heq , heqs) = heq , aux' eeqs feqs X xs xs' heqs
-    aux : ∀ {D' E' F'} (O' : ROrn e D' E') (P' : ROrn f D' F') → ROrnEq (scROrn O' (diffROrn-l O' P')) (toROrn (pcROrn O' P'))
-    aux (ṿ eeqs)         (ṿ feqs)   X xs           xs'           (ṿ heq)      = ṿ (aux' eeqs feqs X xs xs' heq)
-    aux (ṿ eeqs)         (Δ T P')   X (.t , xs)    (.t , xs')    (σ t heq)    = aux (ṿ eeqs) (P' t) X xs xs' heq
-    aux (σ S O')         (σ .S P')  X (.s , xs)    (.s , xs')    (σ s heq)    = σ s (aux (O' s) (P' s) X xs xs' heq)
-    aux (σ S O')         (Δ T P')   X (.t , xs)    (.t , xs')    (σ t heq)    = aux (σ S O') (P' t) X xs xs' heq
-    aux (σ S O')         (∇ s P')   X xs           xs'           heq          = σ s (aux (O' s) P' X xs xs' heq)
-    aux (Δ T O')         P'         X (.t , xs)    (.t , xs')    (σ t heq)    = aux (O' t) P' X xs xs' heq
-    aux (∇ s O')         (σ S P')   X xs           xs'           heq          = σ s (aux O' (P' s) X xs xs' heq)
-    aux (∇ {S} s {D} O') (Δ T P')   X (.t , xs)    (.t , xs')    (σ t heq)    =
-      subst (λ erase-xs → HoriEq (σ S D) (s , erase-xs) (σ S D) (erase (toROrn (pcROrn (∇ s O') (P' t))) xs'))
-            (shiftΔ O' (λ t → diffROrn-l (∇ s O') (P' t)) (t , xs))
-            (aux (∇ s O') (P' t)    X xs xs' heq)
-    aux (∇ {S} s {D} O') (∇ .s P')  X (.refl , xs) (.refl , xs') (σ refl heq) =
-      subst (λ erase-xs → HoriEq (σ S D) (s , erase-xs) (σ S D) (s , erase (toROrn (pcROrn O' P')) xs'))
-            (shiftΔ O' (diffROrn-l-double∇ O' P') (refl , xs))
-            (σ s (aux O' P' X xs xs' heq))
+    aux : {D' : RDesc I} {E' : RDesc J} {F' : RDesc K} (O' : ROrn e D' E') (P' : ROrn f D' F')
+          (hs : Ṡ (toRDesc (pcROrn O' P'))) → erase-Ṡ (scROrn O' (diffROrn-l O' P')) hs ≡ erase-Ṡ (toROrn (pcROrn O' P')) hs
+    aux (ṿ eeqs) (ṿ feqs)  _           = refl
+    aux (ṿ eeqs) (Δ T P')  (t , hs)    = aux (ṿ eeqs) (P' t) hs
+    aux (σ S O') (σ .S P') (s , hs)    = cong (_,_ s) (aux (O' s) (P' s) hs)
+    aux (σ S O') (Δ T P')  (t , hs)    = aux (σ S O') (P' t) hs
+    aux (σ S O') (∇ s P')  hs          = cong (_,_ s) (aux (O' s) P' hs)
+    aux (Δ T O') P'        (t , hs)    = aux (O' t) P' hs
+    aux (∇ s O') (σ S P')  hs          = cong (_,_ s) (aux O' (P' s) hs)
+    aux (∇ s O') (Δ T P')  (t , hs)    = trans (cong (_,_ s) (shift-Δ O' (λ t → diffROrn-l (∇ s O') (P' t)) (const !) (t , hs)))
+                                               (aux (∇ s O') (P' t) hs)
+    aux (∇ s O') (∇ .s P') (refl , hs) = cong (_,_ s) (trans (shift-Δ O' (diffROrn-l-double∇ O' P') (const !) (refl , hs)) (aux O' P' hs))
 
 triangle-r : ∀ {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P : Orn f D F) → OrnEq (P ⊙ diffOrn-r O P) ⌈ O ⊗ P ⌉
-triangle-r {I} {J} {K} {e} {f} O P = (λ { (j , ok k) → refl }) , (λ { (j , ok k) → aux (Orn.comp O j) (Orn.comp P (ok k)) })
+triangle-r {I} {J} {K} {e} {f} O P = (λ { (j , ok k) → refl }) , (λ { (j , ok k) hs → ≡-to-≅ (aux (Orn.comp O j) (Orn.comp P (ok k)) hs) })
   where
-    aux' : {is : List I} {js : List J} {ks : List K} (eeqs : Ė e js is) (feqs : Ė f ks is)
-           (X : I → Set) (xs : Ṁ (X ∘ f ∘ π₂) (und-Ṁ is (pc-Ė eeqs feqs))) (xs' : Ṁ (X ∘ pull) (und-Ṁ is (pc-Ė eeqs feqs))) →
-           ṀHEq (und-Ṁ is (pc-Ė eeqs feqs)) xs xs' →
-           ṀHEq is (erase-Ṁ {X = X} (sc-Ė feqs (diff-Ė-r eeqs feqs)) xs) (erase-Ṁ {X = X} (to≡-Ṁ is (pc-Ė eeqs feqs)) xs')
-    aux' _          []            X _        _          _            = tt
-    aux' (_ ∷ eeqs) (refl ∷ feqs) X (x , xs) (x' , xs') (heq , heqs) = heq , aux' eeqs feqs X xs xs' heqs
-    aux : ∀ {D' E' F'} (O' : ROrn e D' E') (P' : ROrn f D' F') → ROrnEq (scROrn P' (diffROrn-r O' P')) (toROrn (pcROrn O' P'))
-    aux (ṿ eeqs)          (ṿ feqs)   X xs           xs'           (ṿ heqs)      = ṿ (aux' eeqs feqs X xs xs' heqs)
-    aux (ṿ eeqs)          (Δ T P')   X (.t , xs)    (.t , xs')    (σ t heq)    = aux (ṿ eeqs) (P' t) X xs xs' heq
-    aux (σ S O')          (σ .S P')  X (.s , xs)    (.s , xs')    (σ s heq)    = σ s (aux (O' s) (P' s) X xs xs' heq)
-    aux (σ S O')          (Δ T P')   X (.t , xs)    (.t , xs')    (σ t heq)    = aux (σ S O') (P' t) X xs xs' heq
-    aux (σ S O')          (∇ s P')   X xs           xs'           heq          = σ s (aux (O' s) P' X xs xs' heq)
-    aux (Δ T {D'} O')     P'         X (.t , xs)    (.t , xs')    (σ t heq)    =
-      subst (λ erase-xs → HoriEq D' erase-xs D' (erase (toROrn (pcROrn (O' t) P')) xs'))
-            (shiftΔ P' (λ t → diffROrn-r (O' t) P') (t , xs)) (aux (O' t) P' X xs xs' heq)
-    aux (∇ s O')          (σ S P')   X xs           xs'           heq          = σ s (aux O' (P' s) X xs xs' heq)
-    aux (∇ s O')          (Δ T P')   X (.t , xs)    (.t , xs')    (σ t heq)    = aux (∇ s O') (P' t) X xs xs' heq
-    aux (∇ {S} s {D'} O') (∇ .s P')  X (.refl , xs) (.refl , xs') (σ refl heq) =
-      subst (λ erase-xs → HoriEq (σ S D') (s , erase-xs) (σ S D') (s , erase (toROrn (pcROrn O' P')) xs'))
-            (shiftΔ P' (diffROrn-r-double∇ O' P') (refl , xs)) (σ s (aux O' P' X xs xs' heq))
+    aux : {D' : RDesc I} {E' : RDesc J} {F' : RDesc K} (O' : ROrn e D' E') (P' : ROrn f D' F')
+          (hs : Ṡ (toRDesc (pcROrn O' P'))) → erase-Ṡ (scROrn P' (diffROrn-r O' P')) hs ≡ erase-Ṡ (toROrn (pcROrn O' P')) hs
+    aux (ṿ eeqs) (ṿ feqs)  _           = refl
+    aux (ṿ eeqs) (Δ T P')  (t , hs)    = aux (ṿ eeqs) (P' t) hs
+    aux (σ S O') (σ .S P') (s , hs)    = cong (_,_ s) (aux (O' s) (P' s) hs)
+    aux (σ S O') (Δ T P')  (t , hs)    = aux (σ S O') (P' t) hs
+    aux (σ S O') (∇ s P')  hs          = cong (_,_ s) (aux (O' s) P' hs)
+    aux (Δ T O') P'        (t , hs)    = trans (shift-Δ P' (λ t → diffROrn-r (O' t) P') (const !) (t , hs)) (aux (O' t) P' hs)
+    aux (∇ s O') (σ S P')  hs          = cong (_,_ s) (aux O' (P' s) hs)
+    aux (∇ s O') (Δ T P')  (t , hs)    = aux (∇ s O') (P' t) hs
+    aux (∇ s O') (∇ .s P') (refl , hs) = cong (_,_ s) (trans (shift-Δ P' (diffROrn-r-double∇ O' P') (const !) (refl , hs)) (aux O' P' hs))
 
 module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P : Orn f D F) where
 

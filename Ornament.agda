@@ -9,12 +9,14 @@ open import Thesis.Prelude.Function
 open import Thesis.Prelude.InverseImage
 open import Thesis.Prelude.Function.Fam
 open import Thesis.Description
+open import Thesis.Description.Horizontal
 
 open import Function using (id; const; _∘_)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; curry)
-open import Data.List using (List; []; _∷_)
-open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; trans; sym; cong; cong₂; setoid)
+open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; curry) renaming (map to _**_)
+open import Data.List using (List; []; _∷_; map)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; trans; sym; cong; cong₂; setoid; proof-irrelevance)
+open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅; ≅-to-≡) renaming (refl to hrefl)
 
 
 --------
@@ -32,9 +34,26 @@ data Ė {I J : Set} (e : J → I) : List J → List I → Set where
 Ė-trans         []           []           = []
 Ė-trans {e = e} (eeq ∷ eeqs) (feq ∷ feqs) = trans (cong e feq) eeq ∷ Ė-trans eeqs feqs
 
+Ė-trans-inv : {I J K : Set} {e : J → I} {f : K → J} {is : List I} {js : List J} {ks : List K} → Ė (e ∘ f) ks is → Ė f ks js → Ė e js is
+Ė-trans-inv []         []            = []
+Ė-trans-inv (eq ∷ eqs) (refl ∷ eqs') = eq ∷ Ė-trans-inv eqs eqs'
+
+Ė-computation : {I J : Set} (e : J → I) (js : List J) → Ė e js (map e js)
+Ė-computation e []       = []
+Ė-computation e (j ∷ js) = refl ∷ Ė-computation e js
+
+Ė-unique : {I J : Set} {e : J → I} {is : List I} {js : List J} → Ė e js is → is ≡ map e js
+Ė-unique []           = refl
+Ė-unique (refl ∷ eqs) = cong₂ _∷_ refl (Ė-unique eqs)
+
 Ė-subst : {I J : Set} {e e' : J → I} {is : List I} {js : List J} → e ≐ e' → Ė e js is → Ė e' js is
 Ė-subst eeq []               = []
 Ė-subst eeq (_∷_ {j} eq eqs) = trans (sym (eeq j)) eq ∷ Ė-subst eeq eqs
+
+Ė-irrelevance : {I J : Set} {e : J → I} {is : List I} {js : List J} → (eqs eqs' : Ė e js is) → eqs ≡ eqs'
+Ė-irrelevance []         []                  = refl
+Ė-irrelevance (eq ∷ eqs) (eq' ∷ eqs') with proof-irrelevance eq eq'
+Ė-irrelevance (eq ∷ eqs) (.eq ∷ eqs') | refl = cong (_∷_ eq) (Ė-irrelevance eqs eqs')
 
 data ROrn {I J : Set} (e : J → I) : RDesc I → RDesc J → Set₁ where
   ṿ   : {js : List J} {is : List I} (eqs : Ė e js is) → ROrn e (ṿ is) (ṿ js)
@@ -49,16 +68,41 @@ idROrn : {I : Set} (D : RDesc I) → ROrn id D D
 idROrn (ṿ is)  = ṿ Ė-refl
 idROrn (σ S D) = σ[ s ∶ S ] idROrn (D s)
 
+Erasure : {I J : Set} (e : J → I) (Y : List J → Set) (X : List I → Set) → Set
+Erasure {I} {J} e Y X = {is : List I} {js : List J} → Ė e js is → Y js → X is
+
+{-
+
+Erasure-comp : {I J K : Set} (e : J → I) (f : K → J) (Z : List K → Set) (Y : List J → Set) (X : List I → Set) →
+               Erasure e Y X → Erasure f Z Y → Erasure (e ∘ f) Z X
+Erasure-comp e f Z Y X g h {is} {ks} eqs z = g (Ė-trans-inv eqs (Ė-computation f ks)) (h (Ė-computation f ks) z)
+
+-}
+
 erase' : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} → ROrn e D E →
-         {X : List I → Set} {Y : List J → Set} → ({is : List I} {js : List J} → Ė e js is → Y js → X is) → Ḣ E Y → Ḣ D X
+         {X : List I → Set} {Y : List J → Set} → Erasure e Y X → Ḣ E Y → Ḣ D X
 erase' (ṿ eqs) f y        = f eqs y
 erase' (σ S O) f (s , ys) = s , erase' (O s) f ys
 erase' (Δ T O) f (t , ys) = erase' (O t) f ys
 erase' (∇ s O) f ys       = s , erase' O f ys
 
-erase-Ṁ : {I J : Set} {e : J → I} {js : List J} {is : List I} {X : I → Set} → Ė e js is → Ṁ (X ∘ e) js → Ṁ X is
+erase-Ṡ : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} → ROrn e D E → Ṡ E → Ṡ D
+erase-Ṡ O = erase' O (const !)
+
+erase-Ṁ : {I J : Set} {e : J → I} {X : I → Set} → Erasure e (Ṁ (X ∘ e)) (Ṁ X)
 erase-Ṁ         []         _        = tt
 erase-Ṁ {X = X} (eq ∷ eqs) (x , xs) = subst X eq x , erase-Ṁ eqs xs
+
+ṀHEq : {I : Set} {X Y : I → Set} (is : List I) → Ṁ X is → Ṁ Y is → Set
+ṀHEq is xs ys = All-Ṁ (λ _ xy → proj₁ xy ≅ proj₂ xy) is (Ṁ-comp is xs ys)
+
+cong-erase-Ṁ :
+  {I J : Set} {e e' : J → I} {is is' : List I} {js : List J} (eqs : Ė e js is) (eqs' : Ė e' js is') → is ≡ is' →
+  {X : I → Set} (xs : Ṁ (X ∘ e) js) (xs' : Ṁ (X ∘ e') js) → ṀHEq js xs xs' → erase-Ṁ {X = X} eqs xs ≅ erase-Ṁ {X = X} eqs' xs'
+cong-erase-Ṁ         []                 []            refl _        _          _                     = hrefl
+cong-erase-Ṁ {e = e} (_∷_ {j} refl eqs) (refl ∷ eqs') iseq (x , xs) (x' , xs') (heq , heqs) with e j
+cong-erase-Ṁ {e = e} (_∷_ {j} refl eqs) (refl ∷ eqs') refl (x , xs) (.x , xs') (hrefl , heqs) | ._   =
+  ≡-to-≅ (cong (_,_ x) (≅-to-≡ (cong-erase-Ṁ eqs eqs' refl xs xs' heqs)))
 
 erase : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} → ROrn e D E → {X : I → Set} → ⟦ E ⟧ (X ∘ e) → ⟦ D ⟧ X
 erase O = erase' O erase-Ṁ
@@ -67,9 +111,9 @@ erase-idROrn-Ṁ : {I : Set} {X : I → Set} (is : List I) (xs : Ṁ X is) → e
 erase-idROrn-Ṁ []       _        = refl
 erase-idROrn-Ṁ (i ∷ is) (x , xs) = cong₂ _,_ refl (erase-idROrn-Ṁ is xs)
 
-erase-idROrn : ∀ {I} (D : RDesc I) → ∀ {X} {xs : ⟦ D ⟧ X} → erase (idROrn D) xs ≡ xs
-erase-idROrn (ṿ is)  {xs = xs    } = erase-idROrn-Ṁ is xs
-erase-idROrn (σ S D) {xs = s , xs} = cong (_,_ s) (erase-idROrn (D s))
+erase'-idROrn : {I : Set} (D : RDesc I) {X Y : List I → Set} (f : Erasure id Y X) (ys : Ḣ D Y) → erase' (idROrn D) f ys ≡ Ḣ-map D (f Ė-refl) ys
+erase'-idROrn (ṿ is)  f ys       = refl
+erase'-idROrn (σ S D) f (s , ys) = cong (_,_ s) (erase'-idROrn (D s) f ys)
 
 record Orn {I J : Set} (e : J → I) (D : Desc I) (E : Desc J) : Set₁ where
   constructor wrap

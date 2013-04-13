@@ -14,13 +14,13 @@ open import Thesis.Prelude.Product
 open import Thesis.Prelude.InverseImage
 open import Thesis.Description
 open import Thesis.Description.Horizontal
-open import Thesis.Description.HorizontalEquivalence
 open import Thesis.Ornament
 open import Thesis.Ornament.Category
 open import Thesis.Ornament.SequentialComposition
 open import Thesis.Ornament.ParallelComposition
-open import Thesis.Ornament.Horizontal
 open import Thesis.Ornament.Equivalence
+open import Thesis.Ornament.Horizontal
+open import Thesis.Ornament.Horizontal.Equivalence
 open import Thesis.Ornament.RefinementSemantics
 open import Thesis.Ornament.Algebraic
 open import Thesis.Relation
@@ -143,7 +143,7 @@ erase'-algROrn-comp (ṿ is)  X P xs       p = refl
 erase'-algROrn-comp (σ S D) X P (s , xs) p = cong (_,_ s) (erase'-algROrn-comp (D s) X (curry P s) xs p)
 
 
-{-------
+--------
 -- algebraic ornamentation by a classifying algebra produces an isomorphic datatype
 
 module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) where
@@ -188,14 +188,14 @@ module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) 
       (OrnEq-trans (normOrn O ⊙ toAlgOrn) (normOrn ⌈ algOrn D (clsAlg O) ⌉) ⌈ algOrn D (clsAlg O) ⌉
          (to≡ ∘ proj₂ ,
           λ { (._ , ok j) →
-              ROrnEq-trans frefl (Orn.comp (normOrn O ⊙ toAlgOrn) (ok (e j , ok j)))
-                                 (ḢROrn (ḢTrans-normal (Orn.comp O (ok j)) ⊡ toAlgOrn-t (e j) (ok j)))
-                                 (Orn.comp (normOrn ⌈ algOrn D (clsAlg O) ⌉) (ok (e j , ok j)))
+              ROrnEq-trans (Orn.comp (normOrn O ⊙ toAlgOrn) (ok (e j , ok j)))
+                           (ḢROrn (ḢTrans-normal (Orn.comp O (ok j)) ⊡ toAlgOrn-t (e j) (ok j)))
+                           (Orn.comp (normOrn ⌈ algOrn D (clsAlg O) ⌉) (ok (e j , ok j)))
                 (ROrnEq-sym (ḢROrn (ḢTrans-normal (Orn.comp O (ok j)) ⊡ toAlgOrn-t (e j) (ok j)))
                             (Orn.comp (normOrn O ⊙ toAlgOrn) (ok (e j , ok j)))
                    (ḢROrn-comp (ḢTrans-normal (Orn.comp O (ok j))) (toAlgOrn-t (e j) (ok j))))
                 (ḢROrn-≐ (ḢTrans-normal (Orn.comp O (ok j)) ⊡ toAlgOrn-t (e j) (ok j))
-                         (ḢTrans-normal (Orn.comp ⌈ algOrn D (clsAlg O) ⌉ (ok (e j , ok j)))) (to≡ ∘ proj₂)
+                         (ḢTrans-normal (Orn.comp ⌈ algOrn D (clsAlg O) ⌉ (ok (e j , ok j))))
                    (λ hs → trans (uncurry (erase'-from-clsP (Orn.comp O (ok j)))
                                     (algROrn-decomp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º) (ok j)) hs))
                                  (sym (erase'-algROrn-decomp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º) (ok j)) hs)))) })
@@ -229,14 +229,14 @@ module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) 
          (OrnEq-sym (normOrn ⌈ algOrn D (clsAlg O) ⌉) ⌈ algOrn D (clsAlg O) ⌉ (OrnEq-normal ⌈ algOrn D (clsAlg O) ⌉)))
       (OrnEq-trans (normOrn ⌈ algOrn D (clsAlg O) ⌉ ⊙ fromAlgOrn) (normOrn O) O
          (frefl ,
-          λ j → ROrnEq-trans frefl (Orn.comp (normOrn ⌈ algOrn D (clsAlg O) ⌉ ⊙ fromAlgOrn) (ok j))
-                                   (ḢROrn (ḢTrans-normal (Orn.comp ⌈ algOrn D (clsAlg O) ⌉ (ok (e j , ok j))) ⊡ fromAlgOrn-t j))
-                                   (Orn.comp (normOrn O) (ok j))
+          λ j → ROrnEq-trans (Orn.comp (normOrn ⌈ algOrn D (clsAlg O) ⌉ ⊙ fromAlgOrn) (ok j))
+                             (ḢROrn (ḢTrans-normal (Orn.comp ⌈ algOrn D (clsAlg O) ⌉ (ok (e j , ok j))) ⊡ fromAlgOrn-t j))
+                             (Orn.comp (normOrn O) (ok j))
                   (ROrnEq-sym (ḢROrn (ḢTrans-normal (Orn.comp ⌈ algOrn D (clsAlg O) ⌉ (ok (e j , ok j))) ⊡ fromAlgOrn-t j))
                               (Orn.comp (normOrn ⌈ algOrn D (clsAlg O) ⌉ ⊙ fromAlgOrn) (ok j))
                      (ḢROrn-comp (ḢTrans-normal (Orn.comp ⌈ algOrn D (clsAlg O) ⌉ (ok (e j , ok j)))) (fromAlgOrn-t j)))
                   (ḢROrn-≐ (ḢTrans-normal (Orn.comp ⌈ algOrn D (clsAlg O) ⌉ (ok (e j , ok j))) ⊡ fromAlgOrn-t j)
-                           (ḢTrans-normal (Orn.comp O (ok j))) frefl
+                           (ḢTrans-normal (Orn.comp O (ok j)))
                      (λ hs → trans (uncurry (erase'-algROrn-comp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º) (ok j)))
                                       (to-clsP (Orn.comp O (ok j)) hs))
                                    (sym (erase'-to-clsP (Orn.comp O (ok j)) hs)))))
@@ -245,13 +245,11 @@ module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) 
   toAlgOrn-fromAlgOrn-inverse : OrnEq (toAlgOrn ⊙ fromAlgOrn) (idOrn E)
   toAlgOrn-fromAlgOrn-inverse =
     gh-inverse ,
-    (λ j → ROrnEq-trans frefl
-             (Orn.comp (toAlgOrn ⊙ fromAlgOrn) (ok j)) (ḢROrn ḢTrans-id) (Orn.comp (idOrn E) (ok j))
-             (ROrnEq-trans frefl
-                (Orn.comp (toAlgOrn ⊙ fromAlgOrn) (ok j)) (ḢROrn (toAlgOrn-t (e j) (ok j) ⊡ fromAlgOrn-t j)) (ḢROrn ḢTrans-id)
+    (λ j → ROrnEq-trans (Orn.comp (toAlgOrn ⊙ fromAlgOrn) (ok j)) (ḢROrn ḢTrans-id) (Orn.comp (idOrn E) (ok j))
+             (ROrnEq-trans (Orn.comp (toAlgOrn ⊙ fromAlgOrn) (ok j)) (ḢROrn (toAlgOrn-t (e j) (ok j) ⊡ fromAlgOrn-t j)) (ḢROrn ḢTrans-id)
                 (ROrnEq-sym (ḢROrn (toAlgOrn-t (e j) (ok j) ⊡ fromAlgOrn-t j)) (Orn.comp (toAlgOrn ⊙ fromAlgOrn) (ok j))
                    (ḢROrn-comp (toAlgOrn-t (e j) (ok j)) (fromAlgOrn-t j)))
-                (ḢROrn-≐ (toAlgOrn-t (e j) (ok j) ⊡ fromAlgOrn-t j) ḢTrans-id gh-inverse
+                (ḢROrn-≐ (toAlgOrn-t (e j) (ok j) ⊡ fromAlgOrn-t j) ḢTrans-id
                    (ftrans (fcong-l (uncurry (from-clsP (Orn.comp O (ok j))))
                               (fcong-r (to-clsP (Orn.comp O (ok j)))
                                  (algROrn-decomp-comp-inverse (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º) (ok j)))))
@@ -262,23 +260,23 @@ module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) 
   fromAlgOrn-toAlgOrn-inverse =
     hg-inverse ,
     (λ { (._ , ok j) →
-         ROrnEq-trans hg-inverse
-           (Orn.comp (fromAlgOrn ⊙ toAlgOrn) (ok (e j , ok j))) (ḢROrn ḢTrans-id) ((Orn.comp (idOrn ⌊ algOrn D (clsAlg O) ⌋) (ok (e j , ok j))))
-           (ROrnEq-trans frefl
-              (Orn.comp (fromAlgOrn ⊙ toAlgOrn) (ok (e j , ok j))) (ḢROrn (fromAlgOrn-t j ⊡ toAlgOrn-t (e j) (ok j))) (ḢROrn ḢTrans-id)
+         ROrnEq-trans (Orn.comp (fromAlgOrn ⊙ toAlgOrn) (ok (e j , ok j)))
+                      (ḢROrn ḢTrans-id)
+                      ((Orn.comp (idOrn ⌊ algOrn D (clsAlg O) ⌋) (ok (e j , ok j))))
+           (ROrnEq-trans (Orn.comp (fromAlgOrn ⊙ toAlgOrn) (ok (e j , ok j)))
+                         (ḢROrn (fromAlgOrn-t j ⊡ toAlgOrn-t (e j) (ok j)))
+                         (ḢROrn ḢTrans-id)
               (ROrnEq-sym (ḢROrn (fromAlgOrn-t j ⊡ toAlgOrn-t (e j) (ok j))) (Orn.comp (fromAlgOrn ⊙ toAlgOrn) (ok (e j , ok j)))
                  (ḢROrn-comp (fromAlgOrn-t j) (toAlgOrn-t (e j) (ok j))))
-              (ḢROrn-≐ (fromAlgOrn-t j ⊡ toAlgOrn-t (e j) (ok j)) ḢTrans-id hg-inverse
+              (ḢROrn-≐ (fromAlgOrn-t j ⊡ toAlgOrn-t (e j) (ok j)) ḢTrans-id
                  (ftrans (fcong-l (uncurry (algROrn-comp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º) (ok j))))
                             (fcong-r (algROrn-decomp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º) (ok j)))
                                (to-from-clsP-inverse (Orn.comp O (ok j)))))
                          (algROrn-comp-decomp-inverse (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º) (ok j))))))
            (ḢROrn-id {Σ I (InvImage e)} {Desc.comp ⌊ algOrn D (clsAlg O) ⌋ (e j , ok j)}) })
 
--}
 
-
-{-------
+--------
 -- classifying algebra derived from an algebraic ornament is isomorphic to the algebra of the ornament
 
 module CAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝⁺ J) where
@@ -365,7 +363,7 @@ module CAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝⁺ J) where
           setoid = ≃⁺-Setoid (Ḟ D (InvImage proj₁)) J
           open EqReasoning setoid renaming (begin_ to begin′_; _≈⟨_⟩_ to _≃⁺⟨_⟩_; _∎ to _∎′)
 
--}
+{-
 
 OrnEq-to-hom :
   {I J K : Set} {e : J → I} {f : K → I} {D : Desc I} {E : Desc J} {F : Desc K} (O : Orn e D E) (P : Orn f D F) →
@@ -375,8 +373,6 @@ OrnEq-to-hom {I} {J} {K} {e} {f} {D} {E} {F} O P {g} Q (eeq , oeq) =
   where
     h : {i : I} → e ⁻¹ i → f ⁻¹ i
     h j = from≡ f (trans (sym (eeq (und j))) (to≡ j))
-
-{-
 
 --------
 -- the equivalence theorem

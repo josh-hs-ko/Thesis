@@ -57,7 +57,7 @@ RAlg'Morphism-comp {X , R} {Y , S} {Z , T} (h , ch) (g , cg) =
            ∎)
   where open PreorderReasoning (⊆⁺-Preorder (Ḟ D X) Z) renaming (_∼⟨_⟩_ to _⊆⁺⟨_⟩_)
 
-record RAlg'MorphismEq {R S : RAlgebra} (f g : RAlg'Morphism R S) : Set₁ where
+record RAlg'MorphismEq {R S : RAlgebra} (f g : RAlg'Morphism R S) : Set where
   constructor wrap
   field
     comp : ∀ {i} → RAlg'Morphism.h f {i} ≐ RAlg'Morphism.h g {i}

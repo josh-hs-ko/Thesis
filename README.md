@@ -88,10 +88,7 @@ Definition of datatype descriptions, i.e., a universe for functors on families o
 Datatype-generic fold and induction are defined on top of descriptions.
 
 #### Thesis.Description.Horizontal
-Horizontal data, which can be separated into "shape" and "core" (cf. containers).
-
-#### Thesis.Description.HorizontalEquivalence
-An inductively defined equivalence between description-based data that poses little restriction on their actual types.
+Horizontal data, which can be separated into "shape" and "core" (cf. containers), and shape equivalence.
 
 #### Thesis.Ornament
 Definition of ornaments, i.e., a universe for simple, structural natural transformations between functors decoded from descriptions.
@@ -102,7 +99,7 @@ Singleton ornaments are also defined, which create as many singleton types as th
 Definition of (relational) algebraic ornaments and classifying algebras.
 The optimised predicate of an algebraic ornament can be swapped for a relational fold with the algebra of the ornament.
 
-#### Thesis.Ornament.Algebraic.Equivalence
+#### Thesis.Ornament.Algebraic.EquivalenceTheorem
 Let `D : Desc I` be a description.
 The category of relational `D`-algebras and the slice category of ornaments over `D` are equivalent.
 
@@ -120,6 +117,9 @@ An extensional equivalence relation on ornaments, which extends to extensional e
 #### Thesis.Ornament.Horizontal
 Horizontal transformations, i.e., shape-altering morphisms between horizontal data (cf. container morphisms).
 Ornaments can be derived from horizontal transformations.
+
+#### Thesis.Ornament.Horizontal.Equivalence
+Ornamental equivalences about horizontal ornaments.
 
 #### Thesis.Ornament.ParallelComposition
 Parallel composition of ornaments.
@@ -139,10 +139,6 @@ This construction gives a functor from `Orn` to `FRef` which produces more repre
 
 #### Thesis.Ornament.SequentialComposition
 Sequential composition of ornaments.
-
-#### Thesis.Ornament.SequentialComposition.Swap
-The optimised predicate for an ornament refined by sequential composition can be swapped for the original optimised predicate.
-This file can take a long time to typecheck.
 
 #### Thesis.Relation
 Basic definitions of subsets and relations, combinators for specifying nondeterministic computation,
