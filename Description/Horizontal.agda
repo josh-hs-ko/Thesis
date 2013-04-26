@@ -4,6 +4,7 @@ module Thesis.Description.Horizontal where
 
 open import Thesis.Prelude.Category.Isomorphism
 open import Thesis.Prelude.Function
+open import Thesis.Prelude.Function.Fam
 open import Thesis.Prelude.Product
 open import Thesis.Description
 
@@ -49,3 +50,8 @@ core (σ S D) (s , hs) = core (D s) hs
     decomp-comp-inverse (ṿ is)  X (_        , x) = refl
     decomp-comp-inverse (σ S D) X ((s , hs) , x) = cong₂-pair (cong (_,_ s) (cong proj₁ (decomp-comp-inverse (D s) X (hs , x))))
                                                               (hcong proj₂ (≡-to-≅ (decomp-comp-inverse (D s) X (hs , x))))
+
+Ḣ-map-preserves-shape :
+  {I : Set} (D : RDesc I) (X Y : List I → Set) (f : X ⇉ Y) (xs : Ḣ D X) → proj₁ (Ḣ-decomp D X xs) ≡ proj₁ (Ḣ-decomp D Y (Ḣ-map D f xs))
+Ḣ-map-preserves-shape (ṿ is)  X Y f xs       = refl
+Ḣ-map-preserves-shape (σ S D) X Y f (s , xs) = cong (_,_ s) (Ḣ-map-preserves-shape (D s) X Y f xs)

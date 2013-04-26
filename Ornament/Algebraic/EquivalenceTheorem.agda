@@ -36,6 +36,7 @@ open import Relation.Binary using (module Setoid)
 import Relation.Binary.PreorderReasoning as PreorderReasoning
 import Relation.Binary.EqReasoning as EqReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; sym; trans; subst; cong; cong₂) renaming (setoid to ≡-Setoid)
+open import Relation.Binary.HeterogeneousEquality using (_≅_; ≅-to-≡) renaming (refl to hrefl; sym to hsym)
 
 
 --------
@@ -143,7 +144,7 @@ erase'-algROrn-comp (ṿ is)  X P xs       p = refl
 erase'-algROrn-comp (σ S D) X P (s , xs) p = cong (_,_ s) (erase'-algROrn-comp (D s) X (curry P s) xs p)
 
 
---------
+{-------
 -- algebraic ornamentation by a classifying algebra produces an isomorphic datatype
 
 module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) where
@@ -363,18 +364,99 @@ module CAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝⁺ J) where
           setoid = ≃⁺-Setoid (Ḟ D (InvImage proj₁)) J
           open EqReasoning setoid renaming (begin_ to begin′_; _≈⟨_⟩_ to _≃⁺⟨_⟩_; _∎ to _∎′)
 
-{-
+-}
+
+erase-Ṡ-from-clsP :
+  {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (O : ROrn e D E) (js : ⟦ D ⟧ (InvImage e)) (p : clsP O js) →
+  erase-Ṡ O (from-clsP O js p) ≡ proj₁ (Ḣ-decomp D (Ṁ (InvImage e)) js)
+erase-Ṡ-from-clsP (ṿ eqs) js        p          = refl
+erase-Ṡ-from-clsP (σ S O) (s , js)  p          = cong (_,_ s) (erase-Ṡ-from-clsP (O s) js p)
+erase-Ṡ-from-clsP (Δ T O) js        (t , p)    = erase-Ṡ-from-clsP (O t) js p
+erase-Ṡ-from-clsP (∇ s O) (.s , js) (refl , p) = cong (_,_ s) (erase-Ṡ-from-clsP O js p)
+
+next-from-clsP-ṿ :
+  {I J : Set} {e : J → I} {is : List I} {js : List J} (eqs : Ė e js is) (js' : Ṁ (InvImage e) is) → clsP-Ṁ eqs js' → js ≡ und-Ṁ is js'
+next-from-clsP-ṿ []           _         _          = refl
+next-from-clsP-ṿ (refl ∷ eqs) (._ , js) (refl , p) = cong₂ _∷_ refl (next-from-clsP-ṿ eqs js p)
+
+next-from-clsP :
+  {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (O : ROrn e D E) (js : ⟦ D ⟧ (InvImage e)) (p : clsP O js) →
+  next E (from-clsP O js p) ≡ uncurry (und-Ṁ ∘ next D) (Ḣ-decomp D (Ṁ (InvImage e)) js)
+next-from-clsP (ṿ eqs) js p = next-from-clsP-ṿ eqs js p
+next-from-clsP (σ S O) (s , js) p = next-from-clsP (O s) js p
+next-from-clsP (Δ T O) js (t , p) = next-from-clsP (O t) js p
+next-from-clsP (∇ s O) (.s , js) (refl , p) = next-from-clsP O js p
+
+make-clsP-Ṁ :
+  {I J : Set} {e : J → I} {is : List I} {js : List J} (eqs : Ė e js is) (js' : Ṁ (InvImage e) is) → js ≡ und-Ṁ is js' → clsP-Ṁ eqs js'
+make-clsP-Ṁ []         _           _    = tt
+make-clsP-Ṁ (eq ∷ eqs) (ok j , js) refl with eq
+make-clsP-Ṁ (eq ∷ eqs) (ok j , js) refl | refl = refl , make-clsP-Ṁ eqs js refl
+
+make-clsP : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (O : ROrn e D E) (js : ⟦ D ⟧ (InvImage e))
+          (hs : Ṡ E) → erase-Ṡ O hs ≡ proj₁ (Ḣ-decomp D (Ṁ (InvImage e)) js) →
+                       next E hs ≡ uncurry (und-Ṁ ∘ next D) (Ḣ-decomp D (Ṁ (InvImage e)) js) → clsP O js
+make-clsP (ṿ eqs) js        _         _  eq' = make-clsP-Ṁ eqs js eq'
+make-clsP (σ S O) (s , js)  (s' , hs) eq eq' with cong proj₁ eq
+make-clsP (σ S O) (s , js)  (.s , hs) eq eq' | refl = make-clsP (O s) js hs (cong-proj₂ eq) eq'
+make-clsP (Δ T O) js        (t , hs)  eq eq' = t , make-clsP (O t) js hs eq eq'
+make-clsP (∇ s O) (s' , js) hs        eq eq' with cong proj₁ eq
+make-clsP (∇ s O) (.s , js) hs        eq eq' | refl = refl , make-clsP O js hs (cong-proj₂ eq) eq'
+
+InvImage-lift : {I J K : Set} (e : J → I) (f : K → I) (g : J → K) → f ∘ g ≐ e → InvImage e ⇉ InvImage f
+InvImage-lift e f g eeq j = from≡ f (trans (eeq (und j)) (to≡ j))
+
+cong-InvImage-lift :
+  {I J K : Set} (e : J → I) (f : K → I) (g : J → K) (g' : J → K) (eeq : f ∘ g ≐ e) (eeq' : f ∘ g' ≐ e) →
+  g ≐ g' → {i : I} → InvImage-lift e f g eeq {i} ≐ InvImage-lift e f g' eeq' {i}
+cong-InvImage-lift e f g g' eeq eeq' g≐g' j =
+  und≡ (trans (und-from≡ f (trans (eeq (und j)) (to≡ j))) (trans (g≐g' (und j)) (sym (und-from≡ f (trans (eeq' (und j)) (to≡ j))))))
+
+next-erase-Ṡ : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (O : ROrn e D E) (hs : Ṡ E) → next D (erase-Ṡ O hs) ≡ map e (next E hs)
+next-erase-Ṡ (ṿ eqs) hs       = Ė-unique eqs
+next-erase-Ṡ (σ S O) (s , hs) = next-erase-Ṡ (O s) hs
+next-erase-Ṡ (Δ T O) (t , hs) = next-erase-Ṡ (O t) hs
+next-erase-Ṡ (∇ s O) hs       = next-erase-Ṡ O hs
+
+next-from-clsP-lemma :
+  {I J K : Set} (e : J → I) (f : K → I) (g : J → K) (eeq : f ∘ g ≐ e) (D : RDesc I) (js : ⟦ D ⟧ (InvImage e)) →
+  map g (uncurry (und-Ṁ ∘ next D) (Ḣ-decomp D (Ṁ (InvImage e)) js))
+    ≡ uncurry (und-Ṁ ∘ next D) (Ḣ-decomp D (Ṁ (InvImage f)) (mapF D (InvImage-lift e f g eeq) js))
+next-from-clsP-lemma e f g eeq (ṿ [])        _           = refl
+next-from-clsP-lemma e f g eeq (ṿ (._ ∷ is)) (ok j , js) = cong₂ _∷_ (sym (und-from≡ f (trans (eeq j) refl)))
+                                                                     (next-from-clsP-lemma e f g eeq (ṿ is) js)
+next-from-clsP-lemma e f g eeq (σ S D)       (s , js)    = next-from-clsP-lemma e f g eeq (D s) js
+
+OrnEq-to-hom-aux :
+  {I J K : Set} {e : J → I} {f : K → I} {D D' : RDesc I} {E : RDesc J} {F F' : RDesc K}
+  (O : ROrn e D E) (P : ROrn f D' F) (P' : ROrn f D F') → D ≡ D' → F ≡ F' → P ≅ P' →
+  {g : J → K} (Q : ROrn g F E) (eeq : f ∘ g ≐ e) (js : ⟦ D ⟧ (InvImage e)) →
+  (p : clsP O js) → erase-Ṡ (scROrn P Q) (from-clsP O js p) ≅ erase-Ṡ O (from-clsP O js p) → clsP P' (mapF D (InvImage-lift e f g eeq) js)
+OrnEq-to-hom-aux {e = e} {f} {D} O P .P refl refl hrefl {g} Q eeq js p eraseeq =
+  make-clsP P (mapF D (InvImage-lift e f g eeq) js) (erase-Ṡ Q (from-clsP O js p))
+    (trans (sym (erase-Ṡ-scROrn P Q (from-clsP O js p)))
+           (trans (≅-to-≡ eraseeq) (trans (erase-Ṡ-from-clsP O js p) (Ḣ-map-preserves-shape D (Ṁ (InvImage e)) (Ṁ (InvImage f)) _ js))))
+    (trans (next-erase-Ṡ Q (from-clsP O js p)) (trans (cong (map g) (next-from-clsP O js p)) (next-from-clsP-lemma e f g eeq D js)))
 
 OrnEq-to-hom :
   {I J K : Set} {e : J → I} {f : K → I} {D : Desc I} {E : Desc J} {F : Desc K} (O : Orn e D E) (P : Orn f D F) →
-  {g : J → K} (Q : Orn g F E) → OrnEq O (P ⊙ Q) → Σ[ h ∶ InvImage e ⇉ InvImage f ] fun⁺ h •⁺ clsAlg O ⊆⁺ clsAlg P •⁺ Ṙ D (fun⁺ h)
-OrnEq-to-hom {I} {J} {K} {e} {f} {D} {E} {F} O P {g} Q (eeq , oeq) =
-  h , wrap (λ i → wrap λ { js ._ (j , p , refl) → Ḟ-map D h js , mapR-fun-computation (Desc.comp D i) h js , {!proj₂ (to-clsP (Orn.comp P (ok (g (und j)))) (erase' (Orn.comp Q (ok (und j))) (const !) (from-clsP (Orn.comp O j) js p)))!} })  -- Ṡ (Desc.comp F (g (und j)))
+  {g : J → K} (Q : Orn g F E) (oeq : OrnEq (P ⊙ Q) O) →
+  let h : InvImage e ⇉ InvImage f; h = InvImage-lift e f g (proj₁ oeq) in fun⁺ h •⁺ clsAlg O ⊆⁺ clsAlg P •⁺ Ṙ D (fun⁺ h)
+OrnEq-to-hom {I} {J} {K} {e} {f} {D} {E} {F} O P {g} Q (eeq , roeq) =
+  wrap (λ i → wrap λ { js ._ (j , p , refl) → Ḟ-map D h js , mapR-fun-computation (Desc.comp D i) h js , aux js j p })
   where
-    h : {i : I} → e ⁻¹ i → f ⁻¹ i
-    h j = from≡ f (trans (sym (eeq (und j))) (to≡ j))
+    h : InvImage e ⇉ InvImage f
+    h = InvImage-lift e f g eeq
+    aux : {i : I} (js : ⟦ Desc.comp D i ⟧ (InvImage e)) (j : e ⁻¹ i) → clsP (Orn.comp O j) js → clsP (Orn.comp P (h j)) (Ḟ-map D h js)
+    aux js (ok j) p = OrnEq-to-hom-aux (Orn.comp O (ok j)) (Orn.comp P (ok (g j))) (Orn.comp P (from≡ f (trans (eeq j) refl)))
+                        (cong (Desc.comp D) (sym (eeq j))) (cong (Desc.comp F) (sym (und-from≡ f (trans (eeq j) refl))))
+                        (subst (λ i → (k : f ⁻¹ i) → k ≅ ok {f = f} (g j) → Orn.comp P (ok (g j)) ≅ Orn.comp P k)
+                               (eeq j) (λ { ._ hrefl → hrefl }) (from≡ f (trans (eeq j) refl))
+                               (hsym (und≡' (from≡ f (trans (eeq j) refl)) (sym (und-from≡ f (trans (eeq j) refl))))))
+                        (Orn.comp Q (ok j)) eeq js p (roeq j (from-clsP (Orn.comp O (ok j)) js p))
 
---------
+
+{-------
 -- the equivalence theorem
 
 equivalence-theorem : {I : Set} (D : Desc I) → CatEquiv (RAlg' D) (SliceCategory Ōrn (I , D))

@@ -36,10 +36,11 @@ to≡ (ok x) = refl
 und-from≡ : ∀ {A B} (f : A → B) {x y} → (eq : f x ≡ y) → und (from≡ f eq) ≡ x
 und-from≡ f refl = refl
 
-und≡ : ∀ {A B} {f : A → B} {y} {x x' : f ⁻¹ y} → und x ≡ und x' → x ≡ x'
-und≡ {f = f} {x = ok x} {x'} eq = ≅-to-≡ (aux x' eq)
-  where aux : ∀ {x y} (x' : f ⁻¹ y) → x ≡ und x' → ok {f = f} x ≅ x'
-        aux (ok x') refl = hrefl
+und≡' : {A B : Set} {f : A → B} {x : A} {y : B} (x' : f ⁻¹ y) → x ≡ und x' → ok {f = f} x ≅ x'
+und≡' (ok x') refl = hrefl
+
+und≡ : {A B : Set} {f : A → B} {y : B} {x x' : f ⁻¹ y} → und x ≡ und x' → x ≡ x'
+und≡ {f = f} {x = ok x} {x'} eq = ≅-to-≡ (und≡' x' eq)
 
 elim-⁻¹ : {A B : Set} {f : A → B} (P : ∀ {b} → f ⁻¹ b → Set) → (∀ a → P (ok a)) → ∀ {b} (a : f ⁻¹ b) → P a
 elim-⁻¹ P p (ok a) = p a
