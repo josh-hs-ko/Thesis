@@ -47,8 +47,8 @@ FRefF = record { object   = Function.id
                ; id-preserving   = frefl , ≑-refl
                ; comp-preserving = λ _ _ → frefl , ≑-refl }
 
-FRefG : Functor Fam FRef
-FRefG = record { object   = Function.id
+FRefC : Functor Fam FRef
+FRefC = record { object   = Function.id
                ; morphism = λ { {J , Y} {I , X} (e , u) → e , canonFRef u }
                ; ≈-respecting    = λ { (eq , eq') → eq , eq' }
                ; id-preserving   = frefl , ≑-refl

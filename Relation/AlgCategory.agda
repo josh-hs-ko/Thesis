@@ -5,6 +5,7 @@ open import Thesis.Description
 
 module Thesis.Relation.AlgCategory {I : Set} (D : Desc I) where
 
+open import Thesis.Prelude.Equality
 open import Thesis.Prelude.Category
 open import Thesis.Prelude.Function
 open import Thesis.Prelude.Function.Fam
@@ -57,24 +58,14 @@ RAlg'Morphism-comp {X , R} {Y , S} {Z , T} (h , ch) (g , cg) =
            ∎)
   where open PreorderReasoning (⊆⁺-Preorder (Ḟ D X) Z) renaming (_∼⟨_⟩_ to _⊆⁺⟨_⟩_)
 
-record RAlg'MorphismEq {R S : RAlgebra} (f g : RAlg'Morphism R S) : Set where
-  constructor wrap
-  field
-    comp : ∀ {i} → RAlg'Morphism.h f {i} ≐ RAlg'Morphism.h g {i}
-
 RAlg' : Category
 RAlg' =
   record { Object   = RAlgebra
-         ; Morphism = λ R S → record { Carrier = RAlg'Morphism R S
-                                     ; _≈_ = RAlg'MorphismEq
-                                     ; isEquivalence =
-                                         record { refl  = wrap frefl
-                                                ; sym   = λ { (wrap feq) → wrap (λ {i} → fsym (feq {i})) }
-                                                ; trans = λ { (wrap feq) (wrap feq') → wrap (λ {i} → ftrans (feq {i}) (feq' {i})) } } }
+         ; Morphism = λ R S → toSetoid (ProductSetoid (⇉-Setoid (RAlgebra.Carrier R) (RAlgebra.Carrier S)) {!⊆⁺-Setoid !}) {!!}
          ; _·_ = RAlg'Morphism-comp
          ; id  = RAlg'Morphism-id
-         ; id-l   = λ _ → wrap frefl
-         ; id-r   = λ _ → wrap frefl
-         ; assoc  = λ _ _ _ → wrap frefl
-         ; cong-l = λ { (h , _) (wrap eq) → wrap (fcong-l h eq) }
-         ; cong-r = λ { (h , _) (wrap eq) → wrap (fcong-r h eq) } }
+         ; id-l   = {!!}
+         ; id-r   = {!!}
+         ; assoc  = {!!}
+         ; cong-l = {!!}
+         ; cong-r = {!!} }

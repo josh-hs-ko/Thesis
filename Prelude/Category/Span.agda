@@ -2,6 +2,7 @@
 
 module Thesis.Prelude.Category.Span where
 
+open import Thesis.Prelude.Equality
 open import Thesis.Prelude.Category
 open import Thesis.Prelude.Category.Isomorphism
 open import Thesis.Prelude.Category.Isomorphism.Functor
@@ -34,12 +35,7 @@ record SpanMorphism {ℓ₀ ℓ₁ ℓ₂ : Level} (C : Category {ℓ₀} {ℓ�
 SpanCategory : {ℓ₀ ℓ₁ ℓ₂ : Level} (C : Category {ℓ₀} {ℓ₁} {ℓ₂}) (L R : Category.Object C) → Category
 SpanCategory C L R =
   record { Object   = Span C L R
-         ; Morphism = λ s t → record { Carrier = SpanMorphism C L R s t
-                                     ; _≈_ = λ f g → SpanMorphism.m f ≈ SpanMorphism.m g
-                                     ; isEquivalence =
-                                         record { refl  = Setoid.refl  (Morphism (Span.M s) (Span.M t))
-                                                ; sym   = Setoid.sym   (Morphism (Span.M s) (Span.M t))
-                                                ; trans = Setoid.trans (Morphism (Span.M s) (Span.M t)) } }
+         ; Morphism = λ s t → toSetoid (Morphism (Span.M s) (Span.M t)) (SpanMorphism.m {_} {_} {_} {C} {L} {R})
          ; _·_ = λ f g → spanMorphism (SpanMorphism.m f · SpanMorphism.m g)
                                       (two-triangles C L (sliceMorphism (SpanMorphism.m f) (SpanMorphism.triangle-l f))
                                                          (sliceMorphism (SpanMorphism.m g) (SpanMorphism.triangle-l g)))
@@ -91,17 +87,14 @@ SpanMap F =
          ; id-preserving   = id-preserving F
          ; comp-preserving = λ f g → comp-preserving F (SpanMorphism.m f) (SpanMorphism.m g) }
 
-Product : {ℓ₀ ℓ₁ ℓ₂ : Level} (C : Category {ℓ₀} {ℓ₁} {ℓ₂}) (L R : Category.Object C) → Category.Object C → Set (ℓ₀ ⊔ ℓ₁ ⊔ ℓ₂)
-Product C L R X = Σ (Σ[ s ∶ Span C L R ] Span.M s ≡ X) (Terminal (SpanCategory C L R) ∘ proj₁)
-  where open Category C
+Product : {ℓ₀ ℓ₁ ℓ₂ : Level} (C : Category {ℓ₀} {ℓ₁} {ℓ₂}) (L R : Category.Object C) → Span C L R → Set (ℓ₀ ⊔ ℓ₁ ⊔ ℓ₂)
+Product C L R = Terminal (SpanCategory C L R)
 
-product-iso : {ℓ₀ ℓ₁ ℓ₂ : Level} (C : Category {ℓ₀} {ℓ₁} {ℓ₂}) (L R : Category.Object C) (X Y : Category.Object C) →
-              Product C L R X → Product C L R Y → Iso C X Y
-product-iso C L R ._ ._ ((s , refl) , term-s) ((t , refl) , term-t) =
-  iso-preserving SpanU (terminal-iso (SpanCategory C L R) s t term-s term-t)
+product-iso : {ℓ₀ ℓ₁ ℓ₂ : Level} (C : Category {ℓ₀} {ℓ₁} {ℓ₂}) (L R : Category.Object C) (s t : Span C L R) →
+              Product C L R s → Product C L R t → Iso C (Span.M s) (Span.M t)
+product-iso C L R s t prod-s prod-t = iso-preserving SpanU (terminal-iso (SpanCategory C L R) s t prod-s prod-t)
 
 Product-preserving :
   {ℓ₀ ℓ₁ ℓ₂ ℓ₃ ℓ₄ ℓ₅ : Level} {C : Category {ℓ₀} {ℓ₁} {ℓ₂}} {D : Category {ℓ₃} {ℓ₄} {ℓ₅}} → (F : Functor C D) → Set (ℓ₀ ⊔ ℓ₁ ⊔ ℓ₂ ⊔ ℓ₃ ⊔ ℓ₄ ⊔ ℓ₅)
 Product-preserving {C = C} {D = D} F =
-  (L R X : Category.Object C) (p : Product C L R X) →
-  Terminal (SpanCategory D (object F L) (object F R)) (object (SpanMap F) (proj₁ (proj₁ p)))
+  (L R : Category.Object C) (s : Span C L R) (p : Product C L R s) → Product D (object F L) (object F R) (object (SpanMap F) s)

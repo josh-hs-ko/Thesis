@@ -78,11 +78,13 @@ decouple {f = f} {g} {ok a , b} {ok .a , b'} refl eq = cong (_,_ {c = f a} (ok a
   where aux : ∀ {c c'} (b : g ⁻¹ c) (b' : g ⁻¹ c') → und b ≡ und b' → b ≅ b'
         aux (ok b) (ok .b) refl = hrefl
 
-⋈-is-Pullback : {A B C : Set} (f : A → C) (g : B → C) → Pullback Fun (slice A f) (slice B g) (f ⋈ g)
-⋈-is-Pullback {A} {B} {C} f g =
-  (span (slice (f ⋈ g) pull) (sliceMorphism π₁ (λ { (ok a , b) → refl })) (sliceMorphism π₂ (λ { (a , ok b) → refl })) , refl) ,
-  (λ s → spanMorphism
-           (sliceMorphism (λ t → from≡ f (SliceMorphism.triangle (Span.l s) t) , from≡ g (SliceMorphism.triangle (Span.r s) t)) frefl)
-           (λ t → und-from≡ f (SliceMorphism.triangle (Span.l s) t)) (λ t → und-from≡ g (SliceMorphism.triangle (Span.r s) t)) ,
-         (λ m t → decouple (trans (und-from≡ f (SliceMorphism.triangle (Span.l s) t)) (sym (SpanMorphism.triangle-l m t)))
-                           (trans (und-from≡ g (SliceMorphism.triangle (Span.r s) t)) (sym (SpanMorphism.triangle-r m t)))))
+⋈-square : {A B C : Set} (f : A → C) (g : B → C) → Square Fun (slice A f) (slice B g)
+⋈-square f g = span (slice (f ⋈ g) pull) (sliceMorphism π₁ (λ { (ok a , b) → refl })) (sliceMorphism π₂ (λ { (a , ok b) → refl }))
+
+⋈-is-Pullback : {A B C : Set} (f : A → C) (g : B → C) → Pullback Fun (slice A f) (slice B g) (⋈-square f g)
+⋈-is-Pullback {A} {B} {C} f g s =
+  spanMorphism (sliceMorphism (λ t → from≡ f (SliceMorphism.triangle (Span.l s) t) , from≡ g (SliceMorphism.triangle (Span.r s) t)) frefl)
+               (λ t → und-from≡ f (SliceMorphism.triangle (Span.l s) t))
+               (λ t → und-from≡ g (SliceMorphism.triangle (Span.r s) t)) ,
+  (λ m t → decouple (trans (und-from≡ f (SliceMorphism.triangle (Span.l s) t)) (sym (SpanMorphism.triangle-l m t)))
+                    (trans (und-from≡ g (SliceMorphism.triangle (Span.r s) t)) (sym (SpanMorphism.triangle-r m t))))

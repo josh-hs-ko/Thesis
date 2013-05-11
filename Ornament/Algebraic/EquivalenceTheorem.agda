@@ -427,6 +427,8 @@ next-from-clsP-lemma e f g eeq (ṿ (._ ∷ is)) (ok j , js) = cong₂ _∷_ (sy
                                                                      (next-from-clsP-lemma e f g eeq (ṿ is) js)
 next-from-clsP-lemma e f g eeq (σ S D)       (s , js)    = next-from-clsP-lemma e f g eeq (D s) js
 
+{-
+
 OrnEq-to-hom-aux :
   {I J K : Set} {e : J → I} {f : K → I} {D D' : RDesc I} {E : RDesc J} {F F' : RDesc K}
   (O : ROrn e D E) (P : ROrn f D' F) (P' : ROrn f D F') → D ≡ D' → F ≡ F' → P ≅ P' →
@@ -454,6 +456,33 @@ OrnEq-to-hom {I} {J} {K} {e} {f} {D} {E} {F} O P {g} Q (eeq , roeq) =
                                (eeq j) (λ { ._ hrefl → hrefl }) (from≡ f (trans (eeq j) refl))
                                (hsym (und≡' (from≡ f (trans (eeq j) refl)) (sym (und-from≡ f (trans (eeq j) refl))))))
                         (Orn.comp Q (ok j)) eeq js p (roeq j (from-clsP (Orn.comp O (ok j)) js p))
+
+InvImage-lift : {I J K : Set} (e : J → I) (f : K → I) (g : J → K) → f ∘ g ≐ e → InvImage e ⇉ InvImage f
+InvImage-lift e f g eeq j = from≡ f (trans (eeq (und j)) (to≡ j))
+
+-}
+
+hom-to-OrnEq-aux-ṿ :
+  {I : Set} (is : List I) {J K : I → Set} (js : Ṁ J is) (h : J ⇉ K) →
+  Ė (id ** h) (und-Ṁ is (Ṁ-map (λ {i} j → ok (i , j)) is js)) (und-Ṁ is (Ṁ-map (λ {i} j → ok (i , j)) is (Ṁ-map h is js)))
+hom-to-OrnEq-aux-ṿ []       _        h = []
+hom-to-OrnEq-aux-ṿ (i ∷ is) (j , js) h = refl ∷ hom-to-OrnEq-aux-ṿ is js h
+
+hom-to-OrnEq-aux :
+  {I : Set} (D : RDesc I) {J K : I → Set} (P : ℘ (⟦ D ⟧ J)) (Q : ℘ (⟦ D ⟧ K))
+  (h : J ⇉ K) → ((js : ⟦ D ⟧ J) → P js → Q (mapF D h js)) →
+  ROrn (id ** h) (toRDesc (algROrn D Q)) (toRDesc (algROrn D P))
+hom-to-OrnEq-aux (ṿ is)  {J} P Q h p-to-q = Δ[ js ∶ Ṁ J is ] ∇ (Ṁ-map h is js) (Δ[ p ∶ P js ] ∇ (p-to-q js p) (ṿ (hom-to-OrnEq-aux-ṿ is js h)))
+hom-to-OrnEq-aux (σ S D)     P Q h p-to-q = σ[ s ∶ S ] hom-to-OrnEq-aux (D s) (curry P s) (curry Q s) h (curry p-to-q s)
+
+hom-to-OrnEq :
+  {I : Set} (D : Desc I) {J K : I → Set} (R : Ḟ D J ↝⁺ J) (S : Ḟ D K ↝⁺ K)
+  (h : J ⇉ K) → fun⁺ h •⁺ R ⊆⁺ S •⁺ Ṙ D (fun⁺ h) → Orn (id ** h) ⌊ algOrn D S ⌋ ⌊ algOrn D R ⌋
+hom-to-OrnEq D R S h inc =
+  wrap λ { {._} (ok (i , j)) →
+           hom-to-OrnEq-aux (Desc.comp D i) (((R !!) i º) j) (((S !!) i º) (h j)) h
+             (λ js r → let (ks , rs , s) = modus-ponens-⊆⁺ inc i js (h j) (j , r , refl)
+                       in  subst (((S !!) i º) (h j)) (sym (mapR-fun-unique (Desc.comp D i) h js ks rs)) s) }
 
 
 {-------

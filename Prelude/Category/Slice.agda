@@ -2,6 +2,7 @@
 
 module Thesis.Prelude.Category.Slice where
 
+open import Thesis.Prelude.Equality
 open import Thesis.Prelude.Category
 
 open import Level
@@ -48,12 +49,7 @@ two-triangles C B {s} {t} {u} f g =
 SliceCategory : {ℓ₀ ℓ₁ ℓ₂ : Level} (C : Category {ℓ₀} {ℓ₁} {ℓ₂}) (B : Category.Object C) → Category
 SliceCategory C B =
   record { Object   = Slice C B
-         ; Morphism = λ { s t → record { Carrier = SliceMorphism C B s t
-                                       ; _≈_ = λ { f g → SliceMorphism.m f ≈ SliceMorphism.m g }
-                                       ; isEquivalence =
-                                           record { refl  = Setoid.refl (Morphism (Slice.T s) (Slice.T t))
-                                                  ; sym   = Setoid.sym (Morphism (Slice.T s) (Slice.T t))
-                                                  ; trans = Setoid.trans (Morphism (Slice.T s) (Slice.T t)) } } }
+         ; Morphism = λ s t → toSetoid (Morphism (Slice.T s) (Slice.T t)) SliceMorphism.m
          ; _·_ = λ f g → record { m = SliceMorphism.m f · SliceMorphism.m g; triangle = two-triangles C B f g }
          ; id  = λ {s} → record { m = id; triangle = id-r (Slice.s s) }
          ; id-l   = λ f → id-l (SliceMorphism.m f)

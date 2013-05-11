@@ -342,6 +342,15 @@ R ⊇⁺ S = S ⊆⁺ R
 ⊇⁺-Preorder : {I : Set} (X Y : I → Set) → Preorder _ _ _
 ⊇⁺-Preorder X Y = ConversePreorder (⊆⁺-Preorder X Y)
 
+⊆⁺-Setoid : {I : Set} {X Y : I → Set} (R S : X ↝⁺ Y) → Setoid _ _
+⊆⁺-Setoid {I} {X} {Y} R S =
+  record { Carrier = R ⊆⁺ S
+         ; _≈_ = λ inc inc' → (i : I) (x : X i) (y : Y i) → modus-ponens-⊆⁺ inc i x y ≐ modus-ponens-⊆⁺ inc' i x y
+         ; isEquivalence =
+             record { refl  = λ i x y → frefl
+                    ; sym   = λ eq i x y → fsym (eq i x y)
+                    ; trans = λ eq eq' i x y → ftrans (eq i x y) (eq' i x y) } }
+
 º⁺-monotonic : {I : Set} {X Y : I → Set} {R S : X ↝⁺ Y} → R ⊆⁺ S → R º⁺ ⊆⁺ S º⁺
 º⁺-monotonic (wrap R⊆⁺S) = wrap (º-monotonic ∘ R⊆⁺S)
 

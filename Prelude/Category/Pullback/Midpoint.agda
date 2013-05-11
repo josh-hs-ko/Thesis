@@ -17,7 +17,7 @@ module Thesis.Prelude.Category.Pullback.Midpoint
 open import Thesis.Prelude.Equality
 open import Thesis.Prelude.Category.Pullback
 
-open import Data.Product using (Σ; _,_; proj₁; proj₂)
+open import Data.Product using (Σ; _,_; proj₁; proj₂; <_,_>)
 open import Relation.Binary using (module Setoid)
 import Relation.Binary.EqReasoning as EqReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
@@ -193,9 +193,5 @@ module Universality (W : Span (SliceCategory C Z) f g) where
                            (spanMorphism (Span.l X×Y×Z · SliceMorphism.m (SpanMorphism.m m')) lemma-X×Y-X lemma-X×Y-Y)))
                       (SliceMorphism.triangle (SpanMorphism.m m')))
 
-midpoint-pullback : Pullback C f g (Span.M X×Y×Z)
-midpoint-pullback =
-  (span (object SpanUR X×Y×Z)
-        (sliceMorphism (SpanMorphism.m X×Y×Z-to-X×Z) (SpanMorphism.triangle-r X×Y×Z-to-X×Z))
-        (sliceMorphism (SpanMorphism.m X×Y×Z-to-Y×Z) (SpanMorphism.triangle-r X×Y×Z-to-Y×Z)) , refl) ,
-  (λ W → Universality.W-to-X×Y×Z W , Universality.Uniqueness.uniqueness W)
+midpoint-pullback : Pullback C f g (span (object SpanUR X×Y×Z) (morphism SpanUR X×Y×Z-to-X×Z) (morphism SpanUR X×Y×Z-to-Y×Z))
+midpoint-pullback = < Universality.W-to-X×Y×Z , Universality.Uniqueness.uniqueness >

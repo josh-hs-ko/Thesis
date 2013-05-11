@@ -17,7 +17,7 @@ open import Thesis.Prelude.Product
 
 open import Function using (_∘_; type-signature)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; <_,_>) renaming (map to _**_)
-open import Relation.Binary using (module Setoid)
+open import Relation.Binary using (Setoid; module Setoid)
 import Relation.Binary.EqReasoning as EqReasoning
 open import Relation.Binary.PropositionalEquality
   using (_≡_; refl; subst; cong; cong₂; sym; trans; proof-irrelevance; module ≡-Reasoning) renaming (setoid to ≡-Setoid)
@@ -31,18 +31,24 @@ open Functor
 FamObject : Set₁
 FamObject = Σ[ I ∶ Set ] (I → Set)
 
-infixr 4 _,_
-
-_⇉_ : ∀ {I} → (I → Set) → (I → Set) → Set
+_⇉_ : {I : Set} → (I → Set) → (I → Set) → Set
 X ⇉ Y = ∀ {i} → X i → Y i
 
 infixr 1 _⇉_
+
+⇉-Setoid : {I : Set} → (I → Set) → (I → Set) → Setoid _ _
+⇉-Setoid {I} X Y =
+  record { Carrier = X ⇉ Y
+         ; _≈_ = λ f g → {i : I} → f {i} ≐ g {i}
+         ; isEquivalence = record { refl = frefl; sym = λ eq {i} → fsym (eq {i}); trans = λ eq eq' {i} → ftrans (eq {i}) (eq' {i}) } }
 
 record FamMorphism (IX JY : FamObject) : Set₁ where
   constructor _,_
   field
     e : proj₁ IX → proj₁ JY
     u : proj₂ IX ⇉ (proj₂ JY ∘ e)
+
+infixr 4 _,_
 
 record FamMorphismEq (IX JY : FamObject) (f g : FamMorphism IX JY) : Set₁ where
   constructor _,_
@@ -302,9 +308,8 @@ module CanonicalPullbackInFun {B' : Category.Object Fam} (f' g' : Slice Fam B') 
 Mix : {B : Category.Object Fam} (f g : Slice Fam B) → FamObject
 Mix f g = Slice.T (Span.M (CanonicalPullback.p f g))
 
-canonPullback : {B : Category.Object Fam} (f g : Slice Fam B) → Pullback Fam f g (Mix f g)
-canonPullback f g = (CanonicalPullback.p f g , refl) ,
-                    λ p' → CanonicalPullback.Universality.p'-to-p f g p' , CanonicalPullback.Universality.uniqueness f g p'
+canonPullback : {B : Category.Object Fam} (f g : Slice Fam B) → Pullback Fam f g (CanonicalPullback.p f g)
+canonPullback f g = < CanonicalPullback.Universality.p'-to-p f g , CanonicalPullback.Universality.uniqueness f g >
 
 module PullbackPreserving
   {B : Category.Object Fam} (f g : Slice Fam B)
@@ -398,6 +403,5 @@ module PullbackPreserving
               open EqReasoning setoid
 
 FamF-preserves-pullback : Pullback-preserving FamF
-FamF-preserves-pullback f g ._ ((p , refl) , term-p) =
-  λ q' → PullbackPreserving.Universality.q'-to-p' f g p term-p q' ,
-         PullbackPreserving.Universality.Uniqueness.uniqueness f g p term-p q'
+FamF-preserves-pullback f g p pull-p =
+  < PullbackPreserving.Universality.q'-to-p' f g p pull-p , PullbackPreserving.Universality.Uniqueness.uniqueness f g p pull-p >

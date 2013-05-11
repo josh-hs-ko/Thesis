@@ -231,7 +231,7 @@ module IsPullback {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P
   p = slice (object Ind (e ⋈ f , ⌊ O ⊗ P ⌋)) (morphism Ind (pull , ⌈ O ⊗ P ⌉))
   
   ⋈-span : Span (SliceCategory Fun I) (slice J e) (slice K f)
-  ⋈-span = proj₁ (proj₁ (⋈-is-Pullback e f))
+  ⋈-span = ⋈-square e f
 
   p-to-l : SliceMorphism Fam (object Ind (I , D)) p l
   p-to-l = sliceMorphism (π₁ , forget (diffOrn-l O P))
@@ -259,7 +259,7 @@ module IsPullback {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P
     L-span = object (SpanMap (SliceMap FamI)) (span p' p'-to-l p'-to-r)
 
     L-to-⋈ : SpanMorphism (SliceCategory Fun I) (slice J e) (slice K f) L-span ⋈-span
-    L-to-⋈ = proj₁ (proj₂ (⋈-is-Pullback e f) L-span)
+    L-to-⋈ = proj₁ (⋈-is-Pullback e f L-span)
 
     integrate :
       {i : L} → (t : proj₂ (Slice.T p') i) →
@@ -322,7 +322,7 @@ module IsPullback {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P
                                   (span p' p'-to-l p'-to-r) (span p p-to-l p-to-r))
                         p'-to-p
     uniqueness med' =
-      proj₂ (proj₂ (⋈-is-Pullback e f) L-span)
+      proj₂ (⋈-is-Pullback e f L-span)
         (spanMorphism
            (sliceMorphism (FamMorphism.e (SliceMorphism.m (SpanMorphism.m med')))
                           (FamMorphismEq.e (SliceMorphism.triangle (SpanMorphism.m med'))))
@@ -350,8 +350,7 @@ module IsPullback {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P
                                         (FamMorphism.e (SliceMorphism.m (SpanMorphism.m med')) i) refl refl)
                        (≡-to-≅ (Integration.integrate-inv O P _ _ _ _)))))
 
-  ⊗-is-Pullback : Pullback Fam l r (object Ind (e ⋈ f , ⌊ O ⊗ P ⌋))
-  ⊗-is-Pullback = (span p p-to-l p-to-r , refl) ,
-                  λ { (span p' l' r') → Universality.p'-to-p p' l' r' , Universality.uniqueness p' l' r' }
+  ⊗-is-Pullback : Pullback Fam l r (span p p-to-l p-to-r)
+  ⊗-is-Pullback (span p' l' r') = Universality.p'-to-p p' l' r' , Universality.uniqueness p' l' r'
 
 open IsPullback public using (⊗-is-Pullback)
