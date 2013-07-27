@@ -2,13 +2,13 @@
 -- Any two pullback objects are isomorphic.
 -- Pullback preservation of functors is also defined.
 
-module Thesis.Prelude.Category.Pullback where
+module Prelude.Category.Pullback where
 
-open import Thesis.Prelude.Category
-open import Thesis.Prelude.Category.Isomorphism
-open import Thesis.Prelude.Category.Isomorphism.Functor
-open import Thesis.Prelude.Category.Slice
-open import Thesis.Prelude.Category.Span
+open import Prelude.Category
+open import Prelude.Category.Isomorphism
+open import Prelude.Category.Isomorphism.Functor
+open import Prelude.Category.Slice
+open import Prelude.Category.Span
 
 open import Level
 open import Function using (_∘_)

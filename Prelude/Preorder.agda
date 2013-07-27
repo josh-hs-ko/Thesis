@@ -1,6 +1,6 @@
 -- Converse of preorders, setoids derived from preorders, implication as a preorder, and indirect reasoning combinators.
 
-module Thesis.Prelude.Preorder where
+module Prelude.Preorder where
 
 open import Relation.Binary using (Preorder; module Preorder; Setoid; module Setoid; module IsEquivalence)
 

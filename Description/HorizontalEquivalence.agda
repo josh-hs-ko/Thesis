@@ -1,8 +1,8 @@
 -- An inductively defined equivalence between description-based data that poses little restriction on their actual types.
 
-module Thesis.Description.HorizontalEquivalence where
+module Description.HorizontalEquivalence where
 
-open import Thesis.Description
+open import Description
 
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_)

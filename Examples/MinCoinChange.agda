@@ -1,29 +1,29 @@
 -- Solving the minimum coin change problem with the Greedy Theorem and algebraic ornamentation.
 
-module Thesis.Examples.MinCoinChange where
+module Examples.MinCoinChange where
 
-open import Thesis.Prelude.Category.Isomorphism
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.InverseImage
-open import Thesis.Prelude.Function.Fam
-open import Thesis.Prelude.Preorder
-open import Thesis.Description
-open import Thesis.Ornament
-open import Thesis.Ornament.SequentialComposition
-open import Thesis.Ornament.ParallelComposition
-open import Thesis.Ornament.ParallelComposition.Swap
-open import Thesis.Ornament.RefinementSemantics
-open import Thesis.Ornament.Algebraic
-open import Thesis.Refinement
-open import Thesis.Relation
-open import Thesis.Relation.CompChain
-open import Thesis.Relation.Fold
-open import Thesis.Relation.Join
-open import Thesis.Relation.Meet
-open import Thesis.Relation.Minimum
-import Thesis.Relation.GreedyTheorem as GreedyTheorem
-open import Thesis.Examples.List
-open import Thesis.Examples.List.Sorted
+open import Prelude.Category.Isomorphism
+open import Prelude.Function
+open import Prelude.InverseImage
+open import Prelude.Function.Fam
+open import Prelude.Preorder
+open import Description
+open import Ornament
+open import Ornament.SequentialComposition
+open import Ornament.ParallelComposition
+open import Ornament.ParallelComposition.Swap
+open import Ornament.RefinementSemantics
+open import Ornament.Algebraic
+open import Refinement
+open import Relation
+open import Relation.CompChain
+open import Relation.Fold
+open import Relation.Join
+open import Relation.Meet
+open import Relation.Minimum
+import Relation.GreedyTheorem as GreedyTheorem
+open import Examples.List
+open import Examples.List.Ordered
 
 open import Function using (id; const; _∘_; flip; _on_)
 open import Data.Empty using (⊥; ⊥-elim)
@@ -111,7 +111,7 @@ view-ordered-coin 5p 5p c≤d = 5p5p
 -- coin bags as sorted coin lists
 
 CoinBagOD : OrnDesc Coin ! ⌊ ListOD Coin ⌋
-CoinBagOD = SListOD Coin (flip _≤C_) (flip ≤-trans)
+CoinBagOD = OrdListOD Coin (flip _≤C_) (flip ≤-trans)
 
 CoinBagD : Desc Coin
 CoinBagD = ⌊ CoinBagOD ⌋

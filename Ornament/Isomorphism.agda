@@ -1,19 +1,19 @@
 -- A sufficient condition for establishing an isomorphism between the two types related by a ornament.
 
-module Thesis.Ornament.Isomorphism where
+module Ornament.Isomorphism where
 
-open import Thesis.Prelude.Equality
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.Category
-import Thesis.Prelude.Category.Isomorphism as Isomorphism; open Isomorphism Fun
-open import Thesis.Prelude.InverseImage
-open import Thesis.Prelude.Product
-open import Thesis.Refinement
-open import Thesis.Refinement.Isomorphism
-open import Thesis.Description
-open import Thesis.Ornament
-open import Thesis.Ornament.ParallelComposition
-open import Thesis.Ornament.RefinementSemantics
+open import Prelude.Equality
+open import Prelude.Function
+open import Prelude.Category
+import Prelude.Category.Isomorphism as Isomorphism; open Isomorphism Fun
+open import Prelude.InverseImage
+open import Prelude.Product
+open import Refinement
+open import Refinement.Isomorphism
+open import Description
+open import Ornament
+open import Ornament.ParallelComposition
+open import Ornament.RefinementSemantics
 
 open import Function using (id; const; _∘_)
 open import Data.Unit using (⊤; tt)

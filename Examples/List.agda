@@ -1,12 +1,12 @@
 -- Cons-lists as an ornamentation of natural numbers.
 
-module Thesis.Examples.List where
+module Examples.List where
 
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.InverseImage
-open import Thesis.Description
-open import Thesis.Ornament
-open import Thesis.Examples.Nat
+open import Prelude.Function
+open import Prelude.InverseImage
+open import Description
+open import Ornament
+open import Examples.Nat
 
 open import Data.Unit using (⊤; tt)
 open import Data.Bool using (Bool; false; true)

@@ -2,13 +2,13 @@
 -- relational inclusion wrapped up as preorder and setoid, combinators for reasoning with relations,
 -- componentwise relations between families of sets, and definition and properties of relators.
 
-module Thesis.Relation where
+module Relation where
 
-open import Thesis.Prelude.Category.Isomorphism
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.Function.Fam
-open import Thesis.Prelude.Preorder
-open import Thesis.Description
+open import Prelude.Category.Isomorphism
+open import Prelude.Function
+open import Prelude.Function.Fam
+open import Prelude.Preorder
+open import Description
 
 open import Function using (id; _∘_; flip; type-signature)
 open import Data.Empty using (⊥)

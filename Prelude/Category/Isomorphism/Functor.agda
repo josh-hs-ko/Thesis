@@ -1,12 +1,12 @@
 -- Isomorphisms are preserved by functors.
 
-open import Thesis.Prelude.Category
+open import Prelude.Category
 open import Level
 
-module Thesis.Prelude.Category.Isomorphism.Functor
+module Prelude.Category.Isomorphism.Functor
   {ℓ₀ ℓ₁ ℓ₂ : Level} {C : Category {ℓ₀} {ℓ₁} {ℓ₂}} {ℓ₃ ℓ₄ ℓ₅ : Level} {D : Category {ℓ₃} {ℓ₄} {ℓ₅}} (F : Functor C D) where
 
-open import Thesis.Prelude.Category.Isomorphism
+open import Prelude.Category.Isomorphism
 
 open import Relation.Binary using (module Setoid)
 import Relation.Binary.EqReasoning as EqReasoning

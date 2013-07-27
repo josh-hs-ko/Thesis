@@ -1,17 +1,17 @@
 -- Definition of hylomorphisms and the Hylomorphism Theorem.
 
-open import Thesis.Description
-open import Thesis.Relation
+open import Description
+open import Relation
 
-module Thesis.Relation.Hylomorphism {I : Set} (D : Desc I) {X Y : I → Set} (R : Ḟ D Y ↝⁺ Y) (S : Ḟ D X ↝⁺ X) where
+module Relation.Hylomorphism {I : Set} (D : Desc I) {X Y : I → Set} (R : Ḟ D Y ↝⁺ Y) (S : Ḟ D X ↝⁺ X) where
 
-open import Thesis.Prelude.Preorder
-open import Thesis.Prelude.Category.Isomorphism
-open import Thesis.Prelude.Function
-open import Thesis.Description
-open import Thesis.Relation.CompChain
-open import Thesis.Relation.Division
-open import Thesis.Relation.Fold
+open import Prelude.Preorder
+open import Prelude.Category.Isomorphism
+open import Prelude.Function
+open import Description
+open import Relation.CompChain
+open import Relation.Division
+open import Relation.Fold
 
 open import Function using (_∘_; flip)
 open import Data.Product using (Σ; _,_; proj₁; proj₂)

@@ -3,10 +3,10 @@
 -- It is proved here that terminal objects are isomorphic.
 -- A predicate saying that a morphism is part of an isomorphism is also provided.
 
-open import Thesis.Prelude.Category
+open import Prelude.Category
 open import Level
 
-module Thesis.Prelude.Category.Isomorphism {ℓ₀ ℓ₁ ℓ₂ : Level} (C : Category {ℓ₀} {ℓ₁} {ℓ₂}) where
+module Prelude.Category.Isomorphism {ℓ₀ ℓ₁ ℓ₂ : Level} (C : Category {ℓ₀} {ℓ₁} {ℓ₂}) where
 
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
 open import Relation.Binary using (Setoid)

@@ -1,11 +1,11 @@
 -- The forgetful functor from a slice category to its underlying category is pullback-preserving.
 
-module Thesis.Prelude.Category.Slice.Functor where
+module Prelude.Category.Slice.Functor where
 
-open import Thesis.Prelude.Category
-open import Thesis.Prelude.Category.Slice
-open import Thesis.Prelude.Category.Span
-open import Thesis.Prelude.Category.Pullback
+open import Prelude.Category
+open import Prelude.Category.Slice
+open import Prelude.Category.Span
+open import Prelude.Category.Pullback
 
 open import Level
 open import Data.Product using (Σ; _,_; proj₁; proj₂)

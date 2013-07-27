@@ -1,13 +1,13 @@
 -- Definition of refinements, swaps, and upgrades.
 
-module Thesis.Refinement where
+module Refinement where
 
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.Function.Fam
-import Thesis.Prelude.Category.Isomorphism as Isomorphism; open Isomorphism Fun
-open import Thesis.Prelude.Product
-open import Thesis.Prelude.InverseImage
-open import Thesis.Prelude.Equality
+open import Prelude.Function
+open import Prelude.Function.Fam
+import Prelude.Category.Isomorphism as Isomorphism; open Isomorphism Fun
+open import Prelude.Product
+open import Prelude.InverseImage
+open import Prelude.Equality
 
 open import Function using (id; _∘_; const)
 open import Data.Unit using (⊤; tt)

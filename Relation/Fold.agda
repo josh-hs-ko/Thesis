@@ -1,13 +1,13 @@
 -- Definition and properties of relational fold.
 
-module Thesis.Relation.Fold where
+module Relation.Fold where
 
-open import Thesis.Prelude.Category.Isomorphism
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.Function.Fam
-open import Thesis.Description
-open import Thesis.Relation
-open import Thesis.Relation.CompChain
+open import Prelude.Category.Isomorphism
+open import Prelude.Function
+open import Prelude.Function.Fam
+open import Description
+open import Relation
+open import Relation.CompChain
 
 open import Function using (id; _∘_)
 open import Data.Unit using (⊤; tt)

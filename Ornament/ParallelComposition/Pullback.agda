@@ -1,24 +1,24 @@
 -- Parallel composition of ornaments, when mapped to `Fam` by the functor `Ind`, forms a pullback.
 -- This file can take a long time to typecheck.
 
-module Thesis.Ornament.ParallelComposition.Pullback where
+module Ornament.ParallelComposition.Pullback where
 
-open import Thesis.Prelude.Category
-open import Thesis.Prelude.Category.Slice
-open import Thesis.Prelude.Category.Span
-open import Thesis.Prelude.Category.Pullback
-open import Thesis.Prelude.Equality
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.Function.Fam
-open import Thesis.Prelude.InverseImage
-open import Thesis.Prelude.Product
-open import Thesis.Description
-open import Thesis.Description.HorizontalEquivalence
-open import Thesis.Ornament
-open import Thesis.Ornament.ParallelComposition
-open import Thesis.Ornament.SequentialComposition
-open import Thesis.Ornament.Equivalence
-open import Thesis.Ornament.Category
+open import Prelude.Category
+open import Prelude.Category.Slice
+open import Prelude.Category.Span
+open import Prelude.Category.Pullback
+open import Prelude.Equality
+open import Prelude.Function
+open import Prelude.Function.Fam
+open import Prelude.InverseImage
+open import Prelude.Product
+open import Description
+open import Description.HorizontalEquivalence
+open import Ornament
+open import Ornament.ParallelComposition
+open import Ornament.SequentialComposition
+open import Ornament.Equivalence
+open import Ornament.Category
 
 open import Function using (id; _∘_)
 open import Data.Unit using (⊤; tt)

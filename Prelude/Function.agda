@@ -2,9 +2,9 @@
 -- The category `Fun` of sets and functions is also defined here.
 -- The unit type is proved to be terminal in `Fun`.
 
-module Thesis.Prelude.Function where
+module Prelude.Function where
 
-open import Thesis.Prelude.Category
+open import Prelude.Category
 
 open import Level
 open import Function using (_∘_; const; type-signature)

@@ -1,14 +1,14 @@
 -- A sufficient condition for establishing an isomorphism between the two types related by a refinement.
 
-module Thesis.Refinement.Isomorphism where
+module Refinement.Isomorphism where
 
-open import Thesis.Prelude.Equality
-open import Thesis.Prelude.Category.Isomorphism
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.Function.Fam
-open import Thesis.Prelude.Function.Isomorphism
-open import Thesis.Prelude.InverseImage
-open import Thesis.Refinement
+open import Prelude.Equality
+open import Prelude.Category.Isomorphism
+open import Prelude.Function
+open import Prelude.Function.Fam
+open import Prelude.Function.Isomorphism
+open import Prelude.InverseImage
+open import Refinement
 
 open import Function using (id; const; _∘_)
 open import Data.Unit using (⊤; tt)

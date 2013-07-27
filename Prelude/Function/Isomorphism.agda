@@ -1,13 +1,13 @@
 -- Various ways to construct isomorphisms in `Fun`.
 
-module Thesis.Prelude.Function.Isomorphism where
+module Prelude.Function.Isomorphism where
 
-open import Thesis.Prelude.Equality
-open import Thesis.Prelude.Category
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.Product
-import Thesis.Prelude.Category.Isomorphism as Isomorphism; open Isomorphism Fun
-open import Thesis.Prelude.InverseImage
+open import Prelude.Equality
+open import Prelude.Category
+open import Prelude.Function
+open import Prelude.Product
+import Prelude.Category.Isomorphism as Isomorphism; open Isomorphism Fun
+open import Prelude.InverseImage
 
 open import Level
 open import Function using (id; _∘_; type-signature)

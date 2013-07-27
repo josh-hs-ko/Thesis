@@ -1,21 +1,21 @@
 -- Definition of (relational) algebraic ornaments and classifying algebras.
 -- The optimised predicate of an algebraic ornament can be swapped for a relational fold with the algebra of the ornament.
 
-module Thesis.Ornament.Algebraic where
+module Ornament.Algebraic where
 
-open import Thesis.Prelude.InverseImage
-open import Thesis.Prelude.Product
-open import Thesis.Prelude.Category.Isomorphism
-open import Thesis.Prelude.Category.Isomorphism.Functor
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.Function.Fam
-open import Thesis.Description
-open import Thesis.Refinement
-open import Thesis.Ornament
-open import Thesis.Ornament.ParallelComposition
-open import Thesis.Ornament.RefinementSemantics
-open import Thesis.Relation
-open import Thesis.Relation.Fold
+open import Prelude.InverseImage
+open import Prelude.Product
+open import Prelude.Category.Isomorphism
+open import Prelude.Category.Isomorphism.Functor
+open import Prelude.Function
+open import Prelude.Function.Fam
+open import Description
+open import Refinement
+open import Ornament
+open import Ornament.ParallelComposition
+open import Ornament.RefinementSemantics
+open import Relation
+open import Relation.Fold
 
 open import Function using (id; type-signature)
 open import Data.Unit using (⊤; tt)

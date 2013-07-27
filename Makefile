@@ -1,4 +1,4 @@
-THESISPATH = ~/Programs
+THESISPATH = ~/Programs/Thesis
 LIBPATH = ~/Programs/Agda/lib/src
 
 all:	doc check

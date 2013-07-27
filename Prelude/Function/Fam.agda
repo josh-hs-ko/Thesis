@@ -4,16 +4,16 @@
 -- namely taking the set-theoretical pullbacks of the index set and corresponding sets in the families.
 -- The forgetful functor from `Fam` to `Fun` preserves this pullback, and is hence pullback-preserving.
 
-module Thesis.Prelude.Function.Fam where
+module Prelude.Function.Fam where
 
-open import Thesis.Prelude.Equality
-open import Thesis.Prelude.Category
-open import Thesis.Prelude.Category.Isomorphism
-open import Thesis.Prelude.Category.Slice
-open import Thesis.Prelude.Category.Span
-open import Thesis.Prelude.Category.Pullback
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.Product
+open import Prelude.Equality
+open import Prelude.Category
+open import Prelude.Category.Isomorphism
+open import Prelude.Category.Slice
+open import Prelude.Category.Span
+open import Prelude.Category.Pullback
+open import Prelude.Function
+open import Prelude.Product
 
 open import Function using (_∘_; type-signature)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; <_,_>) renaming (map to _**_)

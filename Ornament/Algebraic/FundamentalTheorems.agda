@@ -2,21 +2,21 @@
 -- *The AOCA Theorem:* Algebraic ornamentation by a classifying algebra produces an isomorphic datatype.
 -- *The CAAO Theorem:* A classifying algebra derived from an algebraic ornament is isomorphic to the algebra of the ornament.
 
-module Thesis.Ornament.Algebraic.FundamentalTheorems where
+module Ornament.Algebraic.FundamentalTheorems where
 
-open import Thesis.Prelude.Equality
-open import Thesis.Prelude.Category.Isomorphism
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.Function.Fam
-open import Thesis.Prelude.Product
-open import Thesis.Prelude.InverseImage
-open import Thesis.Description
-open import Thesis.Ornament
-open import Thesis.Ornament.RefinementSemantics
-open import Thesis.Ornament.Isomorphism
-open import Thesis.Ornament.Algebraic
-open import Thesis.Relation
-open import Thesis.Relation.Fold
+open import Prelude.Equality
+open import Prelude.Category.Isomorphism
+open import Prelude.Function
+open import Prelude.Function.Fam
+open import Prelude.Product
+open import Prelude.InverseImage
+open import Description
+open import Ornament
+open import Ornament.RefinementSemantics
+open import Ornament.Isomorphism
+open import Ornament.Algebraic
+open import Relation
+open import Relation.Fold
 
 open import Function using (const; _∘_)
 open import Data.Unit using (⊤; tt)

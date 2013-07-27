@@ -1,29 +1,29 @@
 -- Definition of an optimised predicate for an ornament as the parallel composition of the ornament and the singleton ornament.
 -- This construction gives a functor from `Orn` to `FRef` which produces more representation-efficient promotion predicates.
 
-module Thesis.Ornament.RefinementSemantics where
+module Ornament.RefinementSemantics where
 
-open import Thesis.Prelude.Equality
-open import Thesis.Prelude.Category
-open import Thesis.Prelude.Category.Isomorphism
-open import Thesis.Prelude.Category.Slice
-open import Thesis.Prelude.Category.Span
-open import Thesis.Prelude.Category.Pullback
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.Function.Fam hiding (compIso)
-open import Thesis.Prelude.Function.Isomorphism
-open import Thesis.Prelude.Product
-open import Thesis.Prelude.InverseImage
-open import Thesis.Refinement
-open import Thesis.Refinement.Category
-open import Thesis.Description
-open import Thesis.Description.HorizontalEquivalence
-open import Thesis.Ornament
-open import Thesis.Ornament.Category
-open import Thesis.Ornament.Equivalence
-open import Thesis.Ornament.SequentialComposition
-open import Thesis.Ornament.ParallelComposition
-open import Thesis.Ornament.ParallelComposition.Pullback
+open import Prelude.Equality
+open import Prelude.Category
+open import Prelude.Category.Isomorphism
+open import Prelude.Category.Slice
+open import Prelude.Category.Span
+open import Prelude.Category.Pullback
+open import Prelude.Function
+open import Prelude.Function.Fam hiding (compIso)
+open import Prelude.Function.Isomorphism
+open import Prelude.Product
+open import Prelude.InverseImage
+open import Refinement
+open import Refinement.Category
+open import Description
+open import Description.HorizontalEquivalence
+open import Ornament
+open import Ornament.Category
+open import Ornament.Equivalence
+open import Ornament.SequentialComposition
+open import Ornament.ParallelComposition
+open import Ornament.ParallelComposition.Pullback
 
 open import Function using (id; _∘_)
 open import Data.Product using (Σ; proj₁; proj₂; _,_; _×_; <_,_>) renaming (map to _**_)

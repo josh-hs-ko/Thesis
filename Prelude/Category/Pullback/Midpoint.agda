@@ -2,20 +2,20 @@
 -- Let X, Y, Z be objects of a category C, and X × Y, X × Z, Y × Z, and (X × Y) × Z be products.
 -- Then (X × Y) × Z is a pullback of the projections X × Z → Z and Y × Z → Z.
 
-open import Thesis.Prelude.Category
-open import Thesis.Prelude.Category.Slice
-open import Thesis.Prelude.Category.Span
+open import Prelude.Category
+open import Prelude.Category.Slice
+open import Prelude.Category.Span
 open import Level
 
-module Thesis.Prelude.Category.Pullback.Midpoint
+module Prelude.Category.Pullback.Midpoint
   {ℓ₀ ℓ₁ ℓ₂ : Level} (C : Category {ℓ₀} {ℓ₁} {ℓ₂}) (X Y Z : Category.Object C)
   (X×Y : Span C X Y) (X×Y-is-Terminal : Terminal (SpanCategory C X Y) X×Y)
   (X×Z : Span C X Z) (X×Z-is-Terminal : Terminal (SpanCategory C X Z) X×Z) 
   (Y×Z : Span C Y Z) (Y×Z-is-Terminal : Terminal (SpanCategory C Y Z) Y×Z)
   (X×Y×Z : Span C (Span.M X×Y) Z) (X×Y×Z-is-Terminal : Terminal (SpanCategory C (Span.M X×Y) Z) X×Y×Z) where
 
-open import Thesis.Prelude.Equality
-open import Thesis.Prelude.Category.Pullback
+open import Prelude.Equality
+open import Prelude.Category.Pullback
 
 open import Data.Product using (Σ; _,_; proj₁; proj₂)
 open import Relation.Binary using (module Setoid)
