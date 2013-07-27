@@ -45,4 +45,3 @@ import Examples.List
 import Examples.List.Ordered
 import Examples.MinCoinChange
 import Examples.Nat
-import Examples.Nat.TotalOrdering

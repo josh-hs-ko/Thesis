@@ -174,6 +174,3 @@ Solving the minimum coin change problem with the Greedy Theorem and algebraic or
 
 #### Examples.Nat
 Peano-style natural numbers.
-
-#### Examples.Nat.TotalOrdering
-Decidable total ordering on natural numbers and minimum.

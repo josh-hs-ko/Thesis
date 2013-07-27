@@ -5,7 +5,6 @@ module Examples.Nat where
 open import Description
 
 open import Data.Unit using (⊤; tt)
-open import Data.Bool using (Bool; false; true)
 open import Data.Nat using (ℕ) renaming (zero to zeroℕ; suc to sucℕ)
 open import Data.Product using (Σ; _,_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; _≢_; cong; sym; trans)
@@ -14,42 +13,46 @@ open import Relation.Binary.PropositionalEquality using (_≡_; refl; _≢_; con
 --------
 -- natural numbers
 
+data LTag : Set where
+  `nil  : LTag
+  `cons : LTag
+
 NatD : Desc ⊤
-NatD = wrap λ _ → σ Bool λ { false → ∎
-                           ; true  → ṿ tt }
+NatD = wrap λ _ → σ LTag λ { `nil  → ∎
+                           ; `cons → ṿ tt }
 
 Nat : Set
 Nat = μ NatD tt
 
 zero : Nat
-zero = con (false , tt)
+zero = con (`nil , tt)
 
 suc : Nat → Nat
-suc n = con (true , n)
+suc n = con (`cons , n)
 
 toℕ : Nat → ℕ
-toℕ (con (false , _)) = zeroℕ
-toℕ (con (true  , n)) = sucℕ (toℕ n)
+toℕ (con (`nil  , _)) = zeroℕ
+toℕ (con (`cons , n)) = sucℕ (toℕ n)
 
 suc≢zero : ∀ {n} → suc n ≢ zero
 suc≢zero ()
 
 _+_ : Nat → Nat → Nat
-con (false , _) + y = y
-con (true  , x) + y = suc (x + y)
+con (`nil  , _) + y = y
+con (`cons , x) + y = suc (x + y)
 
 rhs-zero : ∀ x → x + zero ≡ x
-rhs-zero (con (false , _)) = refl
-rhs-zero (con (true  , x)) = cong suc (rhs-zero x)
+rhs-zero (con (`nil  , _)) = refl
+rhs-zero (con (`cons , x)) = cong suc (rhs-zero x)
 
 rhs-suc : ∀ x y → x + suc y ≡ suc (x + y)
-rhs-suc (con (false , _)) y = refl
-rhs-suc (con (true  , x)) y = cong suc (rhs-suc x y)
+rhs-suc (con (`nil  , _)) y = refl
+rhs-suc (con (`cons , x)) y = cong suc (rhs-suc x y)
 
 comm : ∀ x y → x + y ≡ y + x
-comm (con (false , _)) y = sym (rhs-zero y)
-comm (con (true  , x)) y = trans (cong suc (comm x y)) (sym (rhs-suc y x))
+comm (con (`nil  , _)) y = sym (rhs-zero y)
+comm (con (`cons , x)) y = trans (cong suc (comm x y)) (sym (rhs-suc y x))
 
 assoc : ∀ x y z → (x + y) + z ≡ x + (y + z)
-assoc (con (false , _)) y z = refl
-assoc (con (true  , x)) y z = cong suc (assoc x y z)
+assoc (con (`nil  , _)) y z = refl
+assoc (con (`cons , x)) y z = cong suc (assoc x y z)
