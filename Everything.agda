@@ -38,7 +38,6 @@ import Relation.Division
 import Relation.Fold
 import Relation.GreedyTheorem
 import Relation.Hylomorphism
-import Relation.Join
 import Relation.Meet
 import Relation.Minimum
 import Examples.List

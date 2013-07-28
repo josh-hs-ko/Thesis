@@ -154,9 +154,6 @@ A variant of the Greedy Theorem and its embedding into inductive families.
 #### Relation.Hylomorphism
 Definition of hylomorphisms and the Hylomorphism Theorem.
 
-#### Relation.Join
-Definition and properties of binary join and its componentwise version, and definition of summing join (kept for future work).
-
 #### Relation.Meet
 Definition of meet and its componentwise version.
 

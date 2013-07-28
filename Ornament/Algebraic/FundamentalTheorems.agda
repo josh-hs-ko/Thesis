@@ -84,7 +84,7 @@ AOCA-theorem {e = e} O =
 --------
 -- classifying algebra derived from an algebraic ornament is isomorphic to the algebra of the ornament
 
-module CAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝⁺ J) where
+module CAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝ J) where
 
   h : J ⇉ _⁻¹_ proj₁
   h {i} = ok ∘ _,_ i
@@ -102,15 +102,15 @@ module CAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝⁺ J) where
   CAAO-theorem-aux-unique (D * E) (js , ks) (js' , ks') (p , p')   = cong₂ _,_ (CAAO-theorem-aux-unique D js js' p)
                                                                                (CAAO-theorem-aux-unique E ks ks' p')
 
-  CAAO-theorem : fun⁺ h •⁺ R ≃⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ h)
+  CAAO-theorem : fun h • R ≃ clsAlg ⌈ algOrn D R ⌉ • Ṙ D (fun h)
   CAAO-theorem =
     wrap (λ i → wrap λ { js ._ (j , r , refl) →
-                         Ḟ-map D h js , mapR-fun-computation (D at i) h js , js , r , CAAO-theorem-aux-computation (D at i) js }) ,
+                         Ḟ-map D h js , mapR-fun⁻-computation (D at i) h js , js , r , CAAO-theorem-aux-computation (D at i) js }) ,
     wrap (λ i → wrap λ { js ij (ijs , rs , q) → aux js ij ijs rs q })
     where
-      aux : ∀ {i} (js : Ḟ D J i) (ij : proj₁ {B = J} ⁻¹ i) (ijs : Ḟ D (_⁻¹_ proj₁) i) (rs : mapR (D at i) (fun⁺ h) js ijs) →
-            (q : (clsAlg ⌈ algOrn D R ⌉ !!) i ijs ij) → ((fun⁺ h •⁺ R) !!) i js ij
-      aux js (ok (i , j)) ijs rs (js' , r , p) with mapR-fun-unique (D at i) h js ijs rs
+      aux : ∀ {i} (js : Ḟ D J i) (ij : proj₁ {B = J} ⁻¹ i) (ijs : Ḟ D (_⁻¹_ proj₁) i) (rs : mapR (D at i) (fun h) js ijs) →
+            (q : (clsAlg ⌈ algOrn D R ⌉ !!) i ijs ij) → ((fun h • R) !!) i js ij
+      aux js (ok (i , j)) ijs rs (js' , r , p) with mapR-fun⁻-unique (D at i) h js ijs rs
       aux js (ok (i , j)) ._  rs (js' , r , p) | refl with CAAO-theorem-aux-unique (D at i) js js' p
       aux js (ok (i , j)) ._  rs (.js , r , p) | refl | refl = j , r , refl
 

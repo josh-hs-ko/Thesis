@@ -28,10 +28,10 @@ open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅) rena
 --------
 -- algebraic ornaments
 
-algOrn : ∀ {I} (D : Desc I) → ∀ {J} → (Ḟ D J ↝⁺ J) → OrnDesc (Σ I J) proj₁ D
+algOrn : ∀ {I} (D : Desc I) → ∀ {J} → (Ḟ D J ↝ J) → OrnDesc (Σ I J) proj₁ D
 algOrn D {J} R = wrap λ { {._} (ok (i , j)) → Δ[ js ∶ Ḟ D J i ] Δ[ r ∶ (R !!) i js j ] erode (D at i) js }
 
-algOrn-iso : ∀ {I} (D : Desc I) → ∀ {J} (R : Ḟ D J ↝⁺ J) →
+algOrn-iso : ∀ {I} (D : Desc I) → ∀ {J} (R : Ḟ D J ↝ J) →
              ∀ {i} (x : μ D i) → ∀ {j} → Iso Fun (OptP ⌈ algOrn D R ⌉ (ok (i , j)) x) (foldR' R i x j)
 algOrn-iso {I} D {J} R =
   induction D (λ {i} x → ∀ {j} → Iso Fun (OptP ⌈ algOrn D R ⌉ (ok (i , j)) x) (foldR' R i x j))
@@ -97,7 +97,7 @@ algOrn-iso {I} D {J} R =
                                                     (proj₁ (proj₂ (proj₂ (proj₂ p)))) (proj₂ (proj₂ (proj₂ (proj₂ p))))
                 ; from-to-inverse = frefl })
    
-algOrn-FSwap : ∀ {I} (D : Desc I) → ∀ {J} (R : Ḟ D J ↝⁺ J) → FSwap (RSem' ⌈ algOrn D R ⌉)
+algOrn-FSwap : ∀ {I} (D : Desc I) → ∀ {J} (R : Ḟ D J ↝ J) → FSwap (RSem' ⌈ algOrn D R ⌉)
 algOrn-FSwap D R = wrap λ { {._} (ok (i , j)) → record { Q = λ x → foldR' R i x j; s = λ x → algOrn-iso D R x } }
 
 
@@ -118,5 +118,5 @@ mutual
            ∀ {s} → ROrn e (D s) E → ∀ {s'} → ⟦ D s' ⟧ (_⁻¹_ e) → s ≡ s' → Set
   clsP-∇ O js refl = clsP O js
 
-clsAlg : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → Ḟ D (_⁻¹_ e) ↝⁺ (_⁻¹_ e)
+clsAlg : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → Ḟ D (_⁻¹_ e) ↝ (_⁻¹_ e)
 clsAlg (wrap O) = wrap λ i js j → clsP (O j) js
