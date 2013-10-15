@@ -57,10 +57,13 @@ BHeapOD = wrap λ { {._} (ok r) → σ BinTag λ { `nil  → ṿ tt
 BHeap : ℕ → Set
 BHeap = μ ⌊ BHeapOD ⌋
 
+BHeap' : ℕ → Bin → Set
+BHeap' r b = OptP ⌈ BHeapOD ⌉ (ok r) b
+
 incr-insT : Upgrade (Bin → Bin) ({r : ℕ} → BTree r → BHeap r → BHeap r)
 incr-insT = ∀⁺[[ r ∶ ℕ ]] ∀⁺[ _ ∶ BTree r ] let ref = FRefinement.comp (RSem' ⌈ BHeapOD ⌉) (ok r) in ref ⇀ toUpgrade ref
 
-insT' : Upgrade.P incr-insT incr
+insT' : {r : ℕ} → BTree r → (b : Bin) → BHeap' r b → BHeap' r (incr b)  -- Upgrade.P incr-insT incr
 insT' t (con (`nil  , _    )) h'                 = con (t , con tt , tt)
 insT' t (con (`zero , b , _)) (con (    h' , _)) = con (t , h' , tt)
 insT' t (con (`one  , b , _)) (con (u , h' , _)) = con (insT' (link t u) b h' , tt)
@@ -68,7 +71,8 @@ insT' t (con (`one  , b , _)) (con (u , h' , _)) = con (insT' (link t u) b h' , 
 insT : {r : ℕ} → BTree r → BHeap r → BHeap r
 insT = Upgrade.u incr-insT incr insT'
 
-coherence-proof : {r : ℕ} (t : BTree r) (b : Bin) (h : BHeap r) → forget ⌈ BHeapOD ⌉ h ≡ b → forget ⌈ BHeapOD ⌉ (insT t h) ≡ incr b
+coherence-proof : {r : ℕ} (t : BTree r) (b : Bin) (h : BHeap r) →
+                  forget ⌈ BHeapOD ⌉ h ≡ b → forget ⌈ BHeapOD ⌉ (insT t h) ≡ incr b  -- Upgrade.C incr-insT incr insT
 coherence-proof = Upgrade.c incr-insT incr insT'
 
 insert : Val → BHeap 0 → BHeap 0
