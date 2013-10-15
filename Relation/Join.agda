@@ -1,9 +1,9 @@
 -- Definition and properties of binary join and its componentwise version, and definition of summing join (kept for future work).
 
-module Thesis.Relation.Join where
+module Relation.Join where
 
-open import Thesis.Prelude.Preorder
-open import Thesis.Relation
+open import Prelude.Preorder
+open import Relation
 
 open import Function using (id; _∘_)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)

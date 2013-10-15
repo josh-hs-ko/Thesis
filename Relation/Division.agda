@@ -1,8 +1,8 @@
 -- Definition of right-division of componentwise relations.
 
-module Thesis.Relation.Division where
+module Relation.Division where
 
-open import Thesis.Relation
+open import Relation
 
 open import Data.Product using (Σ; _,_)
 

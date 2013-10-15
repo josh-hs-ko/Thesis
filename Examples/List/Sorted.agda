@@ -1,13 +1,13 @@
 -- Sorted lists indexed by a lower bound as an ornamentation of lists.
 
-module Thesis.Examples.List.Sorted (Val : Set) (_≤_ : Val → Val → Set) (≤-trans : ∀ {x y z} → x ≤ y → y ≤ z → x ≤ z) where
+module Examples.List.Sorted (Val : Set) (_≤_ : Val → Val → Set) (≤-trans : ∀ {x y z} → x ≤ y → y ≤ z → x ≤ z) where
 
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.InverseImage
-open import Thesis.Description
-open import Thesis.Ornament
-open import Thesis.Ornament.RefinementSemantics
-open import Thesis.Examples.List
+open import Prelude.Function
+open import Prelude.InverseImage
+open import Description
+open import Ornament
+open import Ornament.RefinementSemantics
+open import Examples.List
 
 open import Data.Unit using (⊤; tt)
 open import Data.Bool using (Bool; false; true)

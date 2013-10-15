@@ -1,16 +1,16 @@
 -- Ornamental equivalences about horizontal ornaments.
 
-module Thesis.Ornament.Horizontal.Equivalence where
+module Ornament.Horizontal.Equivalence where
 
-open import Thesis.Prelude.Category.Isomorphism
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.InverseImage
-open import Thesis.Description
-open import Thesis.Description.Horizontal
-open import Thesis.Ornament
-open import Thesis.Ornament.SequentialComposition
-open import Thesis.Ornament.Horizontal
-open import Thesis.Ornament.Equivalence
+open import Prelude.Category.Isomorphism
+open import Prelude.Function
+open import Prelude.InverseImage
+open import Description
+open import Description.Horizontal
+open import Ornament
+open import Ornament.SequentialComposition
+open import Ornament.Horizontal
+open import Ornament.Equivalence
 
 open import Function using (const)
 open import Data.Unit using (⊤; tt)

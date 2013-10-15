@@ -1,10 +1,10 @@
 -- Auxiliary operations for dependent pairs.
 
-module Thesis.Prelude.Product where
+module Prelude.Product where
 
-open import Thesis.Prelude.Function
-import Thesis.Prelude.Category.Isomorphism as Isomorphism; open Isomorphism Fun
-open import Thesis.Prelude.Equality
+open import Prelude.Function
+import Prelude.Category.Isomorphism as Isomorphism; open Isomorphism Fun
+open import Prelude.Equality
 
 open import Function using (_∘_; type-signature)
 open import Data.Product using (Σ; _,_; _×_; curry) renaming (map to _**_)

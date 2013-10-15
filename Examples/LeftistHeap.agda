@@ -3,7 +3,7 @@
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_) renaming (map to _**_)
 open import Relation.Nullary using (¬_; Dec; yes; no)
 
-module Thesis.Examples.LeftistHeap
+module Examples.LeftistHeap
   (Val : Set) (_≤_ : Val → Val → Set)
     (≤-refl : ∀ {x} → x ≤ x)
     (≤-trans : ∀ {x y z} → x ≤ y → y ≤ z → x ≤ z)
@@ -13,17 +13,17 @@ module Thesis.Examples.LeftistHeap
     (⊓-universal-⇒ : ∀ z x y → z ≤ (x ⊓ y) → z ≤ x  ×  z ≤ y)
     (⊓-universal-⇐ : ∀ {z x y} → z ≤ x → z ≤ y → z ≤ (x ⊓ y)) where
 
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.InverseImage
-open import Thesis.Refinement
-open import Thesis.Description
-open import Thesis.Ornament
-open import Thesis.Ornament.ParallelComposition
-open import Thesis.Ornament.RefinementSemantics
-open import Thesis.Ornament.ParallelComposition.Swap
-open import Thesis.Examples.Nat
-open import Thesis.Examples.Nat.TotalOrdering renaming (_≤_ to _≤'_; ≤-refl to ≤'-refl; _≤?_ to _≤'?_; ≰-invert to ≰'-invert)
-open import Thesis.Examples.List
+open import Prelude.Function
+open import Prelude.InverseImage
+open import Refinement
+open import Description
+open import Ornament
+open import Ornament.ParallelComposition
+open import Ornament.RefinementSemantics
+open import Ornament.ParallelComposition.Swap
+open import Examples.Nat
+open import Examples.Nat.TotalOrdering renaming (_≤_ to _≤'_; ≤-refl to ≤'-refl; _≤?_ to _≤'?_; ≰-invert to ≰'-invert)
+open import Examples.List
 
 open import Function using (id; _∘_)
 open import Data.Unit using (⊤; tt)

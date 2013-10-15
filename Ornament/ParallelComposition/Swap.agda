@@ -2,29 +2,29 @@
 -- for the pointwise conjunction of the optimised predicates for the two component ornaments.
 -- This file can take a long time to typecheck and may require a larger stack size.
 
-open import Thesis.Ornament
+open import Ornament
 
-module Thesis.Ornament.ParallelComposition.Swap {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P : Orn f D F) where
+module Ornament.ParallelComposition.Swap {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P : Orn f D F) where
 
-open import Thesis.Prelude.Equality
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.Function.Fam
-open import Thesis.Prelude.Function.Isomorphism hiding (compIso)
-open import Thesis.Prelude.Product
-open import Thesis.Prelude.Category
-open import Thesis.Prelude.Category.Isomorphism
-open import Thesis.Prelude.Category.Slice
-open import Thesis.Prelude.Category.Slice.Functor
-open import Thesis.Prelude.Category.Span
-open import Thesis.Prelude.Category.Pullback
-open import Thesis.Prelude.Category.Pullback.Midpoint
-open import Thesis.Prelude.InverseImage
-open import Thesis.Refinement
-open import Thesis.Description
-open import Thesis.Ornament.Category
-open import Thesis.Ornament.ParallelComposition
-open import Thesis.Ornament.ParallelComposition.Pullback
-open import Thesis.Ornament.RefinementSemantics
+open import Prelude.Equality
+open import Prelude.Function
+open import Prelude.Function.Fam
+open import Prelude.Function.Isomorphism hiding (compIso)
+open import Prelude.Product
+open import Prelude.Category
+open import Prelude.Category.Isomorphism
+open import Prelude.Category.Slice
+open import Prelude.Category.Slice.Functor
+open import Prelude.Category.Span
+open import Prelude.Category.Pullback
+open import Prelude.Category.Pullback.Midpoint
+open import Prelude.InverseImage
+open import Refinement
+open import Description
+open import Ornament.Category
+open import Ornament.ParallelComposition
+open import Ornament.ParallelComposition.Pullback
+open import Ornament.RefinementSemantics
 
 open import Function using (id; _∘_)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; <_,_>; uncurry) renaming (map to _**_)

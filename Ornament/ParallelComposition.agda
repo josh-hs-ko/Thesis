@@ -1,10 +1,10 @@
 -- Parallel composition of ornaments.
 
-module Thesis.Ornament.ParallelComposition where
+module Ornament.ParallelComposition where
 
-open import Thesis.Prelude.InverseImage
-open import Thesis.Description
-open import Thesis.Ornament
+open import Prelude.InverseImage
+open import Description
+open import Ornament
 
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_)

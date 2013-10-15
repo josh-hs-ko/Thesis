@@ -1,13 +1,13 @@
 -- Families of refinements form a category `FRef`.
 
-module Thesis.Refinement.Category where
+module Refinement.Category where
 
-open import Thesis.Prelude.Category
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.Function.Fam
-open import Thesis.Prelude.InverseImage
-open import Thesis.Prelude.Product
-open import Thesis.Refinement
+open import Prelude.Category
+open import Prelude.Function
+open import Prelude.Function.Fam
+open import Prelude.InverseImage
+open import Prelude.Product
+open import Refinement
 
 open import Function using (_∘_)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; <_,_>)

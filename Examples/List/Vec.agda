@@ -1,16 +1,16 @@
 -- Vectors, i.e., length-indexed lists, defined as the optimised predicate for the ornament from natural numbers to lists.
 
-module Thesis.Examples.List.Vec where
+module Examples.List.Vec where
 
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.InverseImage
-open import Thesis.Prelude.Product
-open import Thesis.Refinement
-open import Thesis.Description
-open import Thesis.Ornament
-open import Thesis.Ornament.RefinementSemantics
-open import Thesis.Examples.Nat
-open import Thesis.Examples.List
+open import Prelude.Function
+open import Prelude.InverseImage
+open import Prelude.Product
+open import Refinement
+open import Description
+open import Ornament
+open import Ornament.RefinementSemantics
+open import Examples.Nat
+open import Examples.List
 
 open import Function using (_∘_)
 open import Data.Unit using (⊤; tt)

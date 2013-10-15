@@ -1,12 +1,12 @@
 -- Definition of span categories. Products and product preservation are also defined here.
 
-module Thesis.Prelude.Category.Span where
+module Prelude.Category.Span where
 
-open import Thesis.Prelude.Equality
-open import Thesis.Prelude.Category
-open import Thesis.Prelude.Category.Isomorphism
-open import Thesis.Prelude.Category.Isomorphism.Functor
-open import Thesis.Prelude.Category.Slice
+open import Prelude.Equality
+open import Prelude.Category
+open import Prelude.Category.Isomorphism
+open import Prelude.Category.Isomorphism.Functor
+open import Prelude.Category.Slice
 
 open import Level
 open import Function using (_∘_)

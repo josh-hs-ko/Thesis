@@ -1,32 +1,32 @@
 -- Let `D : Desc I` be a description.
 -- The category of relational `D`-algebras and the slice category of ornaments over `D` are equivalent.
 
-module Thesis.Ornament.Algebraic.EquivalenceTheorem where
+module Ornament.Algebraic.EquivalenceTheorem where
 
-open import Thesis.Prelude.Equality
-open import Thesis.Prelude.Category.Isomorphism
-open import Thesis.Prelude.Category.WCat
-open import Thesis.Prelude.Category.Slice
-open import Thesis.Prelude.Preorder
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.Function.Fam
-open import Thesis.Prelude.Product
-open import Thesis.Prelude.InverseImage
-open import Thesis.Description
-open import Thesis.Description.Horizontal
-open import Thesis.Ornament
-open import Thesis.Ornament.Category
-open import Thesis.Ornament.SequentialComposition
-open import Thesis.Ornament.ParallelComposition
-open import Thesis.Ornament.Equivalence
-open import Thesis.Ornament.Horizontal
-open import Thesis.Ornament.Horizontal.Equivalence
-open import Thesis.Ornament.RefinementSemantics
-open import Thesis.Ornament.Algebraic
-open import Thesis.Relation
-open import Thesis.Relation.CompChain
-open import Thesis.Relation.Fold
-open import Thesis.Relation.AlgCategory
+open import Prelude.Equality
+open import Prelude.Category.Isomorphism
+open import Prelude.Category.WCat
+open import Prelude.Category.Slice
+open import Prelude.Preorder
+open import Prelude.Function
+open import Prelude.Function.Fam
+open import Prelude.Product
+open import Prelude.InverseImage
+open import Description
+open import Description.Horizontal
+open import Ornament
+open import Ornament.Category
+open import Ornament.SequentialComposition
+open import Ornament.ParallelComposition
+open import Ornament.Equivalence
+open import Ornament.Horizontal
+open import Ornament.Horizontal.Equivalence
+open import Ornament.RefinementSemantics
+open import Ornament.Algebraic
+open import Relation
+open import Relation.CompChain
+open import Relation.Fold
+open import Relation.AlgCategory
 
 open import Function using (id; const; flip; _∘_)
 open import Data.Unit using (⊤; tt)

@@ -1,13 +1,13 @@
 -- Definition of inverse images of a function, and definition of set-theoretic pullbacks in terms of inverse images.
 
-module Thesis.Prelude.InverseImage where
+module Prelude.InverseImage where
 
-open import Thesis.Prelude.Category
-open import Thesis.Prelude.Category.Isomorphism
-open import Thesis.Prelude.Category.Slice
-open import Thesis.Prelude.Category.Span
-open import Thesis.Prelude.Category.Pullback
-open import Thesis.Prelude.Function
+open import Prelude.Category
+open import Prelude.Category.Isomorphism
+open import Prelude.Category.Slice
+open import Prelude.Category.Span
+open import Prelude.Category.Pullback
+open import Prelude.Function
 
 open import Function using (_∘_; type-signature)
 open import Data.Product using (Σ; _,_)

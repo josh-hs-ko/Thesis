@@ -1,8 +1,8 @@
 -- Peano-style natural numbers.
 
-module Thesis.Examples.Nat where
+module Examples.Nat where
 
-open import Thesis.Description
+open import Description
 
 open import Data.Unit using (⊤; tt)
 open import Data.Bool using (Bool; false; true)

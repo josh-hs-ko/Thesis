@@ -1,10 +1,10 @@
 -- Combinators that help avoiding explicit applications of monotonicity and associativity of relational composition
 -- and preservation of composition by relators and converse.
 
-module Thesis.Relation.CompChain where
+module Relation.CompChain where
 
-open import Thesis.Description
-open import Thesis.Relation
+open import Description
+open import Relation
 
 import Relation.Binary.PreorderReasoning as PreorderReasoning
 open import Data.Product using (Σ; _,_; proj₁; proj₂)

@@ -2,14 +2,14 @@
 -- Ornamental descriptions are provided for constructing new descriptions from old ones such that ornaments can be automatically derived.
 -- Singleton ornaments are also defined, which create as many singleton types as there are elements of the base type.
 
-module Thesis.Ornament where
+module Ornament where
 
-open import Thesis.Prelude.Equality
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.InverseImage
-open import Thesis.Prelude.Function.Fam
-open import Thesis.Description
-open import Thesis.Description.Horizontal
+open import Prelude.Equality
+open import Prelude.Function
+open import Prelude.InverseImage
+open import Prelude.Function.Fam
+open import Description
+open import Description.Horizontal
 
 open import Function using (id; const; _∘_)
 open import Data.Unit using (⊤; tt)

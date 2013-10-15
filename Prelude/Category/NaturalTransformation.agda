@@ -1,9 +1,9 @@
 -- If each of the components of a natural transformation from `F` to `G` is part of an isomorphism, then `F` and `G` are naturally isomorphic.
 
-module Thesis.Prelude.Category.NaturalTransformation where
+module Prelude.Category.NaturalTransformation where
 
-open import Thesis.Prelude.Category
-open import Thesis.Prelude.Category.Isomorphism
+open import Prelude.Category
+open import Prelude.Category.Isomorphism
 
 open import Level
 open import Data.Product using (Σ; _,_)

@@ -1,17 +1,17 @@
 -- Fold fusion theorems for algebraic ornamentation.
 
-module Thesis.Ornament.Algebraic.Fusion where
+module Ornament.Algebraic.Fusion where
 
 
-open import Thesis.Prelude.Function
-import Thesis.Prelude.Category.Isomorphism as Isomorphism; open Isomorphism Fun
-open import Thesis.Prelude.InverseImage
-open import Thesis.Description
-open import Thesis.Ornament
-open import Thesis.Ornament.Algebraic
-open import Thesis.Refinement
-open import Thesis.Relation
-open import Thesis.Relation.Fold
+open import Prelude.Function
+import Prelude.Category.Isomorphism as Isomorphism; open Isomorphism Fun
+open import Prelude.InverseImage
+open import Description
+open import Ornament
+open import Ornament.Algebraic
+open import Refinement
+open import Relation
+open import Relation.Fold
 
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
 

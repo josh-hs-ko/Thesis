@@ -1,13 +1,13 @@
 -- Definition of refinements, swaps, and upgrades.
 
-module Thesis.Refinement where
+module Refinement where
 
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.Function.Fam
-import Thesis.Prelude.Category.Isomorphism as Isomorphism; open Isomorphism Fun
-open import Thesis.Prelude.Product
-open import Thesis.Prelude.InverseImage
-open import Thesis.Prelude.Equality
+open import Prelude.Function
+open import Prelude.Function.Fam
+import Prelude.Category.Isomorphism as Isomorphism; open Isomorphism Fun
+open import Prelude.Product
+open import Prelude.InverseImage
+open import Prelude.Equality
 
 open import Function using (id; _∘_; const)
 open import Data.Unit using (⊤; tt)
@@ -210,7 +210,7 @@ _′⇀_ : {I J : Set} {X : I → Set} {Y : J → Set} →
      (r : Refinement I J) → (∀ i j → Upgrade.C (toUpgrade r) i j → Upgrade (X i) (Y j)) → Upgrade ((i : I) → X i) ((j : J) → Y j)
 r ′⇀ s = record { P = λ f → ∀ i j → (c : Upgrade.C (toUpgrade r) i j) → Upgrade.P (s i j c) (f i)
                 ; C = λ f g → ∀ i j → (c : Upgrade.C (toUpgrade r) i j) → Upgrade.C (s i j c) (f i) (g j)
-                ; u = λ f h j → let i = proj₁ (Iso.to (Refinement.i r) j)
+                ; u = λ f h j → let i = Refinement.forget r j
                                 in  Upgrade.u (s i j refl) (f i) (h i j refl)
-                ; c = λ { f h ._ j refl → let i = proj₁ (Iso.to (Refinement.i r) j)
+                ; c = λ { f h ._ j refl → let i = Refinement.forget r j
                                           in  Upgrade.c (s i j refl) (f i) (h i j refl) } }

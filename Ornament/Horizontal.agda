@@ -1,15 +1,15 @@
 -- Horizontal transformations, i.e., shape-altering morphisms between horizontal data (cf. container morphisms).
 -- Ornaments can be derived from horizontal transformations.
 
-module Thesis.Ornament.Horizontal where
+module Ornament.Horizontal where
 
-open import Thesis.Prelude.Category.Isomorphism
-open import Thesis.Prelude.InverseImage
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.Product
-open import Thesis.Description
-open import Thesis.Description.Horizontal
-open import Thesis.Ornament
+open import Prelude.Category.Isomorphism
+open import Prelude.InverseImage
+open import Prelude.Function
+open import Prelude.Product
+open import Description
+open import Description.Horizontal
+open import Ornament
 
 open import Function using (id; const; _∘_)
 open import Data.Unit using (⊤; tt)

@@ -1,10 +1,10 @@
 -- "Weak" category of categories, in which morphisms (i.e., functors) are considered equal if they are naturally isomorphic.
 -- An equivalence of categories is an isomorphism in this weak category of categories.
 
-module Thesis.Prelude.Category.WCat where
+module Prelude.Category.WCat where
 
-open import Thesis.Prelude.Category
-open import Thesis.Prelude.Category.Isomorphism
+open import Prelude.Category
+open import Prelude.Category.Isomorphism
 
 open import Level
 open import Relation.Binary using (module Setoid)

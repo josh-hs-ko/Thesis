@@ -1,9 +1,9 @@
 -- Definition of slice categories.
 
-module Thesis.Prelude.Category.Slice where
+module Prelude.Category.Slice where
 
-open import Thesis.Prelude.Equality
-open import Thesis.Prelude.Category
+open import Prelude.Equality
+open import Prelude.Category
 
 open import Level
 open import Function using ()

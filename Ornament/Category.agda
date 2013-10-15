@@ -2,19 +2,19 @@
 -- The functor `Ind` (for "induction") takes the least fixed points of descriptions and
 -- extends ornaments to forgetful maps on those least fixed points.
 
-module Thesis.Ornament.Category where
+module Ornament.Category where
 
-open import Thesis.Prelude.Category
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.Function.Fam
-open import Thesis.Prelude.Product
-open import Thesis.Prelude.InverseImage
-open import Thesis.Refinement
-open import Thesis.Refinement.Category
-open import Thesis.Description
-open import Thesis.Ornament
-open import Thesis.Ornament.Equivalence
-open import Thesis.Ornament.SequentialComposition
+open import Prelude.Category
+open import Prelude.Function
+open import Prelude.Function.Fam
+open import Prelude.Product
+open import Prelude.InverseImage
+open import Refinement
+open import Refinement.Category
+open import Description
+open import Ornament
+open import Ornament.Equivalence
+open import Ornament.SequentialComposition
 
 open import Function using (id; _∘_)
 open import Data.Product using (Σ; proj₁; _,_) renaming (map to _**_)

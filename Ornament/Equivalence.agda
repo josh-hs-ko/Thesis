@@ -1,15 +1,15 @@
 -- An extensional equivalence relation on ornaments, which extends to extensional equivalence on ornamental forgetful maps.
 
-module Thesis.Ornament.Equivalence where
+module Ornament.Equivalence where
 
-open import Thesis.Prelude.Equality
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.Product
-open import Thesis.Prelude.InverseImage
-open import Thesis.Description
-open import Thesis.Description.Horizontal
-open import Thesis.Ornament
-open import Thesis.Ornament.Horizontal
+open import Prelude.Equality
+open import Prelude.Function
+open import Prelude.Product
+open import Prelude.InverseImage
+open import Description
+open import Description.Horizontal
+open import Ornament
+open import Ornament.Horizontal
 
 open import Function using (id; const; _∘_; type-signature)
 open import Data.Unit using (⊤; tt)

@@ -1,10 +1,10 @@
 -- Decidable total ordering on natural numbers and minimum.
 
-module Thesis.Examples.Nat.TotalOrdering where
+module Examples.Nat.TotalOrdering where
 
-open import Thesis.Description
-open import Thesis.Ornament
-open import Thesis.Examples.Nat
+open import Description
+open import Ornament
+open import Examples.Nat
 
 open import Function using (_∘_; type-signature)
 open import Data.Empty using (⊥; ⊥-elim)

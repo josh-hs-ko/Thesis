@@ -1,16 +1,16 @@
 -- Let `D : Desc I` be a description.
 -- The category `RAlg' D` is the wide subcategory of the category of relational `D`-algebras where the morphisms are restricted to be functions.
 
-open import Thesis.Description
+open import Description
 
-module Thesis.Relation.AlgCategory {I : Set} (D : Desc I) where
+module Relation.AlgCategory {I : Set} (D : Desc I) where
 
-open import Thesis.Prelude.Equality
-open import Thesis.Prelude.Category
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.Function.Fam
-open import Thesis.Relation
-open import Thesis.Relation.CompChain
+open import Prelude.Equality
+open import Prelude.Category
+open import Prelude.Function
+open import Prelude.Function.Fam
+open import Relation
+open import Relation.CompChain
 
 open import Function using (id; _∘_)
 open import Data.Product using (Σ; _,_; proj₁; proj₂)

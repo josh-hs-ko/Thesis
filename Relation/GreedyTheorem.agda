@@ -1,24 +1,24 @@
 -- A variant of the Greedy Theorem and its embedding into inductive families.
 
-open import Thesis.Description
-open import Thesis.Relation
-open import Thesis.Relation.Fold
-open import Thesis.Relation.Meet
+open import Description
+open import Relation
+open import Relation.Fold
+open import Relation.Meet
 
-module Thesis.Relation.GreedyTheorem
+module Relation.GreedyTheorem
   {I : Set} (D : Desc I) {X : I → Set} (R : μ D ↝⁺ μ D) (S : Ḟ D X ↝⁺ X)
   (R-transitive : R •⁺ R ⊆⁺ R) (monotonicity : α •⁺ Ṙ D R •⁺ α º⁺ ⊆⁺ R)
   (Q : Ḟ D X ↝⁺ Ḟ D X) (greedy-condition : α •⁺ Ṙ D (foldR S º⁺) •⁺ (Q ∩⁺ (S º⁺ •⁺ S)) º⁺ ⊆⁺ R º⁺ •⁺ α •⁺ Ṙ D (foldR S º⁺)) where
 
-open import Thesis.Prelude.InverseImage
-open import Thesis.Prelude.Category.Isomorphism
-open import Thesis.Prelude.Function
-open import Thesis.Relation.Hylomorphism
-open import Thesis.Relation.Minimum
-open import Thesis.Ornament
-open import Thesis.Ornament.Algebraic
-open import Thesis.Refinement
-open import Thesis.Relation.CompChain
+open import Prelude.InverseImage
+open import Prelude.Category.Isomorphism
+open import Prelude.Function
+open import Relation.Hylomorphism
+open import Relation.Minimum
+open import Ornament
+open import Ornament.Algebraic
+open import Refinement
+open import Relation.CompChain
 
 open import Function using (id)
 open import Data.Product using (Σ; _,_; proj₁; proj₂)

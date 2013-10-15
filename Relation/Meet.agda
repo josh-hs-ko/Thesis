@@ -1,8 +1,8 @@
 -- Definition of meet and its componentwise version.
 
-module Thesis.Relation.Meet where
+module Relation.Meet where
 
-open import Thesis.Relation
+open import Relation
 
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
 

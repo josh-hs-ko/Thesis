@@ -3,9 +3,9 @@
 -- whereas the collection of arrows is a setoid, i.e., a set equipped with an equivalence relation.
 -- All operations on morphisms must respect the equivalence relation, including the morphism maps of functors.
 
-module Thesis.Prelude.Category where
+module Prelude.Category where
 
-open import Thesis.Prelude.Equality
+open import Prelude.Equality
 
 open import Level
 open import Function using (_∘_)

@@ -1,24 +1,24 @@
 -- Parallel composition of ornaments, when mapped to `Fam` by the functor `Ind`, forms a pullback.
 -- This file can take a long time to typecheck.
 
-module Thesis.Ornament.ParallelComposition.Pullback where
+module Ornament.ParallelComposition.Pullback where
 
-open import Thesis.Prelude.Category
-open import Thesis.Prelude.Category.Slice
-open import Thesis.Prelude.Category.Span
-open import Thesis.Prelude.Category.Pullback
-open import Thesis.Prelude.Equality
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.Function.Fam
-open import Thesis.Prelude.InverseImage
-open import Thesis.Prelude.Product
-open import Thesis.Description
-open import Thesis.Description.Horizontal
-open import Thesis.Ornament
-open import Thesis.Ornament.ParallelComposition
-open import Thesis.Ornament.SequentialComposition
-open import Thesis.Ornament.Equivalence
-open import Thesis.Ornament.Category
+open import Prelude.Category
+open import Prelude.Category.Slice
+open import Prelude.Category.Span
+open import Prelude.Category.Pullback
+open import Prelude.Equality
+open import Prelude.Function
+open import Prelude.Function.Fam
+open import Prelude.InverseImage
+open import Prelude.Product
+open import Description
+open import Description.Horizontal
+open import Ornament
+open import Ornament.ParallelComposition
+open import Ornament.SequentialComposition
+open import Ornament.Equivalence
+open import Ornament.Category
 
 open import Function using (id; _∘_; const)
 open import Data.Unit using (⊤; tt)
@@ -229,21 +229,21 @@ module IsPullback {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P
 
   p : Slice Fam (object Ind (I , D))
   p = slice (object Ind (e ⋈ f , ⌊ O ⊗ P ⌋)) (morphism Ind (pull , ⌈ O ⊗ P ⌉))
-  
-  ⋈-span : Span (SliceCategory Fun I) (slice J e) (slice K f)
-  ⋈-span = ⋈-square e f
 
   p-to-l : SliceMorphism Fam (object Ind (I , D)) p l
   p-to-l = sliceMorphism (π₁ , forget (diffOrn-l O P))
-                         (SliceMorphism.triangle (Span.l ⋈-span) ,
+                         (SliceMorphism.triangle (Span.l (⋈-square e f)) ,
                           ≑-trans refl (≑-sym (≐-to-≑ (forget-after-forget O (diffOrn-l O P))))
                                        (pointwise (OrnEq-forget (O ⊙ diffOrn-l O P) ⌈ O ⊗ P ⌉ (triangle-l O P))))
 
   p-to-r : SliceMorphism Fam (object Ind (I , D)) p r
   p-to-r = sliceMorphism (π₂ , forget (diffOrn-r O P))
-                         (SliceMorphism.triangle (Span.r ⋈-span) ,
+                         (SliceMorphism.triangle (Span.r (⋈-square e f)) ,
                           ≑-trans refl (≑-sym (≐-to-≑ (forget-after-forget P (diffOrn-r O P))))
                                        (pointwise (OrnEq-forget (P ⊙ diffOrn-r O P) ⌈ O ⊗ P ⌉ (triangle-r O P))))
+
+  ⊗-square : Square Fam l r
+  ⊗-square = span p p-to-l p-to-r
 
   module Universality (p' : Slice Fam (object Ind (I , D)))
                       (p'-to-l : SliceMorphism Fam (object Ind (I , D)) p' l)
@@ -255,11 +255,11 @@ module IsPullback {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P
     g : L → I
     g = FamMorphism.e (Slice.s p')
 
-    L-span : Span (SliceCategory Fun I) (slice J e) (slice K f)
-    L-span = object (SpanMap (SliceMap FamI)) (span p' p'-to-l p'-to-r)
+    L-square : Square Fun (slice J e) (slice K f)
+    L-square = object (SpanMap (SliceMap FamI)) (span p' p'-to-l p'-to-r)
 
-    L-to-⋈ : SpanMorphism (SliceCategory Fun I) (slice J e) (slice K f) L-span ⋈-span
-    L-to-⋈ = proj₁ (⋈-is-Pullback e f L-span)
+    L-to-⋈ : SpanMorphism (SliceCategory Fun I) (slice J e) (slice K f) L-square (⋈-square e f)
+    L-to-⋈ = proj₁ (⋈-is-Pullback e f L-square)
 
     integrate :
       {i : L} → (t : proj₂ (Slice.T p') i) →
@@ -322,7 +322,7 @@ module IsPullback {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P
                                   (span p' p'-to-l p'-to-r) (span p p-to-l p-to-r))
                         p'-to-p
     uniqueness med' =
-      proj₂ (⋈-is-Pullback e f L-span)
+      proj₂ (⋈-is-Pullback e f L-square)
         (spanMorphism
            (sliceMorphism (FamMorphism.e (SliceMorphism.m (SpanMorphism.m med')))
                           (FamMorphismEq.e (SliceMorphism.triangle (SpanMorphism.m med'))))
@@ -350,7 +350,7 @@ module IsPullback {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P
                                         (FamMorphism.e (SliceMorphism.m (SpanMorphism.m med')) i) refl refl)
                        (≡-to-≅ (Integration.integrate-inv O P _ _ _ _)))))
 
-  ⊗-is-Pullback : Pullback Fam l r (span p p-to-l p-to-r)
+  ⊗-is-Pullback : Pullback Fam l r ⊗-square
   ⊗-is-Pullback (span p' l' r') = Universality.p'-to-p p' l' r' , Universality.uniqueness p' l' r'
 
 open IsPullback public using (⊗-is-Pullback)

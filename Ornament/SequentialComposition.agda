@@ -1,13 +1,13 @@
 -- Sequential composition of ornaments.
 
-module Thesis.Ornament.SequentialComposition where
+module Ornament.SequentialComposition where
 
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.InverseImage
-open import Thesis.Description
-open import Thesis.Description.Horizontal
-open import Thesis.Ornament
-open import Thesis.Ornament.Equivalence
+open import Prelude.Function
+open import Prelude.InverseImage
+open import Description
+open import Description.Horizontal
+open import Ornament
+open import Ornament.Equivalence
 
 open import Function using (_∘_; const; id)
 open import Data.Unit using (⊤; tt)

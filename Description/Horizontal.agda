@@ -1,12 +1,12 @@
 -- Horizontal data, which can be separated into "shape" and "core" (cf. containers), and shape equivalence.
 
-module Thesis.Description.Horizontal where
+module Description.Horizontal where
 
-open import Thesis.Prelude.Category.Isomorphism
-open import Thesis.Prelude.Function
-open import Thesis.Prelude.Function.Fam
-open import Thesis.Prelude.Product
-open import Thesis.Description
+open import Prelude.Category.Isomorphism
+open import Prelude.Function
+open import Prelude.Function.Fam
+open import Prelude.Product
+open import Description
 
 open import Function using (id; const; _∘_)
 open import Data.Unit using (⊤; tt)
