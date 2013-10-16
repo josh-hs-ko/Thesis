@@ -12,7 +12,7 @@ import System.FilePath.Find
 
 everything_header :: [String]
 everything_header =
-  [ "module Thesis.Everything where",
+  [ "module Everything where",
     "" ]
 
 readme_header :: [String]
@@ -27,7 +27,7 @@ readme_header =
     "",
 		"All files typecheck with Agda 2.3.3, but note that " ++
 		"some files can take a very long time to typecheck. " ++
-		"(The module Thesis.Ornament.SequentialComposition " ++
+		"(The module Ornament.SequentialComposition " ++
 		"would bump into [an error of Agda 2.3.2]" ++
 		"(http://code.google.com/p/agda/issues/detail?id=754).)",
 		"",
@@ -39,7 +39,7 @@ readme_header =
     "" ]
 
 prefix :: String
-prefix = "Thesis."
+prefix = ""
 
 ordering :: [String]
 ordering =
