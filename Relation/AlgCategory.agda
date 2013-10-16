@@ -5,6 +5,8 @@ open import Description
 
 module Relation.AlgCategory {I : Set} (D : Desc I) where
 
+{-
+
 open import Prelude.Equality
 open import Prelude.Category
 open import Prelude.Function
@@ -69,3 +71,5 @@ RAlg' =
          ; assoc  = {!!}
          ; cong-l = {!!}
          ; cong-r = {!!} }
+
+-}

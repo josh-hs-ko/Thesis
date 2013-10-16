@@ -1,3 +1,6 @@
+-- Okasaki's idea of numerical representations are nicely captured by the coherence property of upgrades;
+-- insertion into binomial heaps is used as an example.
+
 open import Relation.Nullary using (Dec; yes; no)
 
 module Examples.BinomialHeap (Val : Set) (_≤_ : Val → Val → Set) (_≤?_ : (x y : Val) → Dec (x ≤ y)) where

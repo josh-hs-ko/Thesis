@@ -305,10 +305,10 @@ module CanonicalPullbackInFun {B' : Category.Object Fam} (f' g' : Slice Fam B') 
       where setoid = FunSetoid (Slice.T (Span.M p')) (Slice.T (Span.M p))
             open EqReasoning setoid
 
-Mix : {B : Category.Object Fam} (f g : Slice Fam B) → FamObject
-Mix f g = Slice.T (Span.M (CanonicalPullback.p f g))
+Mix-square : {B : Category.Object Fam} (f g : Slice Fam B) → Square Fam f g
+Mix-square f g = CanonicalPullback.p f g
 
-canonPullback : {B : Category.Object Fam} (f g : Slice Fam B) → Pullback Fam f g (CanonicalPullback.p f g)
+canonPullback : {B : Category.Object Fam} (f g : Slice Fam B) → Pullback Fam f g (Mix-square f g)
 canonPullback f g = < CanonicalPullback.Universality.p'-to-p f g , CanonicalPullback.Universality.uniqueness f g >
 
 module PullbackPreserving

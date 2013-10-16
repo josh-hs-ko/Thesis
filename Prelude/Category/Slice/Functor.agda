@@ -113,6 +113,6 @@ module PullbackPreserving
 
 SliceU-preserves-pullback :
   {ℓ₀ ℓ₁ ℓ₂ : Level} {C : Category {ℓ₀} {ℓ₁} {ℓ₂}} {B : Category.Object C} → Pullback-preserving (SliceU {C = C} {B})
-SliceU-preserves-pullback g h ._ ((p , refl) , term-p) =
-  λ q' → PullbackPreserving.Universality.q'-to-p' g h p term-p q' ,
-         PullbackPreserving.Universality.Uniqueness.uniqueness g h p term-p q'
+SliceU-preserves-pullback g h p term-p q' =
+  PullbackPreserving.Universality.q'-to-p' g h p term-p q' ,
+  PullbackPreserving.Universality.Uniqueness.uniqueness g h p term-p q'

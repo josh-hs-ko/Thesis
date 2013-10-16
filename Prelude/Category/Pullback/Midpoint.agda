@@ -193,5 +193,8 @@ module Universality (W : Span (SliceCategory C Z) f g) where
                            (spanMorphism (Span.l X×Y×Z · SliceMorphism.m (SpanMorphism.m m')) lemma-X×Y-X lemma-X×Y-Y)))
                       (SliceMorphism.triangle (SpanMorphism.m m')))
 
-midpoint-pullback : Pullback C f g (span (object SpanUR X×Y×Z) (morphism SpanUR X×Y×Z-to-X×Z) (morphism SpanUR X×Y×Z-to-Y×Z))
+midpoint-square : Square C f g
+midpoint-square = span (object SpanUR X×Y×Z) (morphism SpanUR X×Y×Z-to-X×Z) (morphism SpanUR X×Y×Z-to-Y×Z)
+
+midpoint-pullback : Pullback C f g midpoint-square
 midpoint-pullback = < Universality.W-to-X×Y×Z , Universality.Uniqueness.uniqueness >
