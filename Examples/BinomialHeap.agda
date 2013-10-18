@@ -63,20 +63,51 @@ BHeap = μ ⌊ BHeapOD ⌋
 BHeap' : ℕ → Bin → Set
 BHeap' r b = OptP ⌈ BHeapOD ⌉ (ok r) b
 
-incr-insT : Upgrade (Bin → Bin) ({r : ℕ} → BTree r → BHeap r → BHeap r)
-incr-insT = ∀⁺[[ r ∶ ℕ ]] ∀⁺[ _ ∶ BTree r ] let ref = FRefinement.comp (RSem' ⌈ BHeapOD ⌉) (ok r) in ref ⇀ toUpgrade ref
+upg : Upgrade (Bin → Bin) ({r : ℕ} → BTree r → BHeap r → BHeap r)
+upg = ∀⁺[[ r ∶ ℕ ]] ∀⁺[ _ ∶ BTree r ] let ref = FRefinement.comp (RSem' ⌈ BHeapOD ⌉) (ok r) in ref ⇀ toUpgrade ref
 
-insT' : {r : ℕ} → BTree r → (b : Bin) → BHeap' r b → BHeap' r (incr b)  -- Upgrade.P incr-insT incr
-insT' t (con (`nil  , _    )) h'                 = con (t , con tt , tt)
-insT' t (con (`zero , b , _)) (con (    h' , _)) = con (t , h' , tt)
-insT' t (con (`one  , b , _)) (con (u , h' , _)) = con (insT' (link t u) b h' , tt)
+insT' : {r : ℕ} → BTree r → (b : Bin) → BHeap' r b → BHeap' r (incr b)  -- Upgrade.P upg incr
+insT' t (con (`nil  , _    )) h                 = con (t , con tt               , tt)
+insT' t (con (`zero , b , _)) (con (    h , _)) = con (t , h                    , tt)
+insT' t (con (`one  , b , _)) (con (u , h , _)) = con (    insT' (link t u) b h , tt)
 
 insT : {r : ℕ} → BTree r → BHeap r → BHeap r
-insT = Upgrade.u incr-insT incr insT'
+insT = Upgrade.u upg incr insT'
 
-coherence-proof : {r : ℕ} (t : BTree r) (b : Bin) (h : BHeap r) →
-                  forget ⌈ BHeapOD ⌉ h ≡ b → forget ⌈ BHeapOD ⌉ (insT t h) ≡ incr b  -- Upgrade.C incr-insT incr insT
-coherence-proof = Upgrade.c incr-insT incr insT'
+incr-insT-coherence :
+  {r : ℕ} (t : BTree r) (b : Bin) (h : BHeap r) →
+  forget ⌈ BHeapOD ⌉ h ≡ b → forget ⌈ BHeapOD ⌉ (insT t h) ≡ incr b  -- Upgrade.C upg incr insT
+incr-insT-coherence = Upgrade.c upg incr insT'
 
 insert : Val → BHeap 0 → BHeap 0
 insert x = insT (con (x , tt))
+
+add : Bin → Bin → Bin
+add (con (`nil  , _    )) b'                     = b'
+add (con (`zero , b , _)) (con (`nil  , _     )) = con (`zero , b               , tt)
+add (con (`zero , b , _)) (con (`zero , b' , _)) = con (`zero , add b b'        , tt)
+add (con (`zero , b , _)) (con (`one  , b' , _)) = con (`one  , add b b'        , tt)
+add (con (`one  , b , _)) (con (`nil  , _     )) = con (`one  , b               , tt)
+add (con (`one  , b , _)) (con (`zero , b' , _)) = con (`one  , add b b'        , tt)
+add (con (`one  , b , _)) (con (`one  , b' , _)) = con (`zero , incr (add b b') , tt)
+
+upg' : Upgrade (Bin → Bin → Bin) ({r : ℕ} → BHeap r → BHeap r → BHeap r)
+upg' = ∀⁺[[ r ∶ ℕ ]] let ref = FRefinement.comp (RSem' ⌈ BHeapOD ⌉) (ok r) in ref ⇀ ref ⇀ toUpgrade ref
+
+merge' : {r : ℕ} → (b : Bin) → BHeap' r b → (b' : Bin) → BHeap' r b' → BHeap' r (add b b')  -- Upgrade.P upg' add
+merge' (con (`nil  , _    )) h                 b'                     h'                 = h'
+merge' (con (`zero , b , _)) (con (    h , _)) (con (`nil  , _     )) h'                 = con (    h                                     , tt)
+merge' (con (`zero , b , _)) (con (    h , _)) (con (`zero , b' , _)) (con (    h' , _)) = con (    merge' _ h _ h'                       , tt)
+merge' (con (`zero , b , _)) (con (    h , _)) (con (`one  , b' , _)) (con (u , h' , _)) = con (u , merge' _ h _ h'                       , tt)
+merge' (con (`one  , b , _)) (con (t , h , _)) (con (`nil  , _     )) h'                 = con (t , h                                     , tt)
+merge' (con (`one  , b , _)) (con (t , h , _)) (con (`zero , b' , _)) (con (    h' , _)) = con (t , merge' _ h _ h'                       , tt)
+merge' (con (`one  , b , _)) (con (t , h , _)) (con (`one  , b' , _)) (con (u , h' , _)) = con (    insT' (link t u) _ (merge' b h b' h') , tt)
+
+merge : {r : ℕ} → BHeap r → BHeap r → BHeap r
+merge = Upgrade.u upg' add merge'
+
+add-merge-coherence :
+  {r : ℕ} →
+  (b  : Bin) (h  : BHeap r) → forget ⌈ BHeapOD ⌉ h  ≡ b  →
+  (b' : Bin) (h' : BHeap r) → forget ⌈ BHeapOD ⌉ h' ≡ b' → forget ⌈ BHeapOD ⌉ (merge h h') ≡ add b b'  -- Upgrade.C upg' add merge
+add-merge-coherence = Upgrade.c upg' add merge'
