@@ -50,25 +50,25 @@ OrnEq-trans {D = D} O P Q (eeq , OPeq) (eeq' , PQeq) =
 OrnEq-forget : ∀ {I J} {e e' : J → I} {D E} (O : Orn e D E) (P : Orn e' D E) → OrnEq O P → ∀ {j} (x : μ E j) → forget O x ≅ forget P x
 OrnEq-forget {I} {J} {e} {e'} {D} {E} O P (eeq , oeq) = induction E (λ _ x → forget O x ≅ forget P x) (λ j xs ihs → aux j xs ihs refl refl)
   where
-    aux''' : (js : List J) (xs : Ṁ (μ E) js) → All-Ṁ (λ _ x → forget O x ≅ forget P x) js xs →
-             ṀHEq js (mapFold-Ṁ E (ornAlg O) js xs) (mapFold-Ṁ E (ornAlg P) js xs)
+    aux''' : (js : List J) (xs : Ṗ (μ E) js) → All-Ṗ (λ _ x → forget O x ≅ forget P x) js xs →
+             ṖHEq js (mapFold-Ṗ E (ornAlg O) js xs) (mapFold-Ṗ E (ornAlg P) js xs)
     aux''' []       _        _          = tt
     aux''' (j ∷ js) (x , xs) (ih , ihs) = ih , aux''' js xs ihs
     aux'' : (E' : RDesc J) (xs : ⟦ E' ⟧ (μ E)) → All E' (λ _ x → forget O x ≅ forget P x) xs →
-            Σ[ hs ∶ Ṡ E' ] Σ[ xs' ∶ Ṁ (μ D ∘ e) (next E' hs) ] Σ[ xs'' ∶ Ṁ (μ D ∘ e') (next E' hs) ]
-              Ḣ-decomp E' (Ṁ (μ D ∘ e)) (mapFold E E' (ornAlg O) xs) ≡ (hs , xs')    ×
-              (hs , xs'') ≡ Ḣ-decomp E' (Ṁ (μ D ∘ e')) (mapFold E E' (ornAlg P) xs)  ×  ṀHEq (next E' hs) xs' xs''
-    aux'' (ṿ js)   xs       ihs = tt , mapFold-Ṁ E (ornAlg O) js xs , mapFold-Ṁ E (ornAlg P) js xs , refl , refl , aux''' js xs ihs
+            Σ[ hs ∶ Ṡ E' ] Σ[ xs' ∶ Ṗ (μ D ∘ e) (next E' hs) ] Σ[ xs'' ∶ Ṗ (μ D ∘ e') (next E' hs) ]
+              Ḣ-decomp E' (Ṗ (μ D ∘ e)) (mapFold E E' (ornAlg O) xs) ≡ (hs , xs')    ×
+              (hs , xs'') ≡ Ḣ-decomp E' (Ṗ (μ D ∘ e')) (mapFold E E' (ornAlg P) xs)  ×  ṖHEq (next E' hs) xs' xs''
+    aux'' (ṿ js)   xs       ihs = tt , mapFold-Ṗ E (ornAlg O) js xs , mapFold-Ṗ E (ornAlg P) js xs , refl , refl , aux''' js xs ihs
     aux'' (σ S E') (s , xs) ihs = (_,_ s ** (id ** (id ** (cong (_,_ s ** id) ** (cong (_,_ s ** id) ** id))))) (aux'' (E' s) xs ihs)
     aux' : {D' D'' : RDesc I} {E' : RDesc J} (O' : ROrn e D' E') (P' : ROrn e' D'' E') → D' ≡ D'' → ROrnEq O' P' →
            (xs : ⟦ E' ⟧ (μ E)) → All E' (λ _ x → forget O x ≅ forget P x) xs →
-           ḢTrans-app (ḢTrans-normal O') erase-Ṁ (mapFold E E' (ornAlg O) xs) ≅ ḢTrans-app (ḢTrans-normal P') erase-Ṁ (mapFold E E' (ornAlg P) xs)
+           ḢTrans-app (ḢTrans-normal O') erase-Ṗ (mapFold E E' (ornAlg O) xs) ≅ ḢTrans-app (ḢTrans-normal P') erase-Ṗ (mapFold E E' (ornAlg P) xs)
     aux' {._} {D'} {E'} O' P' refl roeq xs ihs =
       let (hs , xs' , xs'' , eq , eq' , heq) = aux'' E' xs ihs
-      in  ≡-to-≅ (cong (Ḣ-comp D' (Ṁ (μ D)))
-                       (trans (cong (ḢTrans-app' (ḢTrans-normal O') erase-Ṁ) eq)
-                              (trans (cong-ḢTrans-app'-erase-Ṁ (ḢTrans-normal O') (ḢTrans-normal P') eeq (≅-to-≡ ∘ roeq) hs xs' xs'' heq)
-                                     (cong (ḢTrans-app' (ḢTrans-normal P') erase-Ṁ) eq'))))
+      in  ≡-to-≅ (cong (Ḣ-comp D' (Ṗ (μ D)))
+                       (trans (cong (ḢTrans-app' (ḢTrans-normal O') erase-Ṗ) eq)
+                              (trans (cong-ḢTrans-app'-erase-Ṗ (ḢTrans-normal O') (ḢTrans-normal P') eeq (≅-to-≡ ∘ roeq) hs xs' xs'' heq)
+                                     (cong (ḢTrans-app' (ḢTrans-normal P') erase-Ṗ) eq'))))
     aux : (j : J) (xs : Ḟ E (μ E) j) → All (Desc.comp E j) (λ _ x → forget O x ≅ forget P x) xs →
           {i : I} (eq : e j ≡ i) {i' : I} (eq' : e' j ≡ i') →
           con {D = D} (subst (Ḟ D (μ D)) eq (erase (Orn.comp O (ok j)) (mapFold E (Desc.comp E j) (ornAlg O) xs)))
@@ -76,6 +76,6 @@ OrnEq-forget {I} {J} {e} {e'} {D} {E} O P (eeq , oeq) = induction E (λ _ x → 
     aux j xs ihs eq eq'  with trans (trans (sym eq) (eeq j)) eq'
     aux j xs ihs eq refl | refl =
       hcong con (htrans (≡-subst-removable (Ḟ D (μ D)) eq (erase (Orn.comp O (ok j)) (mapFold E (Desc.comp E j) (ornAlg O) xs)))
-                        (htrans (≡-to-≅ (sym (ḢTrans-app-normal (Orn.comp O (ok j)) erase-Ṁ (mapFold E (Desc.comp E j) (ornAlg O) xs))))
+                        (htrans (≡-to-≅ (sym (ḢTrans-app-normal (Orn.comp O (ok j)) erase-Ṗ (mapFold E (Desc.comp E j) (ornAlg O) xs))))
                                 (htrans (aux' (Orn.comp O (ok j)) (Orn.comp P (ok j)) (cong (Desc.comp D) (eeq j)) (oeq j) xs ihs)
-                                        (≡-to-≅ (ḢTrans-app-normal (Orn.comp P (ok j)) erase-Ṁ (mapFold E (Desc.comp E j) (ornAlg P) xs))))))
+                                        (≡-to-≅ (ḢTrans-app-normal (Orn.comp P (ok j)) erase-Ṗ (mapFold E (Desc.comp E j) (ornAlg P) xs))))))

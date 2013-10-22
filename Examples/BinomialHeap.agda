@@ -60,6 +60,9 @@ BHeapOD = wrap λ { {._} (ok r) → σ BinTag λ { `nil  → ṿ tt
 BHeap : ℕ → Set
 BHeap = μ ⌊ BHeapOD ⌋
 
+toBin : {r : ℕ} → BHeap r → Bin
+toBin = forget ⌈ BHeapOD ⌉
+
 BHeap' : ℕ → Bin → Set
 BHeap' r b = OptP ⌈ BHeapOD ⌉ (ok r) b
 
@@ -74,9 +77,7 @@ insT' t (con (`one  , b , _)) (con (u , h , _)) = con (    insT' (link t u) b h 
 insT : {r : ℕ} → BTree r → BHeap r → BHeap r
 insT = Upgrade.u upg incr insT'
 
-incr-insT-coherence :
-  {r : ℕ} (t : BTree r) (b : Bin) (h : BHeap r) →
-  forget ⌈ BHeapOD ⌉ h ≡ b → forget ⌈ BHeapOD ⌉ (insT t h) ≡ incr b  -- Upgrade.C upg incr insT
+incr-insT-coherence : {r : ℕ} (t : BTree r) (b : Bin) (h : BHeap r) → toBin h ≡ b → toBin (insT t h) ≡ incr b  -- Upgrade.C upg incr insT
 incr-insT-coherence = Upgrade.c upg incr insT'
 
 insert : Val → BHeap 0 → BHeap 0
@@ -108,6 +109,6 @@ merge = Upgrade.u upg' add merge'
 
 add-merge-coherence :
   {r : ℕ} →
-  (b  : Bin) (h  : BHeap r) → forget ⌈ BHeapOD ⌉ h  ≡ b  →
-  (b' : Bin) (h' : BHeap r) → forget ⌈ BHeapOD ⌉ h' ≡ b' → forget ⌈ BHeapOD ⌉ (merge h h') ≡ add b b'  -- Upgrade.C upg' add merge
+  (b  : Bin) (h  : BHeap r) → toBin h  ≡ b  →
+  (b' : Bin) (h' : BHeap r) → toBin h' ≡ b' → toBin (merge h h') ≡ add b b'  -- Upgrade.C upg' add merge
 add-merge-coherence = Upgrade.c upg' add merge'

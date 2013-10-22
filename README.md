@@ -179,7 +179,7 @@ Okasaki's idea of numerical representations are nicely captured by the coherence
 insertion into binomial heaps is used as an example.
 
 #### Examples.Insertion
-The `insert` function used in insertion sort upgraded to work with vectors, sorted lists, and sorted vectors.
+The `insert` function used in insertion sort upgraded to work with vectors, ordered lists, and ordered vectors.
 
 #### Examples.LeftistHeap
 The ordering property and balancing properties of leftist heaps are treated separately when needed.
@@ -187,8 +187,8 @@ The ordering property and balancing properties of leftist heaps are treated sepa
 #### Examples.List
 Cons-lists as an ornamentation of natural numbers.
 
-#### Examples.List.Sorted
-Sorted lists indexed by a lower bound as an ornamentation of lists.
+#### Examples.List.Ordered
+Ordered lists indexed with a lower bound as an ornamentation of lists.
 
 #### Examples.List.Vec
 Vectors, i.e., length-indexed lists, defined as the optimised predicate for the ornament from natural numbers to lists.

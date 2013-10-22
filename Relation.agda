@@ -443,70 +443,70 @@ fun⁺-shunting-r-⇐ f R S (wrap R⊆⁺f•⁺S) = wrap λ i → fun-shunting-
 --------
 -- functorial map
 
-Ṁ-mapR : {I : Set} {X Y : I → Set} → (X ↝⁺ Y) → (is : List I) → Ṁ X is ↝ Ṁ Y is
-Ṁ-mapR R []       _        = any
-Ṁ-mapR R (i ∷ is) (x , xs) = map℘₂ _,_ ((R !!) i x) (Ṁ-mapR R is xs)
+Ṗ-mapR : {I : Set} {X Y : I → Set} → (X ↝⁺ Y) → (is : List I) → Ṗ X is ↝ Ṗ Y is
+Ṗ-mapR R []       _        = any
+Ṗ-mapR R (i ∷ is) (x , xs) = map℘₂ _,_ ((R !!) i x) (Ṗ-mapR R is xs)
 
-Ṁ-mapR-monotonic : {I : Set} {X Y : I → Set} {R S : X ↝⁺ Y} → R ⊆⁺ S → (is : List I) → Ṁ-mapR R is ⊆ Ṁ-mapR S is
-Ṁ-mapR-monotonic R⊆⁺S []       = ⊆-refl
-Ṁ-mapR-monotonic R⊆⁺S (i ∷ is) = wrap λ { (x , xs) → map℘₂-monotonic _,_ (modus-ponens-⊆⁺ R⊆⁺S _ x)
-                                                                        (modus-ponens-⊆ (Ṁ-mapR-monotonic R⊆⁺S is) xs) }
+Ṗ-mapR-monotonic : {I : Set} {X Y : I → Set} {R S : X ↝⁺ Y} → R ⊆⁺ S → (is : List I) → Ṗ-mapR R is ⊆ Ṗ-mapR S is
+Ṗ-mapR-monotonic R⊆⁺S []       = ⊆-refl
+Ṗ-mapR-monotonic R⊆⁺S (i ∷ is) = wrap λ { (x , xs) → map℘₂-monotonic _,_ (modus-ponens-⊆⁺ R⊆⁺S _ x)
+                                                                        (modus-ponens-⊆ (Ṗ-mapR-monotonic R⊆⁺S is) xs) }
 
-Ṁ-mapR-preserves-comp-⊇ : {I : Set} {X Y Z : I → Set} (R : Y ↝⁺ Z) (S : X ↝⁺ Y) (is : List I) → Ṁ-mapR (R •⁺ S) is ⊇ Ṁ-mapR R is • Ṁ-mapR S is
-Ṁ-mapR-preserves-comp-⊇ R S []       = wrap λ _ _ _ → tt
-Ṁ-mapR-preserves-comp-⊇ R S (i ∷ is) = wrap λ { (x , xs) (z , zs) ((y , ys) , (._ , s , ._ , ss , refl) , (._ , r , ._ , rs , refl)) →
-                                                let rss = modus-ponens-⊆ (Ṁ-mapR-preserves-comp-⊇ R S is) xs zs (ys , ss , rs)
+Ṗ-mapR-preserves-comp-⊇ : {I : Set} {X Y Z : I → Set} (R : Y ↝⁺ Z) (S : X ↝⁺ Y) (is : List I) → Ṗ-mapR (R •⁺ S) is ⊇ Ṗ-mapR R is • Ṗ-mapR S is
+Ṗ-mapR-preserves-comp-⊇ R S []       = wrap λ _ _ _ → tt
+Ṗ-mapR-preserves-comp-⊇ R S (i ∷ is) = wrap λ { (x , xs) (z , zs) ((y , ys) , (._ , s , ._ , ss , refl) , (._ , r , ._ , rs , refl)) →
+                                                let rss = modus-ponens-⊆ (Ṗ-mapR-preserves-comp-⊇ R S is) xs zs (ys , ss , rs)
                                                 in  z , (y , s , r) , zs , rss , refl }
 
-Ṁ-mapR-preserves-comp-⊆ : {I : Set} {X Y Z : I → Set} (R : Y ↝⁺ Z) (S : X ↝⁺ Y) (is : List I) → Ṁ-mapR (R •⁺ S) is ⊆ Ṁ-mapR R is • Ṁ-mapR S is
-Ṁ-mapR-preserves-comp-⊆ R S []       = wrap λ _ _ _ → tt , tt , tt
-Ṁ-mapR-preserves-comp-⊆ R S (i ∷ is) = wrap λ { (x , xs) (z , zs) (.z , (y , s , r) , .zs , rss , refl) →
-                                                let (ys , ss , rs) = modus-ponens-⊆ (Ṁ-mapR-preserves-comp-⊆ R S is) xs zs rss
+Ṗ-mapR-preserves-comp-⊆ : {I : Set} {X Y Z : I → Set} (R : Y ↝⁺ Z) (S : X ↝⁺ Y) (is : List I) → Ṗ-mapR (R •⁺ S) is ⊆ Ṗ-mapR R is • Ṗ-mapR S is
+Ṗ-mapR-preserves-comp-⊆ R S []       = wrap λ _ _ _ → tt , tt , tt
+Ṗ-mapR-preserves-comp-⊆ R S (i ∷ is) = wrap λ { (x , xs) (z , zs) (.z , (y , s , r) , .zs , rss , refl) →
+                                                let (ys , ss , rs) = modus-ponens-⊆ (Ṗ-mapR-preserves-comp-⊆ R S is) xs zs rss
                                                 in  (y , ys) , (y , s , ys , ss , refl) , (z , r , zs , rs , refl) }
 
-Ṁ-mapR-preserves-conv :
-  {I : Set} {X Y : I → Set} (R : X ↝⁺ Y) (is : List I) (xs : Ṁ X is) (ys : Ṁ Y is) → Ṁ-mapR R is xs ys → Ṁ-mapR (R º⁺) is ys xs
-Ṁ-mapR-preserves-conv R []       _        _        _                         = tt
-Ṁ-mapR-preserves-conv R (i ∷ is) (x , xs) (y , ys) (._ , r , ._ , rs , refl) = x , r , xs , Ṁ-mapR-preserves-conv R is xs ys rs , refl
+Ṗ-mapR-preserves-conv :
+  {I : Set} {X Y : I → Set} (R : X ↝⁺ Y) (is : List I) (xs : Ṗ X is) (ys : Ṗ Y is) → Ṗ-mapR R is xs ys → Ṗ-mapR (R º⁺) is ys xs
+Ṗ-mapR-preserves-conv R []       _        _        _                         = tt
+Ṗ-mapR-preserves-conv R (i ∷ is) (x , xs) (y , ys) (._ , r , ._ , rs , refl) = x , r , xs , Ṗ-mapR-preserves-conv R is xs ys rs , refl
 
 mapR : {I : Set} (D : RDesc I) {X Y : I → Set} → (X ↝⁺ Y) → ⟦ D ⟧ X ↝ ⟦ D ⟧ Y
-mapR (ṿ is)  R xs       = Ṁ-mapR R is xs
+mapR (ṿ is)  R xs       = Ṗ-mapR R is xs
 mapR (σ S D) R (s , xs) = map℘ (_,_ s) (mapR (D s) R xs)
 
 mapR-monotonic : {I : Set} (D : RDesc I) {X Y : I → Set} {R S : X ↝⁺ Y} → R ⊆⁺ S → mapR D R ⊆ mapR D S
-mapR-monotonic (ṿ is)  R⊆⁺S = Ṁ-mapR-monotonic R⊆⁺S is
+mapR-monotonic (ṿ is)  R⊆⁺S = Ṗ-mapR-monotonic R⊆⁺S is
 mapR-monotonic (σ S D) R⊆⁺S = wrap λ { (s , xs) → map℘-monotonic (_,_ s) (modus-ponens-⊆ (mapR-monotonic (D s) R⊆⁺S) xs) }
 
-Ṁ-mapR-fun-computation : {I : Set} {X Y : I → Set} (f : X ⇉ Y) (is : List I) (xs : Ṁ X is) → Ṁ-mapR (fun⁺ f) is xs (Ṁ-map f is xs)
-Ṁ-mapR-fun-computation f []       _        = tt
-Ṁ-mapR-fun-computation f (i ∷ is) (x , xs) = f x , refl , Ṁ-map f is xs , Ṁ-mapR-fun-computation f is xs , refl
+Ṗ-mapR-fun-computation : {I : Set} {X Y : I → Set} (f : X ⇉ Y) (is : List I) (xs : Ṗ X is) → Ṗ-mapR (fun⁺ f) is xs (Ṗ-map f is xs)
+Ṗ-mapR-fun-computation f []       _        = tt
+Ṗ-mapR-fun-computation f (i ∷ is) (x , xs) = f x , refl , Ṗ-map f is xs , Ṗ-mapR-fun-computation f is xs , refl
 
-Ṁ-mapR-fun-unique :
-  {I : Set} {X Y : I → Set} (f : X ⇉ Y) (is : List I) (xs : Ṁ X is) (ys : Ṁ Y is) → Ṁ-mapR (fun⁺ f) is xs ys → Ṁ-map f is xs ≡ ys
-Ṁ-mapR-fun-unique f []       _        _             _                             = refl
-Ṁ-mapR-fun-unique f (i ∷ is) (x , xs) (.(f x) , ys) (._ , refl , ._ , eqs , refl) = cong₂ _,_ refl (Ṁ-mapR-fun-unique f is xs ys eqs)
+Ṗ-mapR-fun-unique :
+  {I : Set} {X Y : I → Set} (f : X ⇉ Y) (is : List I) (xs : Ṗ X is) (ys : Ṗ Y is) → Ṗ-mapR (fun⁺ f) is xs ys → Ṗ-map f is xs ≡ ys
+Ṗ-mapR-fun-unique f []       _        _             _                             = refl
+Ṗ-mapR-fun-unique f (i ∷ is) (x , xs) (.(f x) , ys) (._ , refl , ._ , eqs , refl) = cong₂ _,_ refl (Ṗ-mapR-fun-unique f is xs ys eqs)
 
 mapR-preserves-comp-⊆ : {I : Set} (D : RDesc I) {X Y Z : I → Set} (R : Y ↝⁺ Z) (S : X ↝⁺ Y) → mapR D (R •⁺ S) ⊆ mapR D R • mapR D S
-mapR-preserves-comp-⊆ (ṿ is)  R S = Ṁ-mapR-preserves-comp-⊆ R S is
+mapR-preserves-comp-⊆ (ṿ is)  R S = Ṗ-mapR-preserves-comp-⊆ R S is
 mapR-preserves-comp-⊆ (σ T D) R S = wrap λ { (t , xs) ._ (zs , rss , refl) →
                                              let (ys , ss , rs) = modus-ponens-⊆ (mapR-preserves-comp-⊆ (D t) R S) xs zs rss
                                              in  (t , ys) , (ys , ss , refl) , (zs , rs , refl) }
 
 mapR-preserves-comp-⊇ : {I : Set} (D : RDesc I) {X Y Z : I → Set} (R : Y ↝⁺ Z) (S : X ↝⁺ Y) → mapR D (R •⁺ S) ⊇ mapR D R • mapR D S
-mapR-preserves-comp-⊇ (ṿ is)  R S = Ṁ-mapR-preserves-comp-⊇ R S is
+mapR-preserves-comp-⊇ (ṿ is)  R S = Ṗ-mapR-preserves-comp-⊇ R S is
 mapR-preserves-comp-⊇ (σ T D) R S = wrap λ { (t , xs) ._ (._ , (ys , ss , refl) , (zs , rs , refl)) →
                                              zs , modus-ponens-⊆ (mapR-preserves-comp-⊇ (D t) R S) xs zs (ys , ss , rs) , refl }
 
 mapR-preserves-conv : {I : Set} (D : RDesc I) {X Y : I → Set} (R : X ↝⁺ Y) → (xs : ⟦ D ⟧ X) (ys : ⟦ D ⟧ Y) → mapR D R xs ys → mapR D (R º⁺) ys xs
-mapR-preserves-conv (ṿ is)  R xs       ys rs               = Ṁ-mapR-preserves-conv R is xs ys rs
+mapR-preserves-conv (ṿ is)  R xs       ys rs               = Ṗ-mapR-preserves-conv R is xs ys rs
 mapR-preserves-conv (σ S D) R (s , xs) ._ (ys , rs , refl) = xs , mapR-preserves-conv (D s) R xs ys rs , refl
 
 mapR-fun-computation : {I : Set} (D : RDesc I) {X Y : I → Set} (f : X ⇉ Y) → (xs : ⟦ D ⟧ X) → mapR D (fun⁺ f) xs (mapF D f xs)
-mapR-fun-computation (ṿ is)  f xs       = Ṁ-mapR-fun-computation f is xs
+mapR-fun-computation (ṿ is)  f xs       = Ṗ-mapR-fun-computation f is xs
 mapR-fun-computation (σ S D) f (s , xs) = mapF (D s) f xs , mapR-fun-computation (D s) f xs , refl
 
 mapR-fun-unique : {I : Set} (D : RDesc I) {X Y : I → Set} (f : X ⇉ Y) → (xs : ⟦ D ⟧ X) (ys : ⟦ D ⟧ Y) → mapR D (fun⁺ f) xs ys → mapF D f xs ≡ ys
-mapR-fun-unique (ṿ is)  f xs         ys         eqs                = Ṁ-mapR-fun-unique f is xs ys eqs
+mapR-fun-unique (ṿ is)  f xs         ys         eqs                = Ṗ-mapR-fun-unique f is xs ys eqs
 mapR-fun-unique (σ S D) f (s , xs)   (.s , ys)  (.ys , eqs , refl) = cong (_,_ s) (mapR-fun-unique (D s) f xs ys eqs)
 
 

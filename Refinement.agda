@@ -133,9 +133,9 @@ toRefinement {r = r} s =
                          ; to-from-inverse = λ { (x , q) → cong (_,_ x) (Iso.to-from-inverse (Swap.s s x) _) }
                          ; from-to-inverse = λ { (x , p) → cong (_,_ x) (Iso.from-to-inverse (Swap.s s x) _) } }) }
 
-idSwap : {X Y : Set} {r : Refinement X Y} → Swap r
-idSwap {r = r} = record { Q = Refinement.P r
-                        ; s = λ _ → Setoid.refl IsoSetoid }
+id-Swap : {X Y : Set} {r : Refinement X Y} → Swap r
+id-Swap {r = r} = record { Q = Refinement.P r
+                         ; s = λ _ → Setoid.refl IsoSetoid }
 
 record FSwap {I J : Set} {e : J → I} {X : I → Set} {Y : J → Set} (r : FRefinement e X Y) : Set₁ where
   constructor wrap
@@ -145,8 +145,8 @@ record FSwap {I J : Set} {e : J → I} {X : I → Set} {Y : J → Set} (r : FRef
 toFRefinement : {I J : Set} {e : J → I} {X : I → Set} {Y : J → Set} {r : FRefinement e X Y} → FSwap r → FRefinement e X Y
 toFRefinement (wrap s) = wrap (toRefinement ∘ s)
 
-idFSwap : {I J : Set} {e : J → I} {X : I → Set} {Y : J → Set} {r : FRefinement e X Y} → FSwap r
-idFSwap {r = r} = wrap λ _ → idSwap
+id-FSwap : {I J : Set} {e : J → I} {X : I → Set} {Y : J → Set} {r : FRefinement e X Y} → FSwap r
+id-FSwap {r = r} = wrap λ _ → id-Swap
 
 
 --------

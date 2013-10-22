@@ -30,7 +30,7 @@ open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅) rena
 -- algebraic ornaments
 
 algROrn : {I : Set} (D : RDesc I) {J : I → Set} → ℘ (⟦ D ⟧ J) → ROrnDesc (Σ I J) proj₁ D
-algROrn (ṿ is)  {J} P = Δ[ js ∶ Ṁ J is ] Δ[ _ ∶ P js ] ṿ (Ṁ-map (λ {i} j → ok (i , j)) is js)
+algROrn (ṿ is)  {J} P = Δ[ js ∶ Ṗ J is ] Δ[ _ ∶ P js ] ṿ (Ṗ-map (λ {i} j → ok (i , j)) is js)
 algROrn (σ S D)     P = σ[ s ∶ S ] algROrn (D s) (curry P s)
 
 algOrn : ∀ {I} (D : Desc I) {J : I → Set} → (Ḟ D J ↝⁺ J) → OrnDesc (Σ I J) proj₁ D
@@ -44,20 +44,20 @@ algOrn-iso {I} D {J} R =
                                (μ-iso (OptPD ⌈ algOrn D R ⌉) (ok (i , j) , ok (i , con ds)))
                                (aux (Desc.comp D i) ds ihs (((R !!) i º) j)))
   where
-    aux' : (is : List I) (js : Ṁ J is) (ds : Ṁ (μ D) is) →
-           All-Ṁ (λ i x → (j : J i) → Iso Fun (OptP ⌈ algOrn D R ⌉ (ok (i , j)) x) (foldR' R i x j)) is ds →
-           Iso Fun (Ṁ (μ (OptPD ⌈ algOrn D R ⌉))
-                      (und-Ṁ is (pc-Ė (to≡-Ṁ is (Ṁ-map (λ {i} j → ok (i , j)) is js)) (to≡-Ṁ is (Ṁ-map (λ {i} j → ok (i , j)) is ds)))))
-                   (mapFoldR-Ṁ D R is ds js)
+    aux' : (is : List I) (js : Ṗ J is) (ds : Ṗ (μ D) is) →
+           All-Ṗ (λ i x → (j : J i) → Iso Fun (OptP ⌈ algOrn D R ⌉ (ok (i , j)) x) (foldR' R i x j)) is ds →
+           Iso Fun (Ṗ (μ (OptPD ⌈ algOrn D R ⌉))
+                      (und-Ṗ is (pc-Ė (to≡-Ṗ is (Ṗ-map (λ {i} j → ok (i , j)) is js)) (to≡-Ṗ is (Ṗ-map (λ {i} j → ok (i , j)) is ds)))))
+                   (mapFoldR-Ṗ D R is ds js)
     aux' []       _        _        _          = Setoid.refl (IsoSetoid Fun)
     aux' (i ∷ is) (j , js) (d , ds) (ih , ihs) =
       Setoid.trans (IsoSetoid Fun)
         (prodIso (ih j) (aux' is js ds ihs))
         (record { to   = λ { (r , rs) → j , r , js , rs , refl }
                 ; from = (λ { (j' , r , js' , rs , eq) → subst (foldR' R i d) (cong proj₁ eq) r ,
-                                                         subst (mapFoldR-Ṁ D R is ds) (cong proj₂ eq) rs }) ∶
-                           (Σ[ j' ∶ J i ] foldR' R i d j' × (Σ[ js' ∶ Ṁ J is ] mapFoldR-Ṁ D R is ds js' × (j' , js') ≡ (j , js)) →
-                            foldR' R i d j × mapFoldR-Ṁ D R is ds js)
+                                                         subst (mapFoldR-Ṗ D R is ds) (cong proj₂ eq) rs }) ∶
+                           (Σ[ j' ∶ J i ] foldR' R i d j' × (Σ[ js' ∶ Ṗ J is ] mapFoldR-Ṗ D R is ds js' × (j' , js') ≡ (j , js)) →
+                            foldR' R i d j × mapFoldR-Ṗ D R is ds js)
                 ; from-to-inverse = frefl
                 ; to-from-inverse = λ { (.j , r , .js , rs , refl) → refl } })
     aux : (D' : RDesc I) (ds : ⟦ D' ⟧ (μ D)) → All D' (λ i x → (j : J i) → Iso Fun (OptP ⌈ algOrn D R ⌉ (ok (i , j)) x) (foldR' R i x j)) ds →

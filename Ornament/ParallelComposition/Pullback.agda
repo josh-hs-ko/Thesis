@@ -70,41 +70,41 @@ module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (
 
   integrate-aux₀ :
     ∀ {j} (y : μ E j) → ∀ {k} (z : μ F k) → ∀ {i} (eeq : e j ≡ i) → ∀ {i'} (feq : f k ≡ i') → i ≡ i' →
-    ∀ {is js ks} (ys : Ṁ (μ E) js) (zs : Ṁ (μ F) ks) (eeqs : Ė e js is) (feqs : Ė f ks is) →
-    erase-Ṁ {X = μ D} (eeq ∷ eeqs) (forget O y , mapFold-Ṁ E (ornAlg O) js ys)
-      ≅ erase-Ṁ {X = μ D} (feq ∷ feqs) (forget P z , mapFold-Ṁ F (ornAlg P) ks zs) →
-    forget O y ≅ forget P z × erase-Ṁ {X = μ D} eeqs (mapFold-Ṁ E (ornAlg O) js ys) ≡ erase-Ṁ {X = μ D} feqs (mapFold-Ṁ F (ornAlg P) ks zs)
+    ∀ {is js ks} (ys : Ṗ (μ E) js) (zs : Ṗ (μ F) ks) (eeqs : Ė e js is) (feqs : Ė f ks is) →
+    erase-Ṗ {X = μ D} (eeq ∷ eeqs) (forget O y , mapFold-Ṗ E (ornAlg O) js ys)
+      ≅ erase-Ṗ {X = μ D} (feq ∷ feqs) (forget P z , mapFold-Ṗ F (ornAlg P) ks zs) →
+    forget O y ≅ forget P z × erase-Ṗ {X = μ D} eeqs (mapFold-Ṗ E (ornAlg O) js ys) ≡ erase-Ṗ {X = μ D} feqs (mapFold-Ṗ F (ornAlg P) ks zs)
   integrate-aux₀ y z refl refl ieq ys zs eeqs feqs eq = (id ** ≅-to-≡) (cong-split (cong (μ D) ieq) refl eq)
 
   integrate-aux₁ :
     ∀ {i j k} (y : μ E j) (eeq : e j ≡ i) (feq : f k ≡ i) (p : μ ⌊ O ⊗ P ⌋ (from≡ e eeq , from≡ f feq)) → forget (diffOrn-l O P) p ≅ y →
-    ∀ {is js ks} (eeqs : Ė e js is) (feqs : Ė f ks is) (ps : Ṁ (μ ⌊ O ⊗ P ⌋) (und-Ṁ is (pc-Ė eeqs feqs))) →
-    {ys : Ṁ (μ E) js} →
-    erase-Ṁ (diff-Ė-l eeqs feqs) (mapFold-Ṁ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-l O P) {jk}) (und-Ṁ is (pc-Ė eeqs feqs)) ps) ≡ ys →
-    erase-Ṁ (_∷_ {j = from≡ e eeq , from≡ f feq} (und-from≡ e eeq) (diff-Ė-l eeqs feqs))
-      (forget (diffOrn-l O P) p , mapFold-Ṁ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-l O P) {jk}) (und-Ṁ is (pc-Ė eeqs feqs)) ps) ≡ (y , ys)
+    ∀ {is js ks} (eeqs : Ė e js is) (feqs : Ė f ks is) (ps : Ṗ (μ ⌊ O ⊗ P ⌋) (und-Ṗ is (pc-Ė eeqs feqs))) →
+    {ys : Ṗ (μ E) js} →
+    erase-Ṗ (diff-Ė-l eeqs feqs) (mapFold-Ṗ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-l O P) {jk}) (und-Ṗ is (pc-Ė eeqs feqs)) ps) ≡ ys →
+    erase-Ṗ (_∷_ {j = from≡ e eeq , from≡ f feq} (und-from≡ e eeq) (diff-Ė-l eeqs feqs))
+      (forget (diffOrn-l O P) p , mapFold-Ṗ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-l O P) {jk}) (und-Ṗ is (pc-Ė eeqs feqs)) ps) ≡ (y , ys)
   integrate-aux₁ y refl feq p heq eeqs feqs ps eq = cong₂ _,_ (≅-to-≡ heq) eq
 
   integrate-aux₂ :
     ∀ {i j k} (z : μ F k) (eeq : e j ≡ i) (feq : f k ≡ i) (p : μ ⌊ O ⊗ P ⌋ (from≡ e eeq , from≡ f feq)) → forget (diffOrn-r O P) p ≅ z →
-    ∀ {is js ks} (eeqs : Ė e js is) (feqs : Ė f ks is) (ps : Ṁ (μ ⌊ O ⊗ P ⌋) (und-Ṁ is (pc-Ė eeqs feqs))) →
-    {zs : Ṁ (μ F) ks} →
-    erase-Ṁ (diff-Ė-r eeqs feqs) (mapFold-Ṁ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-r O P) {jk}) (und-Ṁ is (pc-Ė eeqs feqs)) ps) ≡ zs →
-    erase-Ṁ (_∷_ {j = from≡ e eeq , from≡ f feq} (und-from≡ f feq) (diff-Ė-r eeqs feqs))
-      (forget (diffOrn-r O P) p , mapFold-Ṁ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-r O P) {jk}) (und-Ṁ is (pc-Ė eeqs feqs))  ps) ≡ (z , zs)
+    ∀ {is js ks} (eeqs : Ė e js is) (feqs : Ė f ks is) (ps : Ṗ (μ ⌊ O ⊗ P ⌋) (und-Ṗ is (pc-Ė eeqs feqs))) →
+    {zs : Ṗ (μ F) ks} →
+    erase-Ṗ (diff-Ė-r eeqs feqs) (mapFold-Ṗ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-r O P) {jk}) (und-Ṗ is (pc-Ė eeqs feqs)) ps) ≡ zs →
+    erase-Ṗ (_∷_ {j = from≡ e eeq , from≡ f feq} (und-from≡ f feq) (diff-Ė-r eeqs feqs))
+      (forget (diffOrn-r O P) p , mapFold-Ṗ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-r O P) {jk}) (und-Ṗ is (pc-Ė eeqs feqs))  ps) ≡ (z , zs)
   integrate-aux₂ z eeq refl p heq eeqs feqs ps eq = cong₂ _,_ (≅-to-≡ heq) eq
 
-  integrate-aux-Ṁ :
+  integrate-aux-Ṗ :
     {is : List I} {js : List J} {ks : List K}
-    (eeqs : Ė e js is) (feqs : Ė f ks is) → (ys : Ṁ (μ E) js) → All-Ṁ integrate-Ind js ys → (zs : Ṁ (μ F) ks) →
-    erase-Ṁ {X = μ D} eeqs (mapFold-Ṁ E (ornAlg O) js ys) ≡ erase-Ṁ feqs (mapFold-Ṁ F (ornAlg P) ks zs) →
-    Σ[ ps ∶ Ṁ (μ ⌊ O ⊗ P ⌋) (und-Ṁ is (pc-Ė eeqs feqs)) ]
-      erase-Ṁ (diff-Ė-l eeqs feqs) (mapFold-Ṁ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-l O P) {jk}) (und-Ṁ is (pc-Ė eeqs feqs)) ps) ≡ ys
-    × erase-Ṁ (diff-Ė-r eeqs feqs) (mapFold-Ṁ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-r O P) {jk}) (und-Ṁ is (pc-Ė eeqs feqs)) ps) ≡ zs
-  integrate-aux-Ṁ []           []           _        _          _        _  = tt , refl , refl
-  integrate-aux-Ṁ (eeq ∷ eeqs) (feq ∷ feqs) (y , ys) (ih , ihs) (z , zs) eq =
+    (eeqs : Ė e js is) (feqs : Ė f ks is) → (ys : Ṗ (μ E) js) → All-Ṗ integrate-Ind js ys → (zs : Ṗ (μ F) ks) →
+    erase-Ṗ {X = μ D} eeqs (mapFold-Ṗ E (ornAlg O) js ys) ≡ erase-Ṗ feqs (mapFold-Ṗ F (ornAlg P) ks zs) →
+    Σ[ ps ∶ Ṗ (μ ⌊ O ⊗ P ⌋) (und-Ṗ is (pc-Ė eeqs feqs)) ]
+      erase-Ṗ (diff-Ė-l eeqs feqs) (mapFold-Ṗ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-l O P) {jk}) (und-Ṗ is (pc-Ė eeqs feqs)) ps) ≡ ys
+    × erase-Ṗ (diff-Ė-r eeqs feqs) (mapFold-Ṗ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-r O P) {jk}) (und-Ṗ is (pc-Ė eeqs feqs)) ps) ≡ zs
+  integrate-aux-Ṗ []           []           _        _          _        _  = tt , refl , refl
+  integrate-aux-Ṗ (eeq ∷ eeqs) (feq ∷ feqs) (y , ys) (ih , ihs) (z , zs) eq =
     let (heq , eq') = integrate-aux₀ y z eeq feq refl ys zs eeqs feqs (≡-to-≅ eq)
-        (ps , yeqs , zeqs) = integrate-aux-Ṁ eeqs feqs ys ihs zs eq'
+        (ps , yeqs , zeqs) = integrate-aux-Ṗ eeqs feqs ys ihs zs eq'
         (p  , yeq  , zeq ) = ih z heq _ (und-from≡ e eeq) (und-from≡ f feq)
     in  (p , ps) , integrate-aux₁ y eeq feq p yeq eeqs feqs ps yeqs , integrate-aux₂ z eeq feq p zeq eeqs feqs ps zeqs
 
@@ -115,7 +115,7 @@ module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (
     Σ[ ps ∶ ⟦ toRDesc (pcROrn O' P') ⟧ (μ ⌊ O ⊗ P ⌋) ]
       erase (diffROrn-l O' P') (mapFold ⌊ O ⊗ P ⌋ (toRDesc (pcROrn O' P')) (λ {jk} → ornAlg (diffOrn-l O P) {jk}) ps) ≡ ys
     × erase (diffROrn-r O' P') (mapFold ⌊ O ⊗ P ⌋ (toRDesc (pcROrn O' P')) (λ {jk} → ornAlg (diffOrn-r O P) {jk}) ps) ≡ zs
-  integrate-aux (ṿ eeqs)    (ṿ feqs)     ys         ihs          zs         eq = integrate-aux-Ṁ eeqs feqs ys ihs zs eq
+  integrate-aux (ṿ eeqs)    (ṿ feqs)     ys         ihs          zs         eq = integrate-aux-Ṗ eeqs feqs ys ihs zs eq
   integrate-aux (ṿ eeqs)    (Δ T P')     ys         ihs          (t , zs)   eq =
     let (ps , yseq , zseq) = integrate-aux (ṿ eeqs) (P' t) ys ihs zs eq in (t , ps) , yseq , cong (_,_ t) zseq
   integrate-aux (σ S O')    (σ .S P')    ys         ihs          zs         eq with cong proj₁ eq
@@ -175,7 +175,7 @@ module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (
     where
       aux' : ∀ {i k} (j : e ⁻¹ i) (eeq : e (und j) ≡ i) (feq : f k ≡ i)
              (p : μ ⌊ O ⊗ P ⌋ (j , from≡ f feq)) (ih : integrate-inv-Ind (j , from≡ f feq) p)
-             {is js ks} (eeqs : Ė e js is) (feqs : Ė f ks is) (ps : Ṁ (μ ⌊ O ⊗ P ⌋) (und-Ṁ is (pc-Ė eeqs feqs))) (heq : _) →
+             {is js ks} (eeqs : Ė e js is) (feqs : Ė f ks is) (ps : Ṗ (μ ⌊ O ⊗ P ⌋) (und-Ṗ is (pc-Ė eeqs feqs))) (heq : _) →
              proj₁ (integrate
                       (forget (diffOrn-l O P) p)
                       (subst (μ F) (und-from≡ f feq) (forget (diffOrn-r O P) p))
@@ -183,10 +183,10 @@ module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (
                                 (forget (diffOrn-l O P) p)
                                 (subst (μ F) (und-from≡ f feq) (forget (diffOrn-r O P) p))
                                 eeq feq refl
-                                (erase-Ṁ (diff-Ė-l eeqs feqs)
-                                         (mapFold-Ṁ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-l O P) {jk}) (und-Ṁ is (pc-Ė eeqs feqs)) ps))
-                                (erase-Ṁ (diff-Ė-r eeqs feqs)
-                                         (mapFold-Ṁ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-r O P) {jk}) (und-Ṁ is (pc-Ė eeqs feqs)) ps))
+                                (erase-Ṗ (diff-Ė-l eeqs feqs)
+                                         (mapFold-Ṗ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-l O P) {jk}) (und-Ṗ is (pc-Ė eeqs feqs)) ps))
+                                (erase-Ṗ (diff-Ė-r eeqs feqs)
+                                         (mapFold-Ṗ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-r O P) {jk}) (und-Ṗ is (pc-Ė eeqs feqs)) ps))
                                 eeqs feqs heq))
                       (j , from≡ f feq) refl (und-from≡ f feq)) ≡ p
       aux' j eeq refl p ih heq eeqs feqs ps = ih _ refl refl

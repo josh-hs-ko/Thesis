@@ -89,27 +89,27 @@ erase' (∇ s O) f ys       = s , erase' O f ys
 erase-Ṡ : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} → ROrn e D E → Ṡ E → Ṡ D
 erase-Ṡ O = erase' O (const !)
 
-erase-Ṁ : {I J : Set} {e : J → I} {X : I → Set} → Erasure e (Ṁ (X ∘ e)) (Ṁ X)
-erase-Ṁ         []         _        = tt
-erase-Ṁ {X = X} (eq ∷ eqs) (x , xs) = subst X eq x , erase-Ṁ eqs xs
+erase-Ṗ : {I J : Set} {e : J → I} {X : I → Set} → Erasure e (Ṗ (X ∘ e)) (Ṗ X)
+erase-Ṗ         []         _        = tt
+erase-Ṗ {X = X} (eq ∷ eqs) (x , xs) = subst X eq x , erase-Ṗ eqs xs
 
-ṀHEq : {I : Set} {X Y : I → Set} (is : List I) → Ṁ X is → Ṁ Y is → Set
-ṀHEq is xs ys = All-Ṁ (λ _ xy → proj₁ xy ≅ proj₂ xy) is (Ṁ-comp is xs ys)
+ṖHEq : {I : Set} {X Y : I → Set} (is : List I) → Ṗ X is → Ṗ Y is → Set
+ṖHEq is xs ys = All-Ṗ (λ _ xy → proj₁ xy ≅ proj₂ xy) is (Ṗ-comp is xs ys)
 
-cong-erase-Ṁ :
+cong-erase-Ṗ :
   {I J : Set} {e e' : J → I} {is is' : List I} {js : List J} (eqs : Ė e js is) (eqs' : Ė e' js is') → is ≡ is' →
-  {X : I → Set} (xs : Ṁ (X ∘ e) js) (xs' : Ṁ (X ∘ e') js) → ṀHEq js xs xs' → erase-Ṁ {X = X} eqs xs ≅ erase-Ṁ {X = X} eqs' xs'
-cong-erase-Ṁ         []                 []            refl _        _          _                     = hrefl
-cong-erase-Ṁ {e = e} (_∷_ {j} refl eqs) (refl ∷ eqs') iseq (x , xs) (x' , xs') (heq , heqs) with e j
-cong-erase-Ṁ {e = e} (_∷_ {j} refl eqs) (refl ∷ eqs') refl (x , xs) (.x , xs') (hrefl , heqs) | ._   =
-  ≡-to-≅ (cong (_,_ x) (≅-to-≡ (cong-erase-Ṁ eqs eqs' refl xs xs' heqs)))
+  {X : I → Set} (xs : Ṗ (X ∘ e) js) (xs' : Ṗ (X ∘ e') js) → ṖHEq js xs xs' → erase-Ṗ {X = X} eqs xs ≅ erase-Ṗ {X = X} eqs' xs'
+cong-erase-Ṗ         []                 []            refl _        _          _                     = hrefl
+cong-erase-Ṗ {e = e} (_∷_ {j} refl eqs) (refl ∷ eqs') iseq (x , xs) (x' , xs') (heq , heqs) with e j
+cong-erase-Ṗ {e = e} (_∷_ {j} refl eqs) (refl ∷ eqs') refl (x , xs) (.x , xs') (hrefl , heqs) | ._   =
+  ≡-to-≅ (cong (_,_ x) (≅-to-≡ (cong-erase-Ṗ eqs eqs' refl xs xs' heqs)))
 
 erase : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} → ROrn e D E → {X : I → Set} → ⟦ E ⟧ (X ∘ e) → ⟦ D ⟧ X
-erase O = erase' O erase-Ṁ
+erase O = erase' O erase-Ṗ
 
-erase-idROrn-Ṁ : {I : Set} {X : I → Set} (is : List I) (xs : Ṁ X is) → erase-Ṁ Ė-refl xs ≡ xs
-erase-idROrn-Ṁ []       _        = refl
-erase-idROrn-Ṁ (i ∷ is) (x , xs) = cong₂ _,_ refl (erase-idROrn-Ṁ is xs)
+erase-idROrn-Ṗ : {I : Set} {X : I → Set} (is : List I) (xs : Ṗ X is) → erase-Ṗ Ė-refl xs ≡ xs
+erase-idROrn-Ṗ []       _        = refl
+erase-idROrn-Ṗ (i ∷ is) (x , xs) = cong₂ _,_ refl (erase-idROrn-Ṗ is xs)
 
 erase'-idROrn : {I : Set} (D : RDesc I) {X Y : List I → Set} (f : Erasure id Y X) (ys : Ḣ D Y) → erase' (idROrn D) f ys ≡ Ḣ-map D (f Ė-refl) ys
 erase'-idROrn (ṿ is)  f ys       = refl
@@ -144,7 +144,7 @@ forget-idOrn {I} {D} = induction D (λ _ x → forget (idOrn D) x ≡ x) (λ i x
 -- ornamental descriptions
 
 data ROrnDesc {I : Set} (J : Set) (e : J → I) : RDesc I → Set₁ where
-  ṿ   : {is : List I} (js : Ṁ (InvImage e) is) → ROrnDesc J e (ṿ is)
+  ṿ   : {is : List I} (js : Ṗ (InvImage e) is) → ROrnDesc J e (ṿ is)
   σ   : (S : Set) → ∀ {D} (O : ∀ s → ROrnDesc J e (D s)) → ROrnDesc J e (σ S D)
   Δ   : (T : Set) → ∀ {D} (O : T → ROrnDesc J e D) → ROrnDesc J e D
   ∇   : {S : Set} (s : S) → ∀ {D} (O : ROrnDesc J e (D s)) → ROrnDesc J e (σ S D)
@@ -154,12 +154,12 @@ record OrnDesc {I : Set} (J : Set) (e : J → I) (D : Desc I) : Set₁ where
   field
     comp : ∀ {i} (j : e ⁻¹ i) → ROrnDesc J e (Desc.comp D i)
 
-und-Ṁ : {I J : Set} {e : J → I} (is : List I) → Ṁ (InvImage e) is → List J
-und-Ṁ []       _        = []
-und-Ṁ (i ∷ is) (j , js) = und j ∷ und-Ṁ is js
+und-Ṗ : {I J : Set} {e : J → I} (is : List I) → Ṗ (InvImage e) is → List J
+und-Ṗ []       _        = []
+und-Ṗ (i ∷ is) (j , js) = und j ∷ und-Ṗ is js
 
 toRDesc : {I J : Set} {e : J → I} {D : RDesc I} → ROrnDesc J e D → RDesc J
-toRDesc (ṿ js)  = ṿ (und-Ṁ _ js)
+toRDesc (ṿ js)  = ṿ (und-Ṗ _ js)
 toRDesc (σ S O) = σ[ s ∶ S ] toRDesc (O s)
 toRDesc (Δ T O) = σ[ t ∶ T ] toRDesc (O t)
 toRDesc (∇ s O) = toRDesc O
@@ -167,12 +167,12 @@ toRDesc (∇ s O) = toRDesc O
 ⌊_⌋ : {I J : Set} {e : J → I} {D : Desc I} → OrnDesc J e D → Desc J
 ⌊ wrap O ⌋ = wrap λ j → toRDesc (O (ok j))
 
-to≡-Ṁ : {I J : Set} {e : J → I} (is : List I) (js : Ṁ (InvImage e) is) → Ė e (und-Ṁ is js) is
-to≡-Ṁ []       _        = []
-to≡-Ṁ (i ∷ is) (j , js) = to≡ j ∷ to≡-Ṁ is js
+to≡-Ṗ : {I J : Set} {e : J → I} (is : List I) (js : Ṗ (InvImage e) is) → Ė e (und-Ṗ is js) is
+to≡-Ṗ []       _        = []
+to≡-Ṗ (i ∷ is) (j , js) = to≡ j ∷ to≡-Ṗ is js
 
 toROrn : {I J : Set} {e : J → I} {D : RDesc I} → (O : ROrnDesc J e D) → ROrn e D (toRDesc O)
-toROrn (ṿ js)  = ṿ (to≡-Ṁ _ js)
+toROrn (ṿ js)  = ṿ (to≡-Ṗ _ js)
 toROrn (σ S O) = σ[ s ∶ S ] toROrn (O s)
 toROrn (Δ T O) = Δ[ t ∶ T ] toROrn (O t)
 toROrn (∇ s O) = ∇ s (toROrn O)
@@ -181,7 +181,7 @@ toROrn (∇ s O) = ∇ s (toROrn O)
 ⌈ wrap O ⌉ = wrap λ { {._} (ok j) → toROrn (O (ok j)) }
 
 idROrnDesc : ∀ {I} (D : RDesc I) → ROrnDesc I id D
-idROrnDesc (ṿ is)  = ṿ (generate-Ṁ ok is)
+idROrnDesc (ṿ is)  = ṿ (generate-Ṗ ok is)
 idROrnDesc (σ S D) = σ[ s ∶ S ] idROrnDesc (D s)
 
 
@@ -189,7 +189,7 @@ idROrnDesc (σ S D) = σ[ s ∶ S ] idROrnDesc (D s)
 -- singleton ornaments
 
 erode : {I : Set} (D : RDesc I) → {J : I → Set} → ⟦ D ⟧ J → ROrnDesc (Σ I J) proj₁ D
-erode (ṿ is)  js         = ṿ (Ṁ-map (λ {i} j → ok (i , j)) is js)
+erode (ṿ is)  js         = ṿ (Ṗ-map (λ {i} j → ok (i , j)) is js)
 erode (σ S D) (s , js)   = ∇ s (erode (D s) js)
 
 singOrn : {I : Set} (D : Desc I) → OrnDesc (Σ I (μ D)) proj₁ D

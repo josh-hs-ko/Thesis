@@ -12,7 +12,7 @@ open import Data.List using (List; []; _∷_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst)
 
 
-pc-Ė : ∀ {I J K} {e : J → I} {f : K → I} {is js ks} → Ė e js is → Ė f ks is → Ṁ (InvImage (pull {J} {K} {I} {e} {f})) is
+pc-Ė : ∀ {I J K} {e : J → I} {f : K → I} {is js ks} → Ė e js is → Ė f ks is → Ṗ (InvImage (pull {J} {K} {I} {e} {f})) is
 pc-Ė             []           _            = tt
 pc-Ė {e = e} {f} (eeq ∷ eeqs) (feq ∷ feqs) = ok (from≡ e eeq , from≡ f feq) , pc-Ė eeqs feqs
 
@@ -39,7 +39,7 @@ _⊗_ {e = e} {f} {D} {E} {F} (wrap O) (wrap P) = wrap λ { {._} (ok (j , k)) �
 
 -- left difference ornament
 
-diff-Ė-l : ∀ {I J K} {e : J → I} {f : K → I} {is js ks} (eeqs : Ė e js is) (feqs : Ė f ks is) → Ė π₁ (und-Ṁ is (pc-Ė eeqs feqs)) js
+diff-Ė-l : ∀ {I J K} {e : J → I} {f : K → I} {is js ks} (eeqs : Ė e js is) (feqs : Ė f ks is) → Ė π₁ (und-Ṗ is (pc-Ė eeqs feqs)) js
 diff-Ė-l         []           _            = []
 diff-Ė-l {e = e} (eeq ∷ eeqs) (feq ∷ feqs) = und-from≡ e eeq ∷ diff-Ė-l eeqs feqs
 
@@ -69,7 +69,7 @@ diffOrn-l {e = e} {f} {D} {E} {F} (wrap O) (wrap P) = wrap λ { {._} (ok (j , k)
 
 -- right difference ornament
 
-diff-Ė-r : ∀ {I J K} {e : J → I} {f : K → I} {is js ks} (eeqs : Ė e js is) (feqs : Ė f ks is) → Ė π₂ (und-Ṁ is (pc-Ė eeqs feqs)) ks
+diff-Ė-r : ∀ {I J K} {e : J → I} {f : K → I} {is js ks} (eeqs : Ė e js is) (feqs : Ė f ks is) → Ė π₂ (und-Ṗ is (pc-Ė eeqs feqs)) ks
 diff-Ė-r         _            []           = []
 diff-Ė-r {f = f} (eeq ∷ eeqs) (feq ∷ feqs) = und-from≡ f feq ∷ diff-Ė-r eeqs feqs
 

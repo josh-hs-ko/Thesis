@@ -25,12 +25,12 @@ mutual
   foldR' {I} {D} {X} R i (con ds) = mapFoldR D (Desc.comp D i) R ds >>= (R !!) i
 
   mapFoldR : {I : Set} (D : Desc I) (E : RDesc I) {X : I → Set} → (Ḟ D X ↝⁺ X) → ⟦ E ⟧ (μ D) ↝ ⟦ E ⟧ X
-  mapFoldR D (ṿ is)   R ds       = mapFoldR-Ṁ D R is ds
+  mapFoldR D (ṿ is)   R ds       = mapFoldR-Ṗ D R is ds
   mapFoldR D (σ S E)  R (s , ds) = map℘ (_,_ s) (mapFoldR D (E s) R ds)
 
-  mapFoldR-Ṁ : {I : Set} (D : Desc I) {X : I → Set} → (Ḟ D X ↝⁺ X) → (is : List I) → Ṁ (μ D) is ↝ Ṁ X is
-  mapFoldR-Ṁ D R []       _        = any
-  mapFoldR-Ṁ D R (i ∷ is) (d , ds) = map℘₂ _,_ (foldR' R i d) (mapFoldR-Ṁ D R is ds)
+  mapFoldR-Ṗ : {I : Set} (D : Desc I) {X : I → Set} → (Ḟ D X ↝⁺ X) → (is : List I) → Ṗ (μ D) is ↝ Ṗ X is
+  mapFoldR-Ṗ D R []       _        = any
+  mapFoldR-Ṗ D R (i ∷ is) (d , ds) = map℘₂ _,_ (foldR' R i d) (mapFoldR-Ṗ D R is ds)
 
 foldR : {I : Set} {D : Desc I} {X : I → Set} → (Ḟ D X ↝⁺ X) → μ D ↝⁺ X
 foldR R = wrap (foldR' R)
@@ -42,7 +42,7 @@ foldR'-fun⁺-computation {I} {D} {X} f =
     aux : (D' : RDesc I) (ds : ⟦ D' ⟧ (μ D)) → All D' (λ i d → foldR' (fun⁺ f) i d (fold f d)) ds →
           mapFoldR D D' (fun⁺ f) ds (mapFold D D' f ds)
     aux (ṿ [])       _        _          = tt
-    aux (ṿ (i ∷ is)) (d , ds) (ih , ihs) = fold f d , ih , mapFold-Ṁ D f is ds , aux (ṿ is) ds ihs , refl
+    aux (ṿ (i ∷ is)) (d , ds) (ih , ihs) = fold f d , ih , mapFold-Ṗ D f is ds , aux (ṿ is) ds ihs , refl
     aux (σ S D')     (s , ds) ihs        = mapFold D (D' s) f ds , aux (D' s) ds ihs , refl
 
 foldR'-fun⁺-unique : {I : Set} {D : Desc I} {X : I → Set} (f : Ḟ D X ⇉ X) → ∀ {i} (d : μ D i) (x : X i) → foldR' (fun⁺ f) i d x → fold f d ≡ x

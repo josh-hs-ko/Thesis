@@ -29,12 +29,12 @@ record ḢTrans {I J : Set} (e : J → I) (D : RDesc I) (E : RDesc J) : Set wher
               {X : List I → Set} {Y : List J → Set} → Erasure e Y X → Σ (Ṡ E) (Y ∘ next E) → Σ (Ṡ D) (X ∘ next D)
 ḢTrans-app' t f (hs , y) = ḢTrans.s t hs , f (ḢTrans.c t hs) y
 
-cong-ḢTrans-app'-erase-Ṁ :
+cong-ḢTrans-app'-erase-Ṗ :
   {I J : Set} {e e' : J → I} {D : RDesc I} {E : RDesc J} (t : ḢTrans e D E) (u : ḢTrans e' D E) →
-  e ≐ e' → ḢTrans.s t ≐ ḢTrans.s u → (hs : Ṡ E) {X : I → Set} (xs : Ṁ (X ∘ e) (next E hs)) (xs' : Ṁ (X ∘ e') (next E hs)) →
-  ṀHEq (next E hs) xs xs' → ḢTrans-app' t {Ṁ X} erase-Ṁ (hs , xs) ≡ ḢTrans-app' u {Ṁ X} erase-Ṁ (hs , xs')
-cong-ḢTrans-app'-erase-Ṁ {D = D} t u e≐e' t≐u hs xs xs' heq =
-  cong₂-pair (t≐u hs) (cong-erase-Ṁ (ḢTrans.c t hs) (ḢTrans.c u hs) (cong (next D) (t≐u hs)) xs xs' heq)
+  e ≐ e' → ḢTrans.s t ≐ ḢTrans.s u → (hs : Ṡ E) {X : I → Set} (xs : Ṗ (X ∘ e) (next E hs)) (xs' : Ṗ (X ∘ e') (next E hs)) →
+  ṖHEq (next E hs) xs xs' → ḢTrans-app' t {Ṗ X} erase-Ṗ (hs , xs) ≡ ḢTrans-app' u {Ṗ X} erase-Ṗ (hs , xs')
+cong-ḢTrans-app'-erase-Ṗ {D = D} t u e≐e' t≐u hs xs xs' heq =
+  cong₂-pair (t≐u hs) (cong-erase-Ṗ (ḢTrans.c t hs) (ḢTrans.c u hs) (cong (next D) (t≐u hs)) xs xs' heq)
 
 ḢTrans-app : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (t : ḢTrans e D E)
              {X : List I → Set} {Y : List J → Set} → Erasure e Y X → Ḣ E Y → Ḣ D X

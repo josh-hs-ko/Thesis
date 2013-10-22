@@ -48,7 +48,7 @@ import Examples.BinomialHeap
 import Examples.Insertion
 import Examples.LeftistHeap
 import Examples.List
-import Examples.List.Sorted
+import Examples.List.Ordered
 import Examples.List.Vec
 import Examples.MinCoinChange
 import Examples.Nat
