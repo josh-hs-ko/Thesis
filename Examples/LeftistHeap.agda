@@ -101,46 +101,48 @@ toList : {b : Val} {r : Nat} → LHeap b r → List Val
 toList = preorder ∘ forget (⌈ HeapOD ⌉ ⊙ diffOrn-l TreeD-HeapD ⌈ LTreeOD ⌉)
 
 lhrelax : {b b' : Val} → b' ≤ b → {r : Nat} → LHeap b r → LHeap b' r
-lhrelax = Upgrade.u upg id λ { b'≤b _ (p , q) → relax b'≤b p , q }
+lhrelax {b} {b'} b'≤b {r} = Upgrade.u upg id (λ _ → relax b'≤b ** id)
   where ref : (b : Val) (r : Nat) → Refinement Tree (LHeap b r)
         ref b r = FRefinement.comp (toFRefinement (⊗-FSwap TreeD-HeapD ⌈ LTreeOD ⌉ id-FSwap id-FSwap)) (ok (ok b , ok r))
-        upg : Upgrade (Tree → Tree) ({b b' : Val} → b' ≤ b → {r : Nat} → LHeap b r → LHeap b' r)
-        upg = ∀⁺[[ b ∶ Val ]] ∀⁺[[ b' ∶ Val ]] ∀⁺[ _ ∶ b' ≤ b ] ∀⁺[[ r ∶ Nat ]] ref b r ⇀ toUpgrade (ref b' r)
+        upg : Upgrade (Tree → Tree) (LHeap b r → LHeap b' r)
+        upg = ref b r ⇀ toUpgrade (ref b' r)
 
-makeT : (x : Val) {r : Nat} (h : LHeap x r) {r' : Nat} (h' : LHeap x r') → Σ[ r'' ∶ Nat ] LHeap x r''
-makeT x {r} h {r'} h' with r ≤'? r'
-makeT x {r} h {r'} h' | yes r≤r' = suc r  , con (x , ≤-refl , r' , r≤r' , h' , h , tt)
-makeT x {r} h {r'} h' | no  r≰r' = suc r' , con (x , ≤-refl , r , ≰'-invert r≰r' , h , h' , tt)
+makeT : (x : Val) {r₀ : Nat} → LHeap x r₀ → {r₁ : Nat} → LHeap x r₁ → Σ[ r ∶ Nat ] LHeap x r
+makeT x {r₀} h₀ {r₁} h₁ with r₀ ≤'? r₁
+makeT x {r₀} h₀ {r₁} h₁ | yes r₀≤r₁ = suc r₀ , con (x , ≤-refl , r₁ , r₀≤r₁ , h₁ , h₀ , tt)
+makeT x {r₀} h₀ {r₁} h₁ | no  r₀≰r₁ = suc r₁ , con (x , ≤-refl , r₀ , ≰'-invert r₀≰r₁ , h₀ , h₁ , tt)
 
 mutual
 
-  merge : {b : Val} {r : Nat} → LHeap b r → {b' : Val} {r' : Nat} → LHeap b' r' →
-          {b'' : Val} → b'' ≤ b → b'' ≤ b' → Σ[ r'' ∶ Nat ] LHeap b'' r''
-  merge {b} {con (`nil  ,     _)} h h' b''≤b b''≤b' = _ , lhrelax b''≤b' h'
-  merge {b} {con (`cons , r , _)} h h' b''≤b b''≤b' = merge' h h' b''≤b b''≤b'
+  merge : {b₀ : Val} {r₀ : Nat} → LHeap b₀ r₀ →
+          {b₁ : Val} {r₁ : Nat} → LHeap b₁ r₁ →
+          {b : Val} → b ≤ b₀ → b ≤ b₁ → Σ[ r ∶ Nat ] LHeap b r
+  merge {b₀} {con (`nil  ,      _)} h₀ h₁ b≤b₀ b≤b₁ = _ , lhrelax b≤b₁ h₁
+  merge {b₀} {con (`cons , r₀ , _)} h₀ h₁ b≤b₀ b≤b₁ = merge' h₀ h₁ b≤b₀ b≤b₁
 
-  merge' : {b : Val} {r : Nat} → LHeap b (suc r) → {b' : Val} {r' : Nat} → LHeap b' r' →
-           {b'' : Val} → b'' ≤ b → b'' ≤ b' → Σ[ r'' ∶ Nat ] LHeap b'' r''
-  merge' h {b'} {con (`nil , _)} h' b''≤b b''≤b' = _ , lhrelax b''≤b h
-  merge' (con (x  , b≤x   , l  , r≤l   , t  , u  , _))
-         {b'} {con (`cons , r' , _)} (con (x' , b'≤x' , l' , r'≤l' , t' , u' , _)) b''≤b b''≤b' =
-    merge'-with x b≤x l r≤l t u x' b'≤x' l' r'≤l' t' u' b''≤b b''≤b' (x ≤? x')
+  merge' : {b₀ : Val} {r₀ : Nat} → LHeap b₀ (suc r₀) →
+           {b₁ : Val} {r₁ : Nat} → LHeap b₁ r₁ →
+           {b : Val} → b ≤ b₀ → b ≤ b₁ → Σ[ r ∶ Nat ] LHeap b r
+  merge' h₀ {b₁} {con (`nil , _)} h₁ b≤b₀ b≤b₁ = _ , lhrelax b≤b₀ h₀
+  merge' (con (x₀  , b₀≤x₀   , l₀  , r₀≤l₀   , t₀  , u₀  , _))
+         {b₁} {con (`cons , r₁ , _)} (con (x₁ , b₁≤x₁ , l₁ , r₁≤l₁ , t₁ , u₁ , _)) b≤b₀ b≤b₁ =
+    merge'-with x₀ b₀≤x₀ l₀ r₀≤l₀ t₀ u₀ x₁ b₁≤x₁ l₁ r₁≤l₁ t₁ u₁ b≤b₀ b≤b₁ (x₀ ≤? x₁)
 
   -- avoiding with-matching to circumvent a possible error of Agda
 
   merge'-with :
-    {b  : Val} {r  : Nat} → (x  : Val) (b≤x   : b  ≤ x ) (l  : Nat) (r≤l   : r  ≤' l ) (t  : LHeap x  l ) (u  : LHeap x  r ) →
-    {b' : Val} {r' : Nat} → (x' : Val) (b'≤x' : b' ≤ x') (l' : Nat) (r'≤l' : r' ≤' l') (t' : LHeap x' l') (u' : LHeap x' r') →
-    {b'' : Val} → b'' ≤ b → b'' ≤ b' → Dec (x ≤ x') → Σ[ r'' ∶ Nat ] LHeap b'' r''
-  merge'-with {b} {r} x b≤x l r≤l t u {b'} {r'} x' b'≤x' l' r'≤l' t' u' b''≤b b''≤b' (yes x≤x') =
-    _ , lhrelax (≤-trans b''≤b b≤x)
-          (proj₂ (makeT x t (proj₂ (merge u {r' = suc r'} (con (x' , x≤x' , l' , r'≤l' , t' , u' , tt)) ≤-refl ≤-refl))))
-  merge'-with {b} {r} x b≤x l r≤l t u {b'} {r'} x' b'≤x' l' r'≤l' t' u' b''≤b b''≤b' (no  x≰x') =
-    _ , lhrelax (≤-trans b''≤b' b'≤x')
-          (proj₂ (makeT x' t' (proj₂ (merge' {r = r} (con (x , ≰-invert x≰x' , l , r≤l , t , u , tt)) u' ≤-refl ≤-refl))))
+    {b₀ : Val} {r₀ : Nat} → (x₀ : Val) (b₀≤x₀ : b₀ ≤ x₀) (l₀ : Nat) (r₀≤l₀ : r₀ ≤' l₀) (t₀ : LHeap x₀ l₀) (u₀ : LHeap x₀ r₀) →
+    {b₁ : Val} {r₁ : Nat} → (x₁ : Val) (b₁≤x₁ : b₁ ≤ x₁) (l₁ : Nat) (r₁≤l₁ : r₁ ≤' l₁) (t₁ : LHeap x₁ l₁) (u₁ : LHeap x₁ r₁) →
+    {b : Val} → b ≤ b₀ → b ≤ b₁ → Dec (x₀ ≤ x₁) → Σ[ r ∶ Nat ] LHeap b r
+  merge'-with {b₀} {r₀} x₀ b₀≤x₀ l₀ r₀≤l₀ t₀ u₀ {b₁} {r₁} x₁ b₁≤x₁ l₁ r₁≤l₁ t₁ u₁ b≤b₀ b≤b₁ (yes x₀≤x₁) =
+    _ , lhrelax (≤-trans b≤b₀ b₀≤x₀)
+          (proj₂ (makeT x₀ t₀ (proj₂ (merge u₀ {r₁ = suc r₁} (con (x₁ , x₀≤x₁ , l₁ , r₁≤l₁ , t₁ , u₁ , tt)) ≤-refl ≤-refl))))
+  merge'-with {b₀} {r₀} x₀ b₀≤x₀ l₀ r₀≤l₀ t₀ u₀ {b₁} {r₁} x₁ b₁≤x₁ l₁ r₁≤l₁ t₁ u₁ b≤b₀ b≤b₁ (no  x₀≰x₁) =
+    _ , lhrelax (≤-trans b≤b₁ b₁≤x₁)
+          (proj₂ (makeT x₁ t₁ (proj₂ (merge' {r₀ = r₀} (con (x₀ , ≰-invert x₀≰x₁ , l₀ , r₀≤l₀ , t₀ , u₀ , tt)) u₁ ≤-refl ≤-refl))))
 
 insert : (y : Val) {b : Val} {r : Nat} → LHeap b r → {b' : Val} → b' ≤ b → b' ≤ y → Σ[ r' ∶ Nat ] LHeap b' r'
-insert y h = merge h {r' = suc zero} (con (y , ≤-refl , zero , ≤'-refl , con tt , con tt , tt))
+insert y h = merge h {r₁ = suc zero} (con (y , ≤-refl , zero , ≤'-refl , con tt , con tt , tt))
 
 
 --------
@@ -164,7 +166,7 @@ toList-W : {b : Val} {n : Nat} → WLHeap b n → List Val
 toList-W = preorder ∘ forget (⌈ HeapOD ⌉ ⊙ diffOrn-l TreeD-HeapD ⌈ WLTreeOD ⌉)
 
 wlhrelax : {b b' : Val} → b' ≤ b → {n : Nat} → WLHeap b n → WLHeap b' n
-wlhrelax = Upgrade.u upg id λ { b'≤b _ (p , q) → relax b'≤b p , q }
+wlhrelax = Upgrade.u upg id λ { b'≤b _ → relax b'≤b ** id }
   where ref : (b : Val) (n : Nat) → Refinement Tree (WLHeap b n)
         ref b r = FRefinement.comp (toFRefinement (⊗-FSwap TreeD-HeapD ⌈ WLTreeOD ⌉ id-FSwap id-FSwap)) (ok (ok b , ok r))
         upg : Upgrade (Tree → Tree) ({b b' : Val} → b' ≤ b → {n : Nat} → WLHeap b n → WLHeap b' n)
@@ -175,33 +177,35 @@ wlhrelax = Upgrade.u upg id λ { b'≤b _ (p , q) → relax b'≤b p , q }
 
 mutual
 
-  wmerge : {b : Val} {n : Nat} → WLHeap b n → {b' : Val} {n' : Nat} → WLHeap b' n' →
-           {b'' : Val} → b'' ≤ b → b'' ≤ b' → WLHeap b'' (n + n')
-  wmerge {b} {con (`nil  ,     _)} h h' b''≤b b''≤b' = wlhrelax b''≤b' h'
-  wmerge {b} {con (`cons , n , _)} h h' b''≤b b''≤b' = wmerge' h h' b''≤b b''≤b'
+  wmerge : {b₀ : Val} {n₀ : Nat} → WLHeap b₀ n₀ → {b₁ : Val} {n₁ : Nat} → WLHeap b₁ n₁ →
+           {b : Val} → b ≤ b₀ → b ≤ b₁ → WLHeap b (n₀ + n₁)
+  wmerge {b₀} {con (`nil  ,      _)} h₀ h₁ b≤b₀ b≤b₁ = wlhrelax b≤b₁ h₁
+  wmerge {b₀} {con (`cons , n₀ , _)} h₀ h₁ b≤b₀ b≤b₁ = wmerge' h₀ h₁ b≤b₀ b≤b₁
 
-  wmerge' : {b : Val} {n : Nat} → WLHeap b (suc n) → {b' : Val} {n' : Nat} → WLHeap b' n' →
-            {b'' : Val} → b'' ≤ b → b'' ≤ b' → WLHeap b'' (suc n + n')
-  wmerge' {b} {n} h {b'} {con (`nil , _)} h' b''≤b b''≤b' = wlhrelax b''≤b (subst (WLHeap b) (sym (rhs-zero (suc n))) h)
-  wmerge' {b} {n} (con (x , b≤x , l , r , r≤l , n≡l+r , t , u , _))
-          {b'} {con (`cons , n' , _)} (con (x' , b'≤x' , l' , r' , r'≤l' , n'≡l'+r' , t' , u' , _)) b''≤b b''≤b' =
-    wmerge'-with x b≤x l r r≤l n≡l+r t u x' b'≤x' l' r' r'≤l' n'≡l'+r' t' u' b''≤b b''≤b' (x ≤? x')
+  wmerge' : {b₀ : Val} {n₀ : Nat} → WLHeap b₀ (suc n₀) → {b₁ : Val} {n₁ : Nat} → WLHeap b₁ n₁ →
+            {b : Val} → b ≤ b₀ → b ≤ b₁ → WLHeap b (suc n₀ + n₁)
+  wmerge' {b₀} {n₀} h₀ {b₁} {con (`nil , _)} h₁ b≤b₀ b≤b₁ = wlhrelax b≤b₀ (subst (WLHeap b₀) (sym (rhs-zero (suc n₀))) h₀)
+  wmerge' {b₀} {n₀} (con (x₀ , b₀≤x₀ , l₀ , r₀ , r₀≤l₀ , n₀≡l₀+r₀ , t₀ , u₀ , _))
+          {b₁} {con (`cons , n₁ , _)} (con (x₁ , b₁≤x₁ , l₁ , r₁ , r₁≤l₁ , n₁≡l₁+r₁ , t₁ , u₁ , _)) b≤b₀ b≤b₁ =
+    wmerge'-with x₀ b₀≤x₀ l₀ r₀ r₀≤l₀ n₀≡l₀+r₀ t₀ u₀ x₁ b₁≤x₁ l₁ r₁ r₁≤l₁ n₁≡l₁+r₁ t₁ u₁ b≤b₀ b≤b₁ (x₀ ≤? x₁)
 
   wmerge'-with :
-    {b  : Val} {n  : Nat} (x  : Val) (b≤x   : b  ≤ x ) (l  r  : Nat) (r≤l   : r  ≤' l ) (n≡l+r    : n  ≡ l  + r ) (t  : WLHeap x  l ) (u  : WLHeap x  r ) →
-    {b' : Val} {n' : Nat} (x' : Val) (b'≤x' : b' ≤ x') (l' r' : Nat) (r'≤l' : r' ≤' l') (n'≡l'+r' : n' ≡ l' + r') (t' : WLHeap x' l') (u' : WLHeap x' r') →
-    {b'' : Val} → b'' ≤ b → b'' ≤ b' → Dec (x ≤ x') → WLHeap b'' (suc n + suc n')
-  wmerge'-with {b} {n} x b≤x l r r≤l n≡l+r t u {b'} {n'} x' b'≤x' l' r' r'≤l' n'≡l'+r' t' u' b''≤b b''≤b' (yes x≤x') =
-    wlhrelax (≤-trans b''≤b b≤x) 
-      (subst (WLHeap x) (cong suc (trans (sym (assoc l r (suc n'))) (cong (λ m → m + suc n') (sym n≡l+r))))
-        (wmakeT x t (wmerge u {n' = suc n'} (con (x' , x≤x' , l' , r' , r'≤l' , n'≡l'+r' , t' , u' , tt)) ≤-refl ≤-refl)))
-  wmerge'-with {b} {n} x b≤x l r r≤l n≡l+r t u {b'} {n'} x' b'≤x' l' r' r'≤l' n'≡l'+r' t' u' b''≤b b''≤b' (no  x≰x') =
-    wlhrelax (≤-trans b''≤b' b'≤x')
-      (subst (WLHeap x') (cong suc (trans (assoc (suc n) l' r')
-                                          (trans (sym (rhs-suc n (l' + r'))) (cong (_+_ n) (cong suc (sym n'≡l'+r'))))))
-        (wmakeT x' (wmerge' {n = n} (con (x , ≰-invert x≰x' , l , r , r≤l , n≡l+r , t , u , tt)) t' ≤-refl ≤-refl) u'))
+    {b₀  : Val} {n₀ : Nat} (x₀ : Val) (b₀≤x₀ : b₀ ≤ x₀) (l₀ r₀ : Nat) (r₀≤l₀ : r₀ ≤' l₀) (n₀≡l₀+r₀ : n₀ ≡ l₀ + r₀)
+      (t₀ : WLHeap x₀ l₀) (u₀ : WLHeap x₀ r₀) →
+    {b₁  : Val} {n₁ : Nat} (x₁ : Val) (b₁≤x₁ : b₁ ≤ x₁) (l₁ r₁ : Nat) (r₁≤l₁ : r₁ ≤' l₁) (n₁≡l₁+r₁ : n₁ ≡ l₁ + r₁)
+      (t₁ : WLHeap x₁ l₁) (u₁ : WLHeap x₁ r₁) →
+    {b : Val} → b ≤ b₀ → b ≤ b₁ → Dec (x₀ ≤ x₁) → WLHeap b (suc n₀ + suc n₁)
+  wmerge'-with {b₀} {n₀} x₀ b₀≤x₀ l₀ r₀ r₀≤l₀ n₀≡l₀+r₀ t₀ u₀ {b₁} {n₁} x₁ b₁≤x₁ l₁ r₁ r₁≤l₁ n₁≡l₁+r₁ t₁ u₁ b≤b₀ b≤b₁ (yes x₀≤x₁) =
+    wlhrelax (≤-trans b≤b₀ b₀≤x₀) 
+      (subst (WLHeap x₀) (cong suc (trans (sym (assoc l₀ r₀ (suc n₁))) (cong (λ m → m + suc n₁) (sym n₀≡l₀+r₀))))
+        (wmakeT x₀ t₀ (wmerge u₀ {n₁ = suc n₁} (con (x₁ , x₀≤x₁ , l₁ , r₁ , r₁≤l₁ , n₁≡l₁+r₁ , t₁ , u₁ , tt)) ≤-refl ≤-refl)))
+  wmerge'-with {b₀} {n₀} x₀ b₀≤x₀ l₀ r₀ r₀≤l₀ n₀≡l₀+r₀ t₀ u₀ {b₁} {n₁} x₁ b₁≤x₁ l₁ r₁ r₁≤l₁ n₁≡l₁+r₁ t₁ u₁ b≤b₀ b≤b₁ (no  x₀≰x₁) =
+    wlhrelax (≤-trans b≤b₁ b₁≤x₁)
+      (subst (WLHeap x₁) (cong suc (trans (assoc (suc n₀) l₁ r₁)
+                                          (trans (sym (rhs-suc n₀ (l₁ + r₁))) (cong (_+_ n₀) (cong suc (sym n₁≡l₁+r₁))))))
+        (wmakeT x₁ (wmerge' {n₀ = n₀} (con (x₀ , ≰-invert x₀≰x₁ , l₀ , r₀ , r₀≤l₀ , n₀≡l₀+r₀ , t₀ , u₀ , tt)) t₁ ≤-refl ≤-refl) u₁))
 
-  wmakeT : (x : Val) {n : Nat} (t : WLHeap x n) {n' : Nat} (t' : WLHeap x n') → WLHeap x (suc (n + n'))
-  wmakeT x {n} t {n'} t' with n ≤'? n'
-  wmakeT x {n} t {n'} t' | yes n≤n' = con (x , ≤-refl , n' , n , n≤n' , comm n n' , t' , t , tt)
-  wmakeT x {n} t {n'} t' | no  n≰n' = con (x , ≤-refl , n , n' , ≰'-invert n≰n' , refl , t , t' , tt)
+  wmakeT : (x : Val) {n : Nat} (h : WLHeap x n) {n' : Nat} (h' : WLHeap x n') → WLHeap x (suc (n + n'))
+  wmakeT x {n} h {n'} h' with n ≤'? n'
+  wmakeT x {n} h {n'} h' | yes n≤n' = con (x , ≤-refl , n' , n , n≤n' , comm n n' , h' , h , tt)
+  wmakeT x {n} h {n'} h' | no  n≰n' = con (x , ≤-refl , n , n' , ≰'-invert n≰n' , refl , h , h' , tt)
