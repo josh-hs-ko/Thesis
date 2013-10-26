@@ -441,7 +441,7 @@ fun-shunting-r-⇐ f R S (wrap R⊆f•S) = wrap λ i → fun⁻-shunting-r-⇐ 
 
 
 --------
--- fun⁻ctorial map
+-- functorial map
 
 Ṗ-mapR : {I : Set} {X Y : I → Set} → (X ↝ Y) → (is : List I) → Ṗ is X ↝⁻ Ṗ is Y
 Ṗ-mapR R []       _        = any

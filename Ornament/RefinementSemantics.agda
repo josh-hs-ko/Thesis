@@ -1,5 +1,5 @@
 -- Definition of an optimised predicate for an ornament as the parallel composition of the ornament and the singleton ornament.
--- This construction gives a fun⁻ctor from `Orn` to `FRef` which produces more representation-efficient promotion predicates.
+-- This construction gives a functor from `Orn` to `FRef` which produces more representation-efficient promotion predicates.
 
 module Ornament.RefinementSemantics where
 

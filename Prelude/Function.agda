@@ -1,5 +1,5 @@
--- This module defines pointwise equality of fun⁻ctions, which forms a setoid, and pointwise heterogeneous equality of fun⁻ctions.
--- The category `Fun` of sets and fun⁻ctions is also defined here.
+-- This module defines pointwise equality of functions, which forms a setoid, and pointwise heterogeneous equality of functions.
+-- The category `Fun` of sets and functions is also defined here.
 -- The unit type is proved to be terminal in `Fun`.
 
 module Prelude.Function where
@@ -16,7 +16,7 @@ open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅) rena
 
 
 --------
--- pointwise equality of fun⁻ctions
+-- pointwise equality of functions
 
 _≐_ : ∀ {a b} {A : Set a} {B : Set b} → (f g : A → B) → Set (a ⊔ b)
 f ≐ g = ∀ x → f x ≡ g x
@@ -43,7 +43,7 @@ fcong-r h feq = λ x → feq (h x)
 
 
 --------
--- pointwise heterogeneous equality of fun⁻ctions
+-- pointwise heterogeneous equality of functions
 
 _≑_ : ∀ {a b} {A A' : Set a} {B B' : Set b} → (A → B) → (A' → B') → Set a
 _≑_ {A = A} {A'} f g = (x : A) (x' : A') → x ≅ x' → f x ≅ g x'
@@ -75,7 +75,7 @@ pointwise peq x .x hrefl = peq x
 
 
 --------
--- categories of sets and fun⁻ctions
+-- categories of sets and functions
 
 Fun : Category
 Fun = record { Object   = Set

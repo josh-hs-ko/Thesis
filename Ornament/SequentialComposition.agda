@@ -73,13 +73,13 @@ forget-after-forget {e = e} {f} {D} {E} {F} O P =
     aux (Δ T O')          (∇ t P')          fs       ihs        = aux (O' t) P' fs ihs
     aux (∇ s O')          P'                fs       ihs        = cong (_,_ s) (aux O' P' fs ihs)
 
-idR⁻Orn-id-l : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (O : ROrn e D E) → ROrnEq (scROrn (idR⁻Orn D) O) O
-idR⁻Orn-id-l {D = D} O hs =
+idROrn-id-l : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (O : ROrn e D E) → ROrnEq (scROrn (idROrn D) O) O
+idROrn-id-l {D = D} O hs =
   ≡-to-≅ (begin
-            erase-Ṡ (scROrn (idR⁻Orn D) O) hs
-              ≡⟨ erase-Ṡ-scROrn (idR⁻Orn D) O hs ⟩
-            erase-Ṡ (idR⁻Orn D) (erase-Ṡ O hs)
-              ≡⟨ erase'-idR⁻Orn D (const !) (erase-Ṡ O hs) ⟩
+            erase-Ṡ (scROrn (idROrn D) O) hs
+              ≡⟨ erase-Ṡ-scROrn (idROrn D) O hs ⟩
+            erase-Ṡ (idROrn D) (erase-Ṡ O hs)
+              ≡⟨ erase'-idROrn D (const !) (erase-Ṡ O hs) ⟩
             Ḣ-map D id (erase-Ṡ O hs)
               ≡⟨ Ḣ-map-preserves-id D (erase-Ṡ O hs) ⟩
             erase-Ṡ O hs
@@ -87,15 +87,15 @@ idR⁻Orn-id-l {D = D} O hs =
   where open ≡-Reasoning
 
 ⊙-id-l : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → OrnEq (idOrn D ⊙ O) O
-⊙-id-l (wrap O) = frefl , λ j → idR⁻Orn-id-l (O (ok j))
+⊙-id-l (wrap O) = frefl , λ j → idROrn-id-l (O (ok j))
 
-idR⁻Orn-id-r : ∀ {I J} {e : J → I} {D E} (O : ROrn e D E) → ROrnEq (scROrn O (idR⁻Orn E)) O
-idR⁻Orn-id-r {E = E} O hs =
+idROrn-id-r : ∀ {I J} {e : J → I} {D E} (O : ROrn e D E) → ROrnEq (scROrn O (idROrn E)) O
+idROrn-id-r {E = E} O hs =
   ≡-to-≅ (begin
-            erase-Ṡ (scROrn O (idR⁻Orn E)) hs
-              ≡⟨ erase-Ṡ-scROrn O (idR⁻Orn E) hs ⟩
-            erase-Ṡ O (erase-Ṡ (idR⁻Orn E) hs)
-              ≡⟨ cong (erase-Ṡ O) (erase'-idR⁻Orn E (const !) hs) ⟩
+            erase-Ṡ (scROrn O (idROrn E)) hs
+              ≡⟨ erase-Ṡ-scROrn O (idROrn E) hs ⟩
+            erase-Ṡ O (erase-Ṡ (idROrn E) hs)
+              ≡⟨ cong (erase-Ṡ O) (erase'-idROrn E (const !) hs) ⟩
             erase-Ṡ O (Ḣ-map E id hs)
               ≡⟨ cong (erase-Ṡ O) (Ḣ-map-preserves-id E hs) ⟩
             erase-Ṡ O hs
@@ -103,7 +103,7 @@ idR⁻Orn-id-r {E = E} O hs =
   where open ≡-Reasoning
 
 ⊙-id-r : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → OrnEq (O ⊙ idOrn E) O
-⊙-id-r (wrap O) = frefl , λ j → idR⁻Orn-id-r (O (ok j))
+⊙-id-r (wrap O) = frefl , λ j → idROrn-id-r (O (ok j))
 
 scROrn-assoc :
   ∀ {I J K L} {e : J → I} {f : K → J} {g : L → K} {D E F G}

@@ -64,10 +64,10 @@ algOrn-iso {I} D {J} R =
           (P : ℘ (⟦ D' ⟧ J)) →
           Iso Fun (⟦ OptPRD (toROrn (algROrn D' P)) ds ⟧ (μ (OptPD ⌈ algOrn D R ⌉))) (Σ[ js ∶ ⟦ D' ⟧ J ] mapFoldR D D' R ds js × P js)
     aux (ṿ is)   ds       ihs P =
-      iso⁻-preserving FamF
+      iso-preserving FamF
         (compIso-inv (Setoid.refl (IsoSetoid Fun))
                      (λ js → Setoid.trans (IsoSetoid Fun)
-                               (iso⁻-preserving FamF (compIso-inv (Setoid.refl (IsoSetoid Fun)) (λ _ → aux' is js ds ihs)))
+                               (iso-preserving FamF (compIso-inv (Setoid.refl (IsoSetoid Fun)) (λ _ → aux' is js ds ihs)))
                                commIso))
     aux (σ S D') (s , ds) ihs P =
       Setoid.trans (IsoSetoid Fun)

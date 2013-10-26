@@ -1,5 +1,5 @@
 -- Let `D : Desc I` be a description.
--- The category `RAlg' D` is the wide subcategory of the category of relational `D`-algebras where the morphisms are restricted to be fun⁻ctions.
+-- The category `RAlg' D` is the wide subcategory of the category of relational `D`-algebras where the morphisms are restricted to be functions.
 
 open import Description
 

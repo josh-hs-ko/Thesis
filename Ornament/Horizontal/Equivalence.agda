@@ -19,7 +19,7 @@ open import Relation.Binary.PropositionalEquality using (_≡_; refl; sym; cong;
 open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅)
 
 
-ḢROrn-id : {I : Set} {D : RDesc I} → ROrnEq (ḢROrn (ḢTrans-id {I} {D})) (idR⁻Orn D)
+ḢROrn-id : {I : Set} {D : RDesc I} → ROrnEq (ḢROrn (ḢTrans-id {I} {D})) (idROrn D)
 ḢROrn-id {I} {D} hs =
   ≡-to-≅ (begin
             erase-Ṡ (ḢROrn (ḢTrans-id {I} {D})) hs
@@ -31,8 +31,8 @@ open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅)
             hs
               ≡⟨ sym (Ḣ-map-preserves-id D hs) ⟩
             Ḣ-map D ! hs
-              ≡⟨ sym (erase'-idR⁻Orn D (const !) hs) ⟩
-            erase-Ṡ (idR⁻Orn D) hs
+              ≡⟨ sym (erase'-idROrn D (const !) hs) ⟩
+            erase-Ṡ (idROrn D) hs
           ∎)
   where open ≡-Reasoning
 

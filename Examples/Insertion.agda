@@ -1,4 +1,4 @@
--- The `insert` fun⁻ction used in insertion sort upgraded to work with vectors, ordered lists, and ordered vectors.
+-- The `insert` function used in insertion sort upgraded to work with vectors, ordered lists, and ordered vectors.
 
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_) renaming (map to _**_)
 open import Relation.Nullary using (¬_; Dec; yes; no)
