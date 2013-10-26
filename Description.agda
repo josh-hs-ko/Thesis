@@ -1,4 +1,4 @@
--- Definition of datatype descriptions, i.e., a universe for functors on families of sets.
+-- Definition of datatype descriptions, i.e., a universe for fun⁻ctors on families of sets.
 -- Datatype-generic fold and induction are defined on top of descriptions.
 
 module Description where

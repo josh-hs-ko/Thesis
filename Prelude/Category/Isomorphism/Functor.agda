@@ -1,4 +1,4 @@
--- Isomorphisms are preserved by functors.
+-- Isomorphisms are preserved by fun⁻ctors.
 
 open import Prelude.Category
 open import Level
@@ -33,8 +33,8 @@ private
           open EqReasoning setoid
           open Iso C i
 
-iso-preserving : {X Y : Object C} → Iso C X Y → Iso D (object F X) (object F Y)
-iso-preserving {X} {Y} i =
+iso⁻-preserving : {X Y : Object C} → Iso C X Y → Iso D (object F X) (object F Y)
+iso⁻-preserving {X} {Y} i =
   record { to   = morphism F to
          ; from = morphism F from
          ; to-from-inverse = inverse i

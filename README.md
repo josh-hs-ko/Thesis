@@ -9,10 +9,10 @@ See [the author's homepage](http://www.cs.ox.ac.uk/people/hsiang-shang.ko/) for 
 ## Module descriptions
 
 #### Prelude.Category
-Basic definitions of categories, functors, and natural transformations.
+Basic definitions of categories, fun⁻ctors, and natural transformations.
 The collection of objects in a category is an Agda set, i.e., equality on objects is definitional equality,
 whereas the collection of arrows is a setoid, i.e., a set equipped with an equivalence relation.
-All operations on morphisms must respect the equivalence relation, including the morphism maps of functors.
+All operations on morphisms must respect the equivalence relation, including the morphism maps of fun⁻ctors.
 
 #### Prelude.Category.Isomorphism
 Categorical definition of isomorphisms, parametrised by an underlying category.
@@ -21,7 +21,7 @@ It is proved here that terminal objects are isomorphic.
 A predicate saying that a morphism is part of an isomorphism is also provided.
 
 #### Prelude.Category.Isomorphism.Functor
-Isomorphisms are preserved by functors.
+Isomorphisms are preserved by fun⁻ctors.
 
 #### Prelude.Category.NaturalTransformation
 If each of the components of a natural transformation from `F` to `G` is part of an isomorphism, then `F` and `G` are naturally isomorphic.
@@ -29,7 +29,7 @@ If each of the components of a natural transformation from `F` to `G` is part of
 #### Prelude.Category.Pullback
 A pullback is defined to be a terminal object in the category of spans over a slice category.
 Any two pullback objects are isomorphic.
-Pullback preservation of functors is also defined.
+Pullback preservation of fun⁻ctors is also defined.
 
 #### Prelude.Category.Pullback.Midpoint
 *The Midpoint Lemma:*
@@ -40,13 +40,13 @@ Then (X × Y) × Z is a pullback of the projections X × Z → Z and Y × Z → 
 Definition of slice categories.
 
 #### Prelude.Category.Slice.Functor
-The forgetful functor from a slice category to its underlying category is pullback-preserving.
+The forgetful fun⁻ctor from a slice category to its underlying category is pullback-preserving.
 
 #### Prelude.Category.Span
 Definition of span categories. Products and product preservation are also defined here.
 
 #### Prelude.Category.WCat
-"Weak" category of categories, in which morphisms (i.e., functors) are considered equal if they are naturally isomorphic.
+"Weak" category of categories, in which morphisms (i.e., fun⁻ctors) are considered equal if they are naturally isomorphic.
 An equivalence of categories is an isomorphism in this weak category of categories.
 
 #### Prelude.Equality
@@ -54,8 +54,8 @@ This module defines the J rule for propositional equality, a generalised K rule 
 and a predicate specifying when an element of a setoid is the unique inhabitant of the setoid.
 
 #### Prelude.Function
-This module defines pointwise equality of functions, which forms a setoid, and pointwise heterogeneous equality of functions.
-The category `Fun` of sets and functions is also defined here.
+This module defines pointwise equality of fun⁻ctions, which forms a setoid, and pointwise heterogeneous equality of fun⁻ctions.
+The category `Fun` of sets and fun⁻ctions is also defined here.
 The unit type is proved to be terminal in `Fun`.
 
 #### Prelude.Function.Fam
@@ -63,13 +63,13 @@ The category `Fam` of families of sets.
 An isomorphism between two families of sets in `Fam` can be broken into isomorphisms between corresponding sets in the two families.
 There is a canonical way of forming pullbacks in `Fam`,
 namely taking the set-theoretical pullbacks of the index set and corresponding sets in the families.
-The forgetful functor from `Fam` to `Fun` preserves this pullback, and is hence pullback-preserving.
+The forgetful fun⁻ctor from `Fam` to `Fun` preserves this pullback, and is hence pullback-preserving.
 
 #### Prelude.Function.Isomorphism
 Various ways to construct isomorphisms in `Fun`.
 
 #### Prelude.InverseImage
-Definition of inverse images of a function, and definition of set-theoretic pullbacks in terms of inverse images.
+Definition of inverse images of a fun⁻ction, and definition of set-theoretic pullbacks in terms of inverse images.
 
 #### Prelude.Preorder
 Converse of preorders, setoids derived from preorders, implication as a preorder, and indirect reasoning combinators.
@@ -84,14 +84,14 @@ Definition of refinements, swaps, and upgrades.
 Families of refinements form a category `FRef`.
 
 #### Description
-Definition of datatype descriptions, i.e., a universe for functors on families of sets.
+Definition of datatype descriptions, i.e., a universe for fun⁻ctors on families of sets.
 Datatype-generic fold and induction are defined on top of descriptions.
 
 #### Description.Horizontal
 Horizontal data, which can be separated into "shape" and "core" (cf. containers), and shape equivalence.
 
 #### Ornament
-Definition of ornaments, i.e., a universe for simple, structural natural transformations between functors decoded from descriptions.
+Definition of ornaments, i.e., a universe for simple, structural natural transformations between fun⁻ctors decoded from descriptions.
 Ornamental descriptions are provided for constructing new descriptions from old ones such that ornaments can be automatically derived.
 Singleton ornaments are also defined, which create as many singleton types as there are elements of the base type.
 
@@ -108,7 +108,7 @@ Fold fusion theorems for algebraic ornamentation.
 
 #### Ornament.Category
 The category of descriptions and ornaments.
-The functor `Ind` (for "induction") takes the least fixed points of descriptions and
+The fun⁻ctor `Ind` (for "induction") takes the least fixed points of descriptions and
 extends ornaments to forgetful maps on those least fixed points.
 
 #### Ornament.Equivalence
@@ -125,7 +125,7 @@ Ornamental equivalences about horizontal ornaments.
 Parallel composition of ornaments.
 
 #### Ornament.ParallelComposition.Pullback
-Parallel composition of ornaments, when mapped to `Fam` by the functor `Ind`, forms a pullback.
+Parallel composition of ornaments, when mapped to `Fam` by the fun⁻ctor `Ind`, forms a pullback.
 This file can take a long time to typecheck.
 
 #### Ornament.ParallelComposition.Swap
@@ -135,7 +135,7 @@ This file can take a long time to typecheck and may require a larger stack size.
 
 #### Ornament.RefinementSemantics
 Definition of an optimised predicate for an ornament as the parallel composition of the ornament and the singleton ornament.
-This construction gives a functor from `Orn` to `FRef` which produces more representation-efficient promotion predicates.
+This construction gives a fun⁻ctor from `Orn` to `FRef` which produces more representation-efficient promotion predicates.
 
 #### Ornament.SequentialComposition
 Sequential composition of ornaments.
@@ -147,7 +147,7 @@ componentwise relations between families of sets, and definition and properties 
 
 #### Relation.AlgCategory
 Let `D : Desc I` be a description.
-The category `RAlg' D` is the wide subcategory of the category of relational `D`-algebras where the morphisms are restricted to be functions.
+The category `RAlg' D` is the wide subcategory of the category of relational `D`-algebras where the morphisms are restricted to be fun⁻ctions.
 
 #### Relation.CompChain
 Combinators that help avoiding explicit applications of monotonicity and associativity of relational composition
@@ -179,7 +179,7 @@ Okasaki's idea of numerical representations are nicely captured by the coherence
 insertion into binomial heaps is used as an example.
 
 #### Examples.Insertion
-The `insert` function used in insertion sort upgraded to work with vectors, ordered lists, and ordered vectors.
+The `insert` fun⁻ction used in insertion sort upgraded to work with vectors, ordered lists, and ordered vectors.
 
 #### Examples.LeftistHeap
 The ordering property and balancing properties of leftist heaps are treated separately when needed.

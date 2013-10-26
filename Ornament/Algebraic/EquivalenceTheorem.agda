@@ -51,7 +51,7 @@ clsP {e = e} O js = ⟦ OptPRD O js ⟧ (Diag e)
 clsP-Ṗ : {I J : Set} {e : J → I} {is : List I} {js : List J} → Ė e js is → Ṗ is (InvImage e) → Set
 clsP-Ṗ {e = e} {is} eqs js = Ṗ (und-Ṗ is (pc-Ė eqs (to≡-Ṗ is (Ṗ-map (λ {i} j → ok (i , j)) is js)))) (Diag e)
 
-clsAlg : {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) → Ḟ D (InvImage e) ↝⁺ InvImage e
+clsAlg : {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) → Ḟ D (InvImage e) ↝ InvImage e
 clsAlg O = wrap λ i js j → clsP (Orn.comp O j) js
 
 -- isomorphism about the classifying predicate
@@ -174,10 +174,10 @@ module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) 
   toAlgOrn-c (Δ T O') P hs           (t , ps)    = toAlgOrn-c (O' t) P hs ps
   toAlgOrn-c (∇ s O') P (.s , hs)    (refl , ps) = toAlgOrn-c O' (curry P s) hs ps
 
-  toAlgOrn-t : (i : I) (j : e ⁻¹ i) → ḢTrans g (Desc.comp E (und j)) (toRDesc (algROrn (Desc.comp D i) (((clsAlg O !!) i º) j)))
+  toAlgOrn-t : (i : I) (j : e ⁻¹ i) → ḢTrans g (Desc.comp E (und j)) (toRDesc (algROrn (Desc.comp D i) (((clsAlg O !!) i º⁻) j)))
   toAlgOrn-t i j =
-    uncurry (from-clsP (Orn.comp O j)) ∘ algROrn-decomp (Desc.comp D i) (InvImage e) (((clsAlg O !!) i º) j) ,
-    λ hs → toAlgOrn-c (Orn.comp O j) (((clsAlg O !!) i º) j) hs (proj₂ (algROrn-decomp (Desc.comp D i) (InvImage e) (((clsAlg O !!) i º) j) hs))
+    uncurry (from-clsP (Orn.comp O j)) ∘ algROrn-decomp (Desc.comp D i) (InvImage e) (((clsAlg O !!) i º⁻) j) ,
+    λ hs → toAlgOrn-c (Orn.comp O j) (((clsAlg O !!) i º⁻) j) hs (proj₂ (algROrn-decomp (Desc.comp D i) (InvImage e) (((clsAlg O !!) i º⁻) j) hs))
 
   toAlgOrn : Orn g E ⌊ algOrn D (clsAlg O) ⌋
   toAlgOrn = wrap λ { {._} (ok (i , j)) → ḢROrn (toAlgOrn-t i j) }
@@ -198,8 +198,8 @@ module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) 
                 (ḢROrn-≐ (ḢTrans-normal (Orn.comp O (ok j)) ⊡ toAlgOrn-t (e j) (ok j))
                          (ḢTrans-normal (Orn.comp ⌈ algOrn D (clsAlg O) ⌉ (ok (e j , ok j))))
                    (λ hs → trans (uncurry (erase'-from-clsP (Orn.comp O (ok j)))
-                                    (algROrn-decomp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º) (ok j)) hs))
-                                 (sym (erase'-algROrn-decomp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º) (ok j)) hs)))) })
+                                    (algROrn-decomp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º⁻) (ok j)) hs))
+                                 (sym (erase'-algROrn-decomp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º⁻) (ok j)) hs)))) })
          (OrnEq-normal ⌈ algOrn D (clsAlg O) ⌉))
 
   fromAlgOrn-c-ṿ : {is : List I} {js : List J} (eqs : Ė e js is) →
@@ -215,10 +215,10 @@ module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) 
   fromAlgOrn-c (Δ T O') P (t , hs) p = fromAlgOrn-c (O' t) P hs p
   fromAlgOrn-c (∇ s O') P hs       p = fromAlgOrn-c O' (curry P s) hs p
 
-  fromAlgOrn-t : (j : J) → ḢTrans h (toRDesc (algROrn (Desc.comp D (e j)) (((clsAlg O !!) (e j) º) (ok j)))) (Desc.comp E j)
+  fromAlgOrn-t : (j : J) → ḢTrans h (toRDesc (algROrn (Desc.comp D (e j)) (((clsAlg O !!) (e j) º⁻) (ok j)))) (Desc.comp E j)
   fromAlgOrn-t j =
-    uncurry (algROrn-comp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º) (ok j))) ∘ to-clsP (Orn.comp O (ok j)) ,
-    λ hs → fromAlgOrn-c (Orn.comp O (ok j)) (((clsAlg O !!) (e j) º) (ok j)) hs (proj₂ (to-clsP (Orn.comp O (ok j)) hs))
+    uncurry (algROrn-comp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º⁻) (ok j))) ∘ to-clsP (Orn.comp O (ok j)) ,
+    λ hs → fromAlgOrn-c (Orn.comp O (ok j)) (((clsAlg O !!) (e j) º⁻) (ok j)) hs (proj₂ (to-clsP (Orn.comp O (ok j)) hs))
 
   fromAlgOrn : Orn h ⌊ algOrn D (clsAlg O) ⌋ E
   fromAlgOrn = wrap (λ { {._} (ok j) → ḢROrn (fromAlgOrn-t j) })
@@ -238,7 +238,7 @@ module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) 
                      (ḢROrn-comp (ḢTrans-normal (Orn.comp ⌈ algOrn D (clsAlg O) ⌉ (ok (e j , ok j)))) (fromAlgOrn-t j)))
                   (ḢROrn-≐ (ḢTrans-normal (Orn.comp ⌈ algOrn D (clsAlg O) ⌉ (ok (e j , ok j))) ⊡ fromAlgOrn-t j)
                            (ḢTrans-normal (Orn.comp O (ok j)))
-                     (λ hs → trans (uncurry (erase'-algROrn-comp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º) (ok j)))
+                     (λ hs → trans (uncurry (erase'-algROrn-comp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º⁻) (ok j)))
                                       (to-clsP (Orn.comp O (ok j)) hs))
                                    (sym (erase'-to-clsP (Orn.comp O (ok j)) hs)))))
          (OrnEq-normal O))
@@ -253,7 +253,7 @@ module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) 
                 (ḢROrn-≐ (toAlgOrn-t (e j) (ok j) ⊡ fromAlgOrn-t j) ḢTrans-id
                    (ftrans (fcong-l (uncurry (from-clsP (Orn.comp O (ok j))))
                               (fcong-r (to-clsP (Orn.comp O (ok j)))
-                                 (algROrn-decomp-comp-inverse (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º) (ok j)))))
+                                 (algROrn-decomp-comp-inverse (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º⁻) (ok j)))))
                            (from-to-clsP-inverse (Orn.comp O (ok j))))))
              (ḢROrn-id {J} {Desc.comp E j}))
 
@@ -270,17 +270,17 @@ module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) 
               (ROrnEq-sym (ḢROrn (fromAlgOrn-t j ⊡ toAlgOrn-t (e j) (ok j))) (Orn.comp (fromAlgOrn ⊙ toAlgOrn) (ok (e j , ok j)))
                  (ḢROrn-comp (fromAlgOrn-t j) (toAlgOrn-t (e j) (ok j))))
               (ḢROrn-≐ (fromAlgOrn-t j ⊡ toAlgOrn-t (e j) (ok j)) ḢTrans-id
-                 (ftrans (fcong-l (uncurry (algROrn-comp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º) (ok j))))
-                            (fcong-r (algROrn-decomp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º) (ok j)))
+                 (ftrans (fcong-l (uncurry (algROrn-comp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º⁻) (ok j))))
+                            (fcong-r (algROrn-decomp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º⁻) (ok j)))
                                (to-from-clsP-inverse (Orn.comp O (ok j)))))
-                         (algROrn-comp-decomp-inverse (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º) (ok j))))))
+                         (algROrn-comp-decomp-inverse (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º⁻) (ok j))))))
            (ḢROrn-id {Σ I (InvImage e)} {Desc.comp ⌊ algOrn D (clsAlg O) ⌋ (e j , ok j)}) })
 
 
 --------
 -- classifying algebra derived from an algebraic ornament is isomorphic to the algebra of the ornament
 
-module CAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝⁺ J) where
+module CAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝ J) where
 
   g : J ⇉ InvImage proj₁
   g {i} = ok ∘ _,_ i
@@ -314,55 +314,55 @@ module CAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝⁺ J) where
   CAAO-extraction (ṿ is)   P js       (.js , p , eqs) | refl = p
   CAAO-extraction (σ S D') P (s , js) p                      = CAAO-extraction (D' s) (curry P s) js p
 
-  R-to-clsAlg : fun⁺ g •⁺ R ≃⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g)
+  R-to-clsAlg : fun g • R ≃ clsAlg ⌈ algOrn D R ⌉ • Ṙ D (fun g)
   R-to-clsAlg = wrap (λ i → wrap λ { js ._ (j , r , refl) →
                                      Ḟ-map D g js ,
-                                     mapR-fun-computation (Desc.comp D i) g js ,
-                                     CAAO-computation (Desc.comp D i) (((R !!) i º) j) js r }) ,
+                                     mapR-fun⁻-computation (Desc.comp D i) g js ,
+                                     CAAO-computation (Desc.comp D i) (((R !!) i º⁻) j) js r }) ,
                 wrap (λ i → wrap λ { js ij (ijs , rs , q) → aux js ij ijs rs q })
     where
-      aux : ∀ {i} (js : Ḟ D J i) (ij : proj₁ {B = J} ⁻¹ i) (ijs : Ḟ D (InvImage proj₁) i) (rs : mapR (Desc.comp D i) (fun⁺ g) js ijs) →
-            (q : (clsAlg ⌈ algOrn D R ⌉ !!) i ijs ij) → ((fun⁺ g •⁺ R) !!) i js ij
-      aux js (ok (i , j)) ijs rs p with mapR-fun-unique (Desc.comp D i) g js ijs rs
-      aux js (ok (i , j)) ._  rs p | refl = j , CAAO-extraction (Desc.comp D i) (((R !!) i º) j) js p , refl
+      aux : ∀ {i} (js : Ḟ D J i) (ij : proj₁ {B = J} ⁻¹ i) (ijs : Ḟ D (InvImage proj₁) i) (rs : mapR (Desc.comp D i) (fun g) js ijs) →
+            (q : (clsAlg ⌈ algOrn D R ⌉ !!) i ijs ij) → ((fun g • R) !!) i js ij
+      aux js (ok (i , j)) ijs rs p with mapR-fun⁻-unique (Desc.comp D i) g js ijs rs
+      aux js (ok (i , j)) ._  rs p | refl = j , CAAO-extraction (Desc.comp D i) (((R !!) i º⁻) j) js p , refl
 
-  clsAlg-to-R : fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ ≃⁺ R •⁺ Ṙ D (fun⁺ h)
+  clsAlg-to-R : fun h • clsAlg ⌈ algOrn D R ⌉ ≃ R • Ṙ D (fun h)
   clsAlg-to-R =
     (begin
-       fun⁺ g •⁺ R ≃⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g)
-         ⇒⟨ •⁺-cong-l (fun⁺ h) ⟩
-       fun⁺ h •⁺ fun⁺ g •⁺ R ≃⁺ fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g)
-         ⇒⟨ ≃⁺-trans (≃⁺-chain (fun⁺ h ◇⁺) (fun⁺ h º⁺ ◇⁺) (fun⁺ g ◇⁺) (iso⁺-conv (Setoid.sym (IsoSetoid Fun) ∘ gh-iso))) ⟩
-       fun⁺ h •⁺ fun⁺ h º⁺ •⁺ R ≃⁺ fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g)
-         ⇒⟨ ≃⁺-trans (≃⁺-sym (≃⁺-chain-r (fun⁺ h ▪⁺ fun⁺ h º⁺ ◇⁺) (idR⁺ ◇⁺) (iso⁺-idR⁺ (Setoid.sym (IsoSetoid Fun) ∘ gh-iso)))) ⟩
-       idR⁺ •⁺ R ≃⁺ fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g)
-         ⇒⟨ ≃⁺-trans (≃⁺-sym (idR⁺-l R)) ⟩
-       R ≃⁺ fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g)
-         ⇒⟨ •⁺-cong-r (Ṙ D (fun⁺ h)) ⟩
-       R •⁺ Ṙ D (fun⁺ h) ≃⁺ (fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g)) •⁺ Ṙ D (fun⁺ h)
-         ⇒⟨ flip ≃⁺-trans
+       fun g • R ≃ clsAlg ⌈ algOrn D R ⌉ • Ṙ D (fun g)
+         ⇒⟨ •-cong-l (fun h) ⟩
+       fun h • fun g • R ≃ fun h • clsAlg ⌈ algOrn D R ⌉ • Ṙ D (fun g)
+         ⇒⟨ ≃-trans (≃-chain (fun h ◇) (fun h º ◇) (fun g ◇) (iso-conv (Setoid.sym (IsoSetoid Fun) ∘ gh-iso))) ⟩
+       fun h • fun h º • R ≃ fun h • clsAlg ⌈ algOrn D R ⌉ • Ṙ D (fun g)
+         ⇒⟨ ≃-trans (≃-sym (≃-chain-r (fun h ▪ fun h º ◇) (idR ◇) (iso-idR (Setoid.sym (IsoSetoid Fun) ∘ gh-iso)))) ⟩
+       idR • R ≃ fun h • clsAlg ⌈ algOrn D R ⌉ • Ṙ D (fun g)
+         ⇒⟨ ≃-trans (≃-sym (idR-l R)) ⟩
+       R ≃ fun h • clsAlg ⌈ algOrn D R ⌉ • Ṙ D (fun g)
+         ⇒⟨ •-cong-r (Ṙ D (fun h)) ⟩
+       R • Ṙ D (fun h) ≃ (fun h • clsAlg ⌈ algOrn D R ⌉ • Ṙ D (fun g)) • Ṙ D (fun h)
+         ⇒⟨ flip ≃-trans
               (begin′
-                 (fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g)) •⁺ Ṙ D (fun⁺ h)
-                   ≃⁺⟨ ≃⁺-sym (•⁺-cong-l (fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g)) (Ṙ-cong D (iso⁺-conv gh-iso))) ⟩
-                 (fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g)) •⁺ Ṙ D (fun⁺ g º⁺)
-                   ≃⁺⟨ chain-normalise⁺ (([ fun⁺ h ]⁺ ▪⁺ [ clsAlg ⌈ algOrn D R ⌉ ]⁺ ▪⁺ [ Ṙ D (fun⁺ g) ]⁺) ▪⁺ [ Ṙ D (fun⁺ g º⁺) ]⁺) ⟩
-                 fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g) •⁺ Ṙ D (fun⁺ g º⁺)
-                   ≃⁺⟨ ≃⁺-sym (≃⁺-chain-l (fun⁺ h ▪⁺ clsAlg ⌈ algOrn D R ⌉ ◇⁺) (Ṙ-preserves-comp D (fun⁺ g) (fun⁺ g º⁺))) ⟩
-                 fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D (fun⁺ g •⁺ fun⁺ g º⁺)
-                   ≃⁺⟨ ≃⁺-chain-l (fun⁺ h ▪⁺ clsAlg ⌈ algOrn D R ⌉ ◇⁺) (Ṙ-cong D (iso⁺-idR⁺ gh-iso)) ⟩
-                 fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ Ṙ D idR⁺
-                   ≃⁺⟨ ≃⁺-chain-l (fun⁺ h ▪⁺ clsAlg ⌈ algOrn D R ⌉ ◇⁺) (Ṙ-preserves-idR⁺ D) ⟩
-                 fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ •⁺ idR⁺
-                   ≃⁺⟨ •⁺-cong-l (fun⁺ h) (idR⁺-r (clsAlg ⌈ algOrn D R ⌉)) ⟩
-                 fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉
+                 (fun h • clsAlg ⌈ algOrn D R ⌉ • Ṙ D (fun g)) • Ṙ D (fun h)
+                   ≃⟨ ≃-sym (•-cong-l (fun h • clsAlg ⌈ algOrn D R ⌉ • Ṙ D (fun g)) (Ṙ-cong D (iso-conv gh-iso))) ⟩
+                 (fun h • clsAlg ⌈ algOrn D R ⌉ • Ṙ D (fun g)) • Ṙ D (fun g º)
+                   ≃⟨ chain-normalise (([ fun h ] ▪ [ clsAlg ⌈ algOrn D R ⌉ ] ▪ [ Ṙ D (fun g) ]) ▪ [ Ṙ D (fun g º) ]) ⟩
+                 fun h • clsAlg ⌈ algOrn D R ⌉ • Ṙ D (fun g) • Ṙ D (fun g º)
+                   ≃⟨ ≃-sym (≃-chain-l (fun h ▪ clsAlg ⌈ algOrn D R ⌉ ◇) (Ṙ-preserves-comp D (fun g) (fun g º))) ⟩
+                 fun h • clsAlg ⌈ algOrn D R ⌉ • Ṙ D (fun g • fun g º)
+                   ≃⟨ ≃-chain-l (fun h ▪ clsAlg ⌈ algOrn D R ⌉ ◇) (Ṙ-cong D (iso-idR gh-iso)) ⟩
+                 fun h • clsAlg ⌈ algOrn D R ⌉ • Ṙ D idR
+                   ≃⟨ ≃-chain-l (fun h ▪ clsAlg ⌈ algOrn D R ⌉ ◇) (Ṙ-preserves-idR D) ⟩
+                 fun h • clsAlg ⌈ algOrn D R ⌉ • idR
+                   ≃⟨ •-cong-l (fun h) (idR-r (clsAlg ⌈ algOrn D R ⌉)) ⟩
+                 fun h • clsAlg ⌈ algOrn D R ⌉
               ∎′) ⟩
-       R •⁺ Ṙ D (fun⁺ h) ≃⁺ fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉
-         ⇒⟨ ≃⁺-sym ⟩
-       fun⁺ h •⁺ clsAlg ⌈ algOrn D R ⌉ ≃⁺ R •⁺ Ṙ D (fun⁺ h)
+       R • Ṙ D (fun h) ≃ fun h • clsAlg ⌈ algOrn D R ⌉
+         ⇒⟨ ≃-sym ⟩
+       fun h • clsAlg ⌈ algOrn D R ⌉ ≃ R • Ṙ D (fun h)
     ∎) R-to-clsAlg
     where open PreorderReasoning (⇒-Preorder) renaming (_∼⟨_⟩_ to _⇒⟨_⟩_)
-          setoid = ≃⁺-Setoid (Ḟ D (InvImage proj₁)) J
-          open EqReasoning setoid renaming (begin_ to begin′_; _≈⟨_⟩_ to _≃⁺⟨_⟩_; _∎ to _∎′)
+          setoid = ≃-Setoid (Ḟ D (InvImage proj₁)) J
+          open EqReasoning setoid renaming (begin_ to begin′_; _≈⟨_⟩_ to _≃⟨_⟩_; _∎ to _∎′)
 
 -}
 
@@ -443,9 +443,9 @@ OrnEq-to-hom-aux {e = e} {f} {D} O P .P refl refl hrefl {g} Q eeq js p eraseeq =
 OrnEq-to-hom :
   {I J K : Set} {e : J → I} {f : K → I} {D : Desc I} {E : Desc J} {F : Desc K} (O : Orn e D E) (P : Orn f D F) →
   {g : J → K} (Q : Orn g F E) (oeq : OrnEq (P ⊙ Q) O) →
-  let h : InvImage e ⇉ InvImage f; h = InvImage-lift e f g (proj₁ oeq) in fun⁺ h •⁺ clsAlg O ⊆⁺ clsAlg P •⁺ Ṙ D (fun⁺ h)
+  let h : InvImage e ⇉ InvImage f; h = InvImage-lift e f g (proj₁ oeq) in fun h • clsAlg O ⊆ clsAlg P • Ṙ D (fun h)
 OrnEq-to-hom {I} {J} {K} {e} {f} {D} {E} {F} O P {g} Q (eeq , roeq) =
-  wrap (λ i → wrap λ { js ._ (j , p , refl) → Ḟ-map D h js , mapR-fun-computation (Desc.comp D i) h js , aux js j p })
+  wrap (λ i → wrap λ { js ._ (j , p , refl) → Ḟ-map D h js , mapR-fun⁻-computation (Desc.comp D i) h js , aux js j p })
   where
     h : InvImage e ⇉ InvImage f
     h = InvImage-lift e f g eeq
@@ -476,13 +476,13 @@ hom-to-OrnEq-aux (ṿ is)  {J} P Q h p-to-q = Δ[ js ∶ Ṗ is J ] ∇ (Ṗ-map
 hom-to-OrnEq-aux (σ S D)     P Q h p-to-q = σ[ s ∶ S ] hom-to-OrnEq-aux (D s) (curry P s) (curry Q s) h (curry p-to-q s)
 
 hom-to-OrnEq :
-  {I : Set} (D : Desc I) {J K : I → Set} (R : Ḟ D J ↝⁺ J) (S : Ḟ D K ↝⁺ K)
-  (h : J ⇉ K) → fun⁺ h •⁺ R ⊆⁺ S •⁺ Ṙ D (fun⁺ h) → Orn (id ** h) ⌊ algOrn D S ⌋ ⌊ algOrn D R ⌋
+  {I : Set} (D : Desc I) {J K : I → Set} (R : Ḟ D J ↝ J) (S : Ḟ D K ↝ K)
+  (h : J ⇉ K) → fun h • R ⊆ S • Ṙ D (fun h) → Orn (id ** h) ⌊ algOrn D S ⌋ ⌊ algOrn D R ⌋
 hom-to-OrnEq D R S h inc =
   wrap λ { {._} (ok (i , j)) →
-           hom-to-OrnEq-aux (Desc.comp D i) (((R !!) i º) j) (((S !!) i º) (h j)) h
-             (λ js r → let (ks , rs , s) = modus-ponens-⊆⁺ inc i js (h j) (j , r , refl)
-                       in  subst (((S !!) i º) (h j)) (sym (mapR-fun-unique (Desc.comp D i) h js ks rs)) s) }
+           hom-to-OrnEq-aux (Desc.comp D i) (((R !!) i º⁻) j) (((S !!) i º⁻) (h j)) h
+             (λ js r → let (ks , rs , s) = modus-ponens-⊆ inc i js (h j) (j , r , refl)
+                       in  subst (((S !!) i º⁻) (h j)) (sym (mapR-fun⁻-unique (Desc.comp D i) h js ks rs)) s) }
 
 
 {-------

@@ -1,4 +1,4 @@
--- The forgetful functor from a slice category to its underlying category is pullback-preserving.
+-- The forgetful fun⁻ctor from a slice category to its underlying category is pullback-preserving.
 
 module Prelude.Category.Slice.Functor where
 

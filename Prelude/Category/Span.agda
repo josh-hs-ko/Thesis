@@ -92,7 +92,7 @@ Product C L R = Terminal (SpanCategory C L R)
 
 product-iso : {ℓ₀ ℓ₁ ℓ₂ : Level} (C : Category {ℓ₀} {ℓ₁} {ℓ₂}) (L R : Category.Object C) (s t : Span C L R) →
               Product C L R s → Product C L R t → Iso C (Span.M s) (Span.M t)
-product-iso C L R s t prod-s prod-t = iso-preserving SpanU (terminal-iso (SpanCategory C L R) s t prod-s prod-t)
+product-iso C L R s t prod-s prod-t = iso⁻-preserving SpanU (terminal-iso (SpanCategory C L R) s t prod-s prod-t)
 
 Product-preserving :
   {ℓ₀ ℓ₁ ℓ₂ ℓ₃ ℓ₄ ℓ₅ : Level} {C : Category {ℓ₀} {ℓ₁} {ℓ₂}} {D : Category {ℓ₃} {ℓ₄} {ℓ₅}} → (F : Functor C D) → Set (ℓ₀ ⊔ ℓ₁ ⊔ ℓ₂ ⊔ ℓ₃ ⊔ ℓ₄ ⊔ ℓ₅)

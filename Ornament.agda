@@ -1,4 +1,4 @@
--- Definition of ornaments, i.e., a universe for simple, structural natural transformations between functors decoded from descriptions.
+-- Definition of ornaments, i.e., a universe for simple, structural natural transformations between fun⁻ctors decoded from descriptions.
 -- Ornamental descriptions are provided for constructing new descriptions from old ones such that ornaments can be automatically derived.
 -- Singleton ornaments are also defined, which create as many singleton types as there are elements of the base type.
 
@@ -64,9 +64,9 @@ data ROrn {I J : Set} (e : J → I) : RDesc I → RDesc J → Set₁ where
 syntax σ S (λ s → O) = σ[ s ∶ S ] O
 syntax Δ T (λ t → O) = Δ[ t ∶ T ] O
 
-idROrn : {I : Set} (D : RDesc I) → ROrn id D D
-idROrn (ṿ is)  = ṿ Ė-refl
-idROrn (σ S D) = σ[ s ∶ S ] idROrn (D s)
+idR⁻Orn : {I : Set} (D : RDesc I) → ROrn id D D
+idR⁻Orn (ṿ is)  = ṿ Ė-refl
+idR⁻Orn (σ S D) = σ[ s ∶ S ] idR⁻Orn (D s)
 
 Erasure : {I J : Set} (e : J → I) (Y : List J → Set) (X : List I → Set) → Set
 Erasure {I} {J} e Y X = {is : List I} {js : List J} → Ė e js is → Y js → X is
@@ -107,13 +107,13 @@ cong-erase-Ṗ {e = e} (_∷_ {j} refl eqs) (refl ∷ eqs') refl (x , xs) (.x , 
 erase : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} → ROrn e D E → {X : I → Set} → ⟦ E ⟧ (X ∘ e) → ⟦ D ⟧ X
 erase O = erase' O erase-Ṗ
 
-erase-idROrn-Ṗ : {I : Set} {X : I → Set} (is : List I) (xs : Ṗ is X) → erase-Ṗ Ė-refl xs ≡ xs
-erase-idROrn-Ṗ []       _        = refl
-erase-idROrn-Ṗ (i ∷ is) (x , xs) = cong₂ _,_ refl (erase-idROrn-Ṗ is xs)
+erase-idR⁻Orn-Ṗ : {I : Set} {X : I → Set} (is : List I) (xs : Ṗ is X) → erase-Ṗ Ė-refl xs ≡ xs
+erase-idR⁻Orn-Ṗ []       _        = refl
+erase-idR⁻Orn-Ṗ (i ∷ is) (x , xs) = cong₂ _,_ refl (erase-idR⁻Orn-Ṗ is xs)
 
-erase'-idROrn : {I : Set} (D : RDesc I) {X Y : List I → Set} (f : Erasure id Y X) (ys : Ḣ D Y) → erase' (idROrn D) f ys ≡ Ḣ-map D (f Ė-refl) ys
-erase'-idROrn (ṿ is)  f ys       = refl
-erase'-idROrn (σ S D) f (s , ys) = cong (_,_ s) (erase'-idROrn (D s) f ys)
+erase'-idR⁻Orn : {I : Set} (D : RDesc I) {X Y : List I → Set} (f : Erasure id Y X) (ys : Ḣ D Y) → erase' (idR⁻Orn D) f ys ≡ Ḣ-map D (f Ė-refl) ys
+erase'-idR⁻Orn (ṿ is)  f ys       = refl
+erase'-idR⁻Orn (σ S D) f (s , ys) = cong (_,_ s) (erase'-idR⁻Orn (D s) f ys)
 
 record Orn {I J : Set} (e : J → I) (D : Desc I) (E : Desc J) : Set₁ where
   constructor wrap
@@ -121,7 +121,7 @@ record Orn {I J : Set} (e : J → I) (D : Desc I) (E : Desc J) : Set₁ where
     comp : ∀ {i} (j : e ⁻¹ i) → ROrn e (Desc.comp D i) (Desc.comp E (und j))
 
 idOrn : {I : Set} (D : Desc I) → Orn id D D
-idOrn D = wrap λ { {._} (ok i) → idROrn (Desc.comp D i) }
+idOrn D = wrap λ { {._} (ok i) → idR⁻Orn (Desc.comp D i) }
 
 -- ornamental algebra
 
@@ -135,7 +135,7 @@ forget-idOrn : ∀ {I} {D : Desc I} → ∀ {i} (x : μ D i) → forget (idOrn D
 forget-idOrn {I} {D} = induction D (λ _ x → forget (idOrn D) x ≡ x) (λ i xs ihs → cong con (aux (Desc.comp D i) xs ihs))
   where
     aux : (D' : RDesc I) (xs : ⟦ D' ⟧ (μ D)) → All D' (λ _ x → forget (idOrn D) x ≡ x) xs →
-          erase (idROrn D') (mapFold D D' (ornAlg (idOrn D)) xs) ≡ xs
+          erase (idR⁻Orn D') (mapFold D D' (ornAlg (idOrn D)) xs) ≡ xs
     aux (ṿ [])       _        _          = refl
     aux (ṿ (i ∷ is)) (x , xs) (ih , ihs) = cong₂ _,_ ih (aux (ṿ is) xs ihs)
     aux (σ S D')     (s , xs) ihs        = cong (_,_ s) (aux (D' s) xs ihs)
@@ -180,9 +180,9 @@ toROrn (∇ s O) = ∇ s (toROrn O)
 ⌈_⌉ : {I J : Set} {e : J → I} {D : Desc I} → (O : OrnDesc J e D) → Orn e D ⌊ O ⌋
 ⌈ wrap O ⌉ = wrap λ { {._} (ok j) → toROrn (O (ok j)) }
 
-idROrnDesc : ∀ {I} (D : RDesc I) → ROrnDesc I id D
-idROrnDesc (ṿ is)  = ṿ (generate-Ṗ ok is)
-idROrnDesc (σ S D) = σ[ s ∶ S ] idROrnDesc (D s)
+idR⁻OrnDesc : ∀ {I} (D : RDesc I) → ROrnDesc I id D
+idR⁻OrnDesc (ṿ is)  = ṿ (generate-Ṗ ok is)
+idR⁻OrnDesc (σ S D) = σ[ s ∶ S ] idR⁻OrnDesc (D s)
 
 
 --------

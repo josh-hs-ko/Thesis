@@ -1,4 +1,4 @@
--- "Weak" category of categories, in which morphisms (i.e., functors) are considered equal if they are naturally isomorphic.
+-- "Weak" category of categories, in which morphisms (i.e., fun⁻ctors) are considered equal if they are naturally isomorphic.
 -- An equivalence of categories is an isomorphism in this weak category of categories.
 
 module Prelude.Category.WCat where

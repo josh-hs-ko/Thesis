@@ -1,7 +1,7 @@
--- Basic definitions of categories, functors, and natural transformations.
+-- Basic definitions of categories, fun⁻ctors, and natural transformations.
 -- The collection of objects in a category is an Agda set, i.e., equality on objects is definitional equality,
 -- whereas the collection of arrows is a setoid, i.e., a set equipped with an equivalence relation.
--- All operations on morphisms must respect the equivalence relation, including the morphism maps of functors.
+-- All operations on morphisms must respect the equivalence relation, including the morphism maps of fun⁻ctors.
 
 module Prelude.Category where
 

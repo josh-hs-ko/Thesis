@@ -9,61 +9,61 @@ open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
 import Relation.Binary.PreorderReasoning as PreorderReasoning
 
 
-min_•Λ_ : {X Y : Set} → (R : Y ↝ Y) (S : X ↝ Y) → X ↝ Y
-min R •Λ S = λ x y → S x y × (∀ y' → S x y' → R y' y)
+min⁻_•⁻Λ_ : {X Y : Set} → (R : Y ↝⁻ Y) (S : X ↝⁻ Y) → X ↝⁻ Y
+min⁻ R •⁻Λ S = λ x y → S x y × (∀ y' → S x y' → R y' y)
 
-min-universal-⇒ : {X Y : Set} {T : X ↝ Y} {R : Y ↝ Y} {S : X ↝ Y} → T ⊆ min R •Λ S → (T ⊆ S) × (T • S º ⊆ R)
-min-universal-⇒ T⊆minR•ΛS =
-  wrap (λ x y t → proj₁ (modus-ponens-⊆ T⊆minR•ΛS x y t)) ,
-  wrap (λ { y' y (x , s , t) → proj₂ (modus-ponens-⊆ T⊆minR•ΛS x y t) y' s })
+min⁻-universal-⇒ : {X Y : Set} {T : X ↝⁻ Y} {R : Y ↝⁻ Y} {S : X ↝⁻ Y} → T ⊆⁻ min⁻ R •⁻Λ S → (T ⊆⁻ S) × (T •⁻ S º⁻ ⊆⁻ R)
+min⁻-universal-⇒ T⊆⁻min⁻R•⁻ΛS =
+  wrap (λ x y t → proj₁ (modus-ponens-⊆⁻ T⊆⁻min⁻R•⁻ΛS x y t)) ,
+  wrap (λ { y' y (x , s , t) → proj₂ (modus-ponens-⊆⁻ T⊆⁻min⁻R•⁻ΛS x y t) y' s })
 
-min-universal-⇐ : {X Y : Set} {T : X ↝ Y} {R : Y ↝ Y} {S : X ↝ Y} → T ⊆ S → T • S º ⊆ R → T ⊆ min R •Λ S
-min-universal-⇐ T⊆S T•Sº⊆R = wrap λ x y t → modus-ponens-⊆ T⊆S x y t , (λ y' s → modus-ponens-⊆ T•Sº⊆R y' y (x , s , t))
+min⁻-universal-⇐ : {X Y : Set} {T : X ↝⁻ Y} {R : Y ↝⁻ Y} {S : X ↝⁻ Y} → T ⊆⁻ S → T •⁻ S º⁻ ⊆⁻ R → T ⊆⁻ min⁻ R •⁻Λ S
+min⁻-universal-⇐ T⊆⁻S T•⁻Sº⁻⊆⁻R = wrap λ x y t → modus-ponens-⊆⁻ T⊆⁻S x y t , (λ y' s → modus-ponens-⊆⁻ T•⁻Sº⁻⊆⁻R y' y (x , s , t))
 
-min-monotonic : {X Y : Set} {R R' : Y ↝ Y} {S S' : X ↝ Y} → R ⊆ R' → S ≃ S' → min R •Λ S ⊆ min R' •Λ S'
-min-monotonic {X} {Y} {R} {R'} {S} {S'} R⊆R' (S⊆S' , S⊇S') =
-  min-universal-⇐
-    (⊆-trans (proj₁ (min-universal-⇒ ⊆-refl)) S⊆S')
+min⁻-monotonic : {X Y : Set} {R R' : Y ↝⁻ Y} {S S' : X ↝⁻ Y} → R ⊆⁻ R' → S ≃⁻ S' → min⁻ R •⁻Λ S ⊆⁻ min⁻ R' •⁻Λ S'
+min⁻-monotonic {X} {Y} {R} {R'} {S} {S'} R⊆⁻R' (S⊆⁻S' , S⊇⁻S') =
+  min⁻-universal-⇐
+    (⊆⁻-trans (proj₁ (min⁻-universal-⇒ ⊆⁻-refl)) S⊆⁻S')
     (begin
-       min R •Λ S • S' º
-         ⊆⟨ •-monotonic-l (min R •Λ S) (º-monotonic S⊇S') ⟩
-       min R •Λ S • S º
-         ⊆⟨ proj₂ (min-universal-⇒ ⊆-refl) ⟩
+       min⁻ R •⁻Λ S •⁻ S' º⁻
+         ⊆⁻⟨ •⁻-monotonic-l (min⁻ R •⁻Λ S) (º⁻-monotonic S⊇⁻S') ⟩
+       min⁻ R •⁻Λ S •⁻ S º⁻
+         ⊆⁻⟨ proj₂ (min⁻-universal-⇒ ⊆⁻-refl) ⟩
        R
-         ⊆⟨ R⊆R' ⟩
+         ⊆⁻⟨ R⊆⁻R' ⟩
        R'
      □)
-  where open PreorderReasoning (⊆-Preorder Y Y) renaming (_∼⟨_⟩_ to _⊆⟨_⟩_; _∎ to _□)
+  where open PreorderReasoning (⊆⁻-Preorder Y Y) renaming (_∼⟨_⟩_ to _⊆⁻⟨_⟩_; _∎ to _□)
 
-min-cong : {X Y : Set} {R R' : Y ↝ Y} {S S' : X ↝ Y} → R ≃ R' → S ≃ S' → min R •Λ S ≃ min R' •Λ S'
-min-cong (R⊆R' , R⊇R') (S⊆S' , S⊇S') = min-monotonic R⊆R' (S⊆S' , S⊇S') , min-monotonic R⊇R' (S⊇S' , S⊆S')
+min⁻-cong : {X Y : Set} {R R' : Y ↝⁻ Y} {S S' : X ↝⁻ Y} → R ≃⁻ R' → S ≃⁻ S' → min⁻ R •⁻Λ S ≃⁻ min⁻ R' •⁻Λ S'
+min⁻-cong (R⊆⁻R' , R⊇⁻R') (S⊆⁻S' , S⊇⁻S') = min⁻-monotonic R⊆⁻R' (S⊆⁻S' , S⊇⁻S') , min⁻-monotonic R⊇⁻R' (S⊇⁻S' , S⊆⁻S')
 
-min-context : {X Y : Set} (R : Y ↝ Y) (S : X ↝ Y) → min R •Λ S ≃ min (R ∩ (S • S º)) •Λ S
-min-context R S = min-universal-⇐
-                    (proj₁ (min-universal-⇒ ⊆-refl))
-                    (∩-universal-⇐
-                       (proj₂ (min-universal-⇒ ⊆-refl))
-                       (•-monotonic-r (S º) (proj₁ (min-universal-⇒ ⊆-refl)))) ,
-                  min-monotonic (proj₁ (∩-universal-⇒ ⊆-refl)) ≃-refl
+min⁻-context : {X Y : Set} (R : Y ↝⁻ Y) (S : X ↝⁻ Y) → min⁻ R •⁻Λ S ≃⁻ min⁻ (R ∩⁻ (S •⁻ S º⁻)) •⁻Λ S
+min⁻-context R S = min⁻-universal-⇐
+                    (proj₁ (min⁻-universal-⇒ ⊆⁻-refl))
+                    (∩⁻-universal-⇐
+                       (proj₂ (min⁻-universal-⇒ ⊆⁻-refl))
+                       (•⁻-monotonic-r (S º⁻) (proj₁ (min⁻-universal-⇒ ⊆⁻-refl)))) ,
+                  min⁻-monotonic (proj₁ (∩⁻-universal-⇒ ⊆⁻-refl)) ≃⁻-refl
 
 
 --------
 -- componentwise minimum
 
-min⁺_•⁺Λ_ : {I : Set} {X Y : I → Set} → (R : Y ↝⁺ Y) (S : X ↝⁺ Y) → X ↝⁺ Y
-min⁺ R •⁺Λ S = wrap λ i → min ((R !!) i) •Λ ((S !!) i)
+min_•Λ_ : {I : Set} {X Y : I → Set} → (R : Y ↝ Y) (S : X ↝ Y) → X ↝ Y
+min R •Λ S = wrap λ i → min⁻ ((R !!) i) •⁻Λ ((S !!) i)
 
-min⁺-universal-⇒ : {I : Set} {X Y : I → Set} {T : X ↝⁺ Y} {R : Y ↝⁺ Y} {S : X ↝⁺ Y} → T ⊆⁺ min⁺ R •⁺Λ S → (T ⊆⁺ S) × (T •⁺ S º⁺ ⊆⁺ R)
-min⁺-universal-⇒ (wrap T⊆⁺min⁺R•⁺ΛS) = wrap (λ i → proj₁ (min-universal-⇒ (T⊆⁺min⁺R•⁺ΛS i))) , wrap (λ i → proj₂ (min-universal-⇒ (T⊆⁺min⁺R•⁺ΛS i)))
+min-universal-⇒ : {I : Set} {X Y : I → Set} {T : X ↝ Y} {R : Y ↝ Y} {S : X ↝ Y} → T ⊆ min R •Λ S → (T ⊆ S) × (T • S º ⊆ R)
+min-universal-⇒ (wrap T⊆minR•ΛS) = wrap (λ i → proj₁ (min⁻-universal-⇒ (T⊆minR•ΛS i))) , wrap (λ i → proj₂ (min⁻-universal-⇒ (T⊆minR•ΛS i)))
 
-min⁺-universal-⇐ : {I : Set} {X Y : I → Set} {T : X ↝⁺ Y} {R : Y ↝⁺ Y} {S : X ↝⁺ Y} → T ⊆⁺ S → T •⁺ S º⁺ ⊆⁺ R → T ⊆⁺ min⁺ R •⁺Λ S
-min⁺-universal-⇐ (wrap T⊆⁺S) (wrap T•⁺Sº⁺⊆⁺R) = wrap λ i → min-universal-⇐ (T⊆⁺S i) (T•⁺Sº⁺⊆⁺R i)
+min-universal-⇐ : {I : Set} {X Y : I → Set} {T : X ↝ Y} {R : Y ↝ Y} {S : X ↝ Y} → T ⊆ S → T • S º ⊆ R → T ⊆ min R •Λ S
+min-universal-⇐ (wrap T⊆S) (wrap T•Sº⊆R) = wrap λ i → min⁻-universal-⇐ (T⊆S i) (T•Sº⊆R i)
 
-min⁺-monotonic : {I : Set} {X Y : I → Set} {R R' : Y ↝⁺ Y} {S S' : X ↝⁺ Y} → R ⊆⁺ R' → S ≃⁺ S' → min⁺ R •⁺Λ S ⊆⁺ min⁺ R' •⁺Λ S'
-min⁺-monotonic (wrap R⊆⁺R') (wrap S⊆⁺S' , wrap S⊇⁺S') = wrap λ i → min-monotonic (R⊆⁺R' i) (S⊆⁺S' i , S⊇⁺S' i)
+min-monotonic : {I : Set} {X Y : I → Set} {R R' : Y ↝ Y} {S S' : X ↝ Y} → R ⊆ R' → S ≃ S' → min R •Λ S ⊆ min R' •Λ S'
+min-monotonic (wrap R⊆R') (wrap S⊆S' , wrap S⊇S') = wrap λ i → min⁻-monotonic (R⊆R' i) (S⊆S' i , S⊇S' i)
 
-min⁺-cong : {I : Set} {X Y : I → Set} {R R' : Y ↝⁺ Y} {S S' : X ↝⁺ Y} → R ≃⁺ R' → S ≃⁺ S' → min⁺ R •⁺Λ S ≃⁺ min⁺ R' •⁺Λ S'
-min⁺-cong (R⊆⁺R' , R⊇⁺R') (S⊆⁺S' , S⊇⁺S') = min⁺-monotonic R⊆⁺R' (S⊆⁺S' , S⊇⁺S') , min⁺-monotonic R⊇⁺R' (S⊇⁺S' , S⊆⁺S')
+min-cong : {I : Set} {X Y : I → Set} {R R' : Y ↝ Y} {S S' : X ↝ Y} → R ≃ R' → S ≃ S' → min R •Λ S ≃ min R' •Λ S'
+min-cong (R⊆R' , R⊇R') (S⊆S' , S⊇S') = min-monotonic R⊆R' (S⊆S' , S⊇S') , min-monotonic R⊇R' (S⊇S' , S⊆S')
 
-min⁺-context : {I : Set} {X Y : I → Set} (R : Y ↝⁺ Y) (S : X ↝⁺ Y) → min⁺ R •⁺Λ S ≃⁺ min⁺ (R ∩⁺ (S •⁺ S º⁺)) •⁺Λ S
-min⁺-context R S = wrap (λ i → proj₁ (min-context ((R !!) i) ((S !!) i))) , wrap (λ i → proj₂ (min-context ((R !!) i) ((S !!) i)))
+min-context : {I : Set} {X Y : I → Set} (R : Y ↝ Y) (S : X ↝ Y) → min R •Λ S ≃ min (R ∩ (S • S º)) •Λ S
+min-context R S = wrap (λ i → proj₁ (min⁻-context ((R !!) i) ((S !!) i))) , wrap (λ i → proj₂ (min⁻-context ((R !!) i) ((S !!) i)))
