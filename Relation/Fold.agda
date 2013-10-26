@@ -28,7 +28,7 @@ mutual
   mapFoldR D (ṿ is)   R ds       = mapFoldR-Ṗ D R is ds
   mapFoldR D (σ S E)  R (s , ds) = map℘ (_,_ s) (mapFoldR D (E s) R ds)
 
-  mapFoldR-Ṗ : {I : Set} (D : Desc I) {X : I → Set} → (Ḟ D X ↝⁺ X) → (is : List I) → Ṗ (μ D) is ↝ Ṗ X is
+  mapFoldR-Ṗ : {I : Set} (D : Desc I) {X : I → Set} → (Ḟ D X ↝⁺ X) → (is : List I) → Ṗ is (μ D) ↝ Ṗ is X
   mapFoldR-Ṗ D R []       _        = any
   mapFoldR-Ṗ D R (i ∷ is) (d , ds) = map℘₂ _,_ (foldR' R i d) (mapFoldR-Ṗ D R is ds)
 

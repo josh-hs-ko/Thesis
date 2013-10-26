@@ -70,7 +70,7 @@ module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (
 
   integrate-aux₀ :
     ∀ {j} (y : μ E j) → ∀ {k} (z : μ F k) → ∀ {i} (eeq : e j ≡ i) → ∀ {i'} (feq : f k ≡ i') → i ≡ i' →
-    ∀ {is js ks} (ys : Ṗ (μ E) js) (zs : Ṗ (μ F) ks) (eeqs : Ė e js is) (feqs : Ė f ks is) →
+    ∀ {is js ks} (ys : Ṗ js (μ E)) (zs : Ṗ ks (μ F)) (eeqs : Ė e js is) (feqs : Ė f ks is) →
     erase-Ṗ {X = μ D} (eeq ∷ eeqs) (forget O y , mapFold-Ṗ E (ornAlg O) js ys)
       ≅ erase-Ṗ {X = μ D} (feq ∷ feqs) (forget P z , mapFold-Ṗ F (ornAlg P) ks zs) →
     forget O y ≅ forget P z × erase-Ṗ {X = μ D} eeqs (mapFold-Ṗ E (ornAlg O) js ys) ≡ erase-Ṗ {X = μ D} feqs (mapFold-Ṗ F (ornAlg P) ks zs)
@@ -78,8 +78,8 @@ module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (
 
   integrate-aux₁ :
     ∀ {i j k} (y : μ E j) (eeq : e j ≡ i) (feq : f k ≡ i) (p : μ ⌊ O ⊗ P ⌋ (from≡ e eeq , from≡ f feq)) → forget (diffOrn-l O P) p ≅ y →
-    ∀ {is js ks} (eeqs : Ė e js is) (feqs : Ė f ks is) (ps : Ṗ (μ ⌊ O ⊗ P ⌋) (und-Ṗ is (pc-Ė eeqs feqs))) →
-    {ys : Ṗ (μ E) js} →
+    ∀ {is js ks} (eeqs : Ė e js is) (feqs : Ė f ks is) (ps : Ṗ (und-Ṗ is (pc-Ė eeqs feqs)) (μ ⌊ O ⊗ P ⌋)) →
+    {ys : Ṗ js (μ E)} →
     erase-Ṗ (diff-Ė-l eeqs feqs) (mapFold-Ṗ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-l O P) {jk}) (und-Ṗ is (pc-Ė eeqs feqs)) ps) ≡ ys →
     erase-Ṗ (_∷_ {j = from≡ e eeq , from≡ f feq} (und-from≡ e eeq) (diff-Ė-l eeqs feqs))
       (forget (diffOrn-l O P) p , mapFold-Ṗ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-l O P) {jk}) (und-Ṗ is (pc-Ė eeqs feqs)) ps) ≡ (y , ys)
@@ -87,8 +87,8 @@ module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (
 
   integrate-aux₂ :
     ∀ {i j k} (z : μ F k) (eeq : e j ≡ i) (feq : f k ≡ i) (p : μ ⌊ O ⊗ P ⌋ (from≡ e eeq , from≡ f feq)) → forget (diffOrn-r O P) p ≅ z →
-    ∀ {is js ks} (eeqs : Ė e js is) (feqs : Ė f ks is) (ps : Ṗ (μ ⌊ O ⊗ P ⌋) (und-Ṗ is (pc-Ė eeqs feqs))) →
-    {zs : Ṗ (μ F) ks} →
+    ∀ {is js ks} (eeqs : Ė e js is) (feqs : Ė f ks is) (ps : Ṗ (und-Ṗ is (pc-Ė eeqs feqs)) (μ ⌊ O ⊗ P ⌋)) →
+    {zs : Ṗ ks (μ F)} →
     erase-Ṗ (diff-Ė-r eeqs feqs) (mapFold-Ṗ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-r O P) {jk}) (und-Ṗ is (pc-Ė eeqs feqs)) ps) ≡ zs →
     erase-Ṗ (_∷_ {j = from≡ e eeq , from≡ f feq} (und-from≡ f feq) (diff-Ė-r eeqs feqs))
       (forget (diffOrn-r O P) p , mapFold-Ṗ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-r O P) {jk}) (und-Ṗ is (pc-Ė eeqs feqs))  ps) ≡ (z , zs)
@@ -96,9 +96,9 @@ module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (
 
   integrate-aux-Ṗ :
     {is : List I} {js : List J} {ks : List K}
-    (eeqs : Ė e js is) (feqs : Ė f ks is) → (ys : Ṗ (μ E) js) → All-Ṗ integrate-Ind js ys → (zs : Ṗ (μ F) ks) →
+    (eeqs : Ė e js is) (feqs : Ė f ks is) → (ys : Ṗ js (μ E)) → All-Ṗ integrate-Ind js ys → (zs : Ṗ ks (μ F)) →
     erase-Ṗ {X = μ D} eeqs (mapFold-Ṗ E (ornAlg O) js ys) ≡ erase-Ṗ feqs (mapFold-Ṗ F (ornAlg P) ks zs) →
-    Σ[ ps ∶ Ṗ (μ ⌊ O ⊗ P ⌋) (und-Ṗ is (pc-Ė eeqs feqs)) ]
+    Σ[ ps ∶ Ṗ (und-Ṗ is (pc-Ė eeqs feqs)) (μ ⌊ O ⊗ P ⌋) ]
       erase-Ṗ (diff-Ė-l eeqs feqs) (mapFold-Ṗ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-l O P) {jk}) (und-Ṗ is (pc-Ė eeqs feqs)) ps) ≡ ys
     × erase-Ṗ (diff-Ė-r eeqs feqs) (mapFold-Ṗ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-r O P) {jk}) (und-Ṗ is (pc-Ė eeqs feqs)) ps) ≡ zs
   integrate-aux-Ṗ []           []           _        _          _        _  = tt , refl , refl
@@ -175,7 +175,7 @@ module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (
     where
       aux' : ∀ {i k} (j : e ⁻¹ i) (eeq : e (und j) ≡ i) (feq : f k ≡ i)
              (p : μ ⌊ O ⊗ P ⌋ (j , from≡ f feq)) (ih : integrate-inv-Ind (j , from≡ f feq) p)
-             {is js ks} (eeqs : Ė e js is) (feqs : Ė f ks is) (ps : Ṗ (μ ⌊ O ⊗ P ⌋) (und-Ṗ is (pc-Ė eeqs feqs))) (heq : _) →
+             {is js ks} (eeqs : Ė e js is) (feqs : Ė f ks is) (ps : Ṗ (und-Ṗ is (pc-Ė eeqs feqs)) (μ ⌊ O ⊗ P ⌋)) (heq : _) →
              proj₁ (integrate
                       (forget (diffOrn-l O P) p)
                       (subst (μ F) (und-from≡ f feq) (forget (diffOrn-r O P) p))

@@ -11,7 +11,7 @@ open import Prelude.Function.Fam
 open import Description
 open import Description.Horizontal
 
-open import Function using (id; const; _∘_)
+open import Function using (id; flip; const; _∘_)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; curry) renaming (map to _**_)
 open import Data.List using (List; []; _∷_; map)
@@ -89,16 +89,16 @@ erase' (∇ s O) f ys       = s , erase' O f ys
 erase-Ṡ : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} → ROrn e D E → Ṡ E → Ṡ D
 erase-Ṡ O = erase' O (const !)
 
-erase-Ṗ : {I J : Set} {e : J → I} {X : I → Set} → Erasure e (Ṗ (X ∘ e)) (Ṗ X)
+erase-Ṗ : {I J : Set} {e : J → I} {X : I → Set} → Erasure e (flip Ṗ (X ∘ e)) (flip Ṗ X)
 erase-Ṗ         []         _        = tt
 erase-Ṗ {X = X} (eq ∷ eqs) (x , xs) = subst X eq x , erase-Ṗ eqs xs
 
-ṖHEq : {I : Set} {X Y : I → Set} (is : List I) → Ṗ X is → Ṗ Y is → Set
+ṖHEq : {I : Set} {X Y : I → Set} (is : List I) → Ṗ is X → Ṗ is Y → Set
 ṖHEq is xs ys = All-Ṗ (λ _ xy → proj₁ xy ≅ proj₂ xy) is (Ṗ-comp is xs ys)
 
 cong-erase-Ṗ :
   {I J : Set} {e e' : J → I} {is is' : List I} {js : List J} (eqs : Ė e js is) (eqs' : Ė e' js is') → is ≡ is' →
-  {X : I → Set} (xs : Ṗ (X ∘ e) js) (xs' : Ṗ (X ∘ e') js) → ṖHEq js xs xs' → erase-Ṗ {X = X} eqs xs ≅ erase-Ṗ {X = X} eqs' xs'
+  {X : I → Set} (xs : Ṗ js (X ∘ e)) (xs' : Ṗ js (X ∘ e')) → ṖHEq js xs xs' → erase-Ṗ {X = X} eqs xs ≅ erase-Ṗ {X = X} eqs' xs'
 cong-erase-Ṗ         []                 []            refl _        _          _                     = hrefl
 cong-erase-Ṗ {e = e} (_∷_ {j} refl eqs) (refl ∷ eqs') iseq (x , xs) (x' , xs') (heq , heqs) with e j
 cong-erase-Ṗ {e = e} (_∷_ {j} refl eqs) (refl ∷ eqs') refl (x , xs) (.x , xs') (hrefl , heqs) | ._   =
@@ -107,7 +107,7 @@ cong-erase-Ṗ {e = e} (_∷_ {j} refl eqs) (refl ∷ eqs') refl (x , xs) (.x , 
 erase : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} → ROrn e D E → {X : I → Set} → ⟦ E ⟧ (X ∘ e) → ⟦ D ⟧ X
 erase O = erase' O erase-Ṗ
 
-erase-idROrn-Ṗ : {I : Set} {X : I → Set} (is : List I) (xs : Ṗ X is) → erase-Ṗ Ė-refl xs ≡ xs
+erase-idROrn-Ṗ : {I : Set} {X : I → Set} (is : List I) (xs : Ṗ is X) → erase-Ṗ Ė-refl xs ≡ xs
 erase-idROrn-Ṗ []       _        = refl
 erase-idROrn-Ṗ (i ∷ is) (x , xs) = cong₂ _,_ refl (erase-idROrn-Ṗ is xs)
 
@@ -144,7 +144,7 @@ forget-idOrn {I} {D} = induction D (λ _ x → forget (idOrn D) x ≡ x) (λ i x
 -- ornamental descriptions
 
 data ROrnDesc {I : Set} (J : Set) (e : J → I) : RDesc I → Set₁ where
-  ṿ   : {is : List I} (js : Ṗ (InvImage e) is) → ROrnDesc J e (ṿ is)
+  ṿ   : {is : List I} (js : Ṗ is (InvImage e)) → ROrnDesc J e (ṿ is)
   σ   : (S : Set) → ∀ {D} (O : ∀ s → ROrnDesc J e (D s)) → ROrnDesc J e (σ S D)
   Δ   : (T : Set) → ∀ {D} (O : T → ROrnDesc J e D) → ROrnDesc J e D
   ∇   : {S : Set} (s : S) → ∀ {D} (O : ROrnDesc J e (D s)) → ROrnDesc J e (σ S D)
@@ -154,7 +154,7 @@ record OrnDesc {I : Set} (J : Set) (e : J → I) (D : Desc I) : Set₁ where
   field
     comp : ∀ {i} (j : e ⁻¹ i) → ROrnDesc J e (Desc.comp D i)
 
-und-Ṗ : {I J : Set} {e : J → I} (is : List I) → Ṗ (InvImage e) is → List J
+und-Ṗ : {I J : Set} {e : J → I} (is : List I) → Ṗ is (InvImage e) → List J
 und-Ṗ []       _        = []
 und-Ṗ (i ∷ is) (j , js) = und j ∷ und-Ṗ is js
 
@@ -167,7 +167,7 @@ toRDesc (∇ s O) = toRDesc O
 ⌊_⌋ : {I J : Set} {e : J → I} {D : Desc I} → OrnDesc J e D → Desc J
 ⌊ wrap O ⌋ = wrap λ j → toRDesc (O (ok j))
 
-to≡-Ṗ : {I J : Set} {e : J → I} (is : List I) (js : Ṗ (InvImage e) is) → Ė e (und-Ṗ is js) is
+to≡-Ṗ : {I J : Set} {e : J → I} (is : List I) (js : Ṗ is (InvImage e)) → Ė e (und-Ṗ is js) is
 to≡-Ṗ []       _        = []
 to≡-Ṗ (i ∷ is) (j , js) = to≡ j ∷ to≡-Ṗ is js
 

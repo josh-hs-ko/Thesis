@@ -443,7 +443,7 @@ fun⁺-shunting-r-⇐ f R S (wrap R⊆⁺f•⁺S) = wrap λ i → fun-shunting-
 --------
 -- functorial map
 
-Ṗ-mapR : {I : Set} {X Y : I → Set} → (X ↝⁺ Y) → (is : List I) → Ṗ X is ↝ Ṗ Y is
+Ṗ-mapR : {I : Set} {X Y : I → Set} → (X ↝⁺ Y) → (is : List I) → Ṗ is X ↝ Ṗ is Y
 Ṗ-mapR R []       _        = any
 Ṗ-mapR R (i ∷ is) (x , xs) = map℘₂ _,_ ((R !!) i x) (Ṗ-mapR R is xs)
 
@@ -465,7 +465,7 @@ fun⁺-shunting-r-⇐ f R S (wrap R⊆⁺f•⁺S) = wrap λ i → fun-shunting-
                                                 in  (y , ys) , (y , s , ys , ss , refl) , (z , r , zs , rs , refl) }
 
 Ṗ-mapR-preserves-conv :
-  {I : Set} {X Y : I → Set} (R : X ↝⁺ Y) (is : List I) (xs : Ṗ X is) (ys : Ṗ Y is) → Ṗ-mapR R is xs ys → Ṗ-mapR (R º⁺) is ys xs
+  {I : Set} {X Y : I → Set} (R : X ↝⁺ Y) (is : List I) (xs : Ṗ is X) (ys : Ṗ is Y) → Ṗ-mapR R is xs ys → Ṗ-mapR (R º⁺) is ys xs
 Ṗ-mapR-preserves-conv R []       _        _        _                         = tt
 Ṗ-mapR-preserves-conv R (i ∷ is) (x , xs) (y , ys) (._ , r , ._ , rs , refl) = x , r , xs , Ṗ-mapR-preserves-conv R is xs ys rs , refl
 
@@ -477,12 +477,12 @@ mapR-monotonic : {I : Set} (D : RDesc I) {X Y : I → Set} {R S : X ↝⁺ Y} �
 mapR-monotonic (ṿ is)  R⊆⁺S = Ṗ-mapR-monotonic R⊆⁺S is
 mapR-monotonic (σ S D) R⊆⁺S = wrap λ { (s , xs) → map℘-monotonic (_,_ s) (modus-ponens-⊆ (mapR-monotonic (D s) R⊆⁺S) xs) }
 
-Ṗ-mapR-fun-computation : {I : Set} {X Y : I → Set} (f : X ⇉ Y) (is : List I) (xs : Ṗ X is) → Ṗ-mapR (fun⁺ f) is xs (Ṗ-map f is xs)
+Ṗ-mapR-fun-computation : {I : Set} {X Y : I → Set} (f : X ⇉ Y) (is : List I) (xs : Ṗ is X) → Ṗ-mapR (fun⁺ f) is xs (Ṗ-map f is xs)
 Ṗ-mapR-fun-computation f []       _        = tt
 Ṗ-mapR-fun-computation f (i ∷ is) (x , xs) = f x , refl , Ṗ-map f is xs , Ṗ-mapR-fun-computation f is xs , refl
 
 Ṗ-mapR-fun-unique :
-  {I : Set} {X Y : I → Set} (f : X ⇉ Y) (is : List I) (xs : Ṗ X is) (ys : Ṗ Y is) → Ṗ-mapR (fun⁺ f) is xs ys → Ṗ-map f is xs ≡ ys
+  {I : Set} {X Y : I → Set} (f : X ⇉ Y) (is : List I) (xs : Ṗ is X) (ys : Ṗ is Y) → Ṗ-mapR (fun⁺ f) is xs ys → Ṗ-map f is xs ≡ ys
 Ṗ-mapR-fun-unique f []       _        _             _                             = refl
 Ṗ-mapR-fun-unique f (i ∷ is) (x , xs) (.(f x) , ys) (._ , refl , ._ , eqs , refl) = cong₂ _,_ refl (Ṗ-mapR-fun-unique f is xs ys eqs)
 

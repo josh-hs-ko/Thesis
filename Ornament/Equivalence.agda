@@ -11,7 +11,7 @@ open import Description.Horizontal
 open import Ornament
 open import Ornament.Horizontal
 
-open import Function using (id; const; _∘_; type-signature)
+open import Function using (id; flip; const; _∘_; type-signature)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_) renaming (map to _**_)
 open import Data.List using (List; []; _∷_)
@@ -50,14 +50,14 @@ OrnEq-trans {D = D} O P Q (eeq , OPeq) (eeq' , PQeq) =
 OrnEq-forget : ∀ {I J} {e e' : J → I} {D E} (O : Orn e D E) (P : Orn e' D E) → OrnEq O P → ∀ {j} (x : μ E j) → forget O x ≅ forget P x
 OrnEq-forget {I} {J} {e} {e'} {D} {E} O P (eeq , oeq) = induction E (λ _ x → forget O x ≅ forget P x) (λ j xs ihs → aux j xs ihs refl refl)
   where
-    aux''' : (js : List J) (xs : Ṗ (μ E) js) → All-Ṗ (λ _ x → forget O x ≅ forget P x) js xs →
+    aux''' : (js : List J) (xs : Ṗ js (μ E)) → All-Ṗ (λ _ x → forget O x ≅ forget P x) js xs →
              ṖHEq js (mapFold-Ṗ E (ornAlg O) js xs) (mapFold-Ṗ E (ornAlg P) js xs)
     aux''' []       _        _          = tt
     aux''' (j ∷ js) (x , xs) (ih , ihs) = ih , aux''' js xs ihs
     aux'' : (E' : RDesc J) (xs : ⟦ E' ⟧ (μ E)) → All E' (λ _ x → forget O x ≅ forget P x) xs →
-            Σ[ hs ∶ Ṡ E' ] Σ[ xs' ∶ Ṗ (μ D ∘ e) (next E' hs) ] Σ[ xs'' ∶ Ṗ (μ D ∘ e') (next E' hs) ]
-              Ḣ-decomp E' (Ṗ (μ D ∘ e)) (mapFold E E' (ornAlg O) xs) ≡ (hs , xs')    ×
-              (hs , xs'') ≡ Ḣ-decomp E' (Ṗ (μ D ∘ e')) (mapFold E E' (ornAlg P) xs)  ×  ṖHEq (next E' hs) xs' xs''
+            Σ[ hs ∶ Ṡ E' ] Σ[ xs' ∶ Ṗ (next E' hs) (μ D ∘ e) ] Σ[ xs'' ∶ Ṗ (next E' hs) (μ D ∘ e') ]
+              Ḣ-decomp E' (flip Ṗ (μ D ∘ e)) (mapFold E E' (ornAlg O) xs) ≡ (hs , xs')    ×
+              (hs , xs'') ≡ Ḣ-decomp E' (flip Ṗ (μ D ∘ e')) (mapFold E E' (ornAlg P) xs)  ×  ṖHEq (next E' hs) xs' xs''
     aux'' (ṿ js)   xs       ihs = tt , mapFold-Ṗ E (ornAlg O) js xs , mapFold-Ṗ E (ornAlg P) js xs , refl , refl , aux''' js xs ihs
     aux'' (σ S E') (s , xs) ihs = (_,_ s ** (id ** (id ** (cong (_,_ s ** id) ** (cong (_,_ s ** id) ** id))))) (aux'' (E' s) xs ihs)
     aux' : {D' D'' : RDesc I} {E' : RDesc J} (O' : ROrn e D' E') (P' : ROrn e' D'' E') → D' ≡ D'' → ROrnEq O' P' →
@@ -65,7 +65,7 @@ OrnEq-forget {I} {J} {e} {e'} {D} {E} O P (eeq , oeq) = induction E (λ _ x → 
            ḢTrans-app (ḢTrans-normal O') erase-Ṗ (mapFold E E' (ornAlg O) xs) ≅ ḢTrans-app (ḢTrans-normal P') erase-Ṗ (mapFold E E' (ornAlg P) xs)
     aux' {._} {D'} {E'} O' P' refl roeq xs ihs =
       let (hs , xs' , xs'' , eq , eq' , heq) = aux'' E' xs ihs
-      in  ≡-to-≅ (cong (Ḣ-comp D' (Ṗ (μ D)))
+      in  ≡-to-≅ (cong (Ḣ-comp D' (flip Ṗ (μ D)))
                        (trans (cong (ḢTrans-app' (ḢTrans-normal O') erase-Ṗ) eq)
                               (trans (cong-ḢTrans-app'-erase-Ṗ (ḢTrans-normal O') (ḢTrans-normal P') eeq (≅-to-≡ ∘ roeq) hs xs' xs'' heq)
                                      (cong (ḢTrans-app' (ḢTrans-normal P') erase-Ṗ) eq'))))

@@ -11,7 +11,7 @@ open import Description
 open import Description.Horizontal
 open import Ornament
 
-open import Function using (id; const; _∘_)
+open import Function using (id; flip; const; _∘_)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; <_,_>; curry; uncurry) renaming (map to _**_)
 open import Data.List using (List; []; _∷_)
@@ -31,8 +31,8 @@ record ḢTrans {I J : Set} (e : J → I) (D : RDesc I) (E : RDesc J) : Set wher
 
 cong-ḢTrans-app'-erase-Ṗ :
   {I J : Set} {e e' : J → I} {D : RDesc I} {E : RDesc J} (t : ḢTrans e D E) (u : ḢTrans e' D E) →
-  e ≐ e' → ḢTrans.s t ≐ ḢTrans.s u → (hs : Ṡ E) {X : I → Set} (xs : Ṗ (X ∘ e) (next E hs)) (xs' : Ṗ (X ∘ e') (next E hs)) →
-  ṖHEq (next E hs) xs xs' → ḢTrans-app' t {Ṗ X} erase-Ṗ (hs , xs) ≡ ḢTrans-app' u {Ṗ X} erase-Ṗ (hs , xs')
+  e ≐ e' → ḢTrans.s t ≐ ḢTrans.s u → (hs : Ṡ E) {X : I → Set} (xs : Ṗ (next E hs) (X ∘ e)) (xs' : Ṗ (next E hs) (X ∘ e')) →
+  ṖHEq (next E hs) xs xs' → ḢTrans-app' t {flip Ṗ X} erase-Ṗ (hs , xs) ≡ ḢTrans-app' u {flip Ṗ X} erase-Ṗ (hs , xs')
 cong-ḢTrans-app'-erase-Ṗ {D = D} t u e≐e' t≐u hs xs xs' heq =
   cong₂-pair (t≐u hs) (cong-erase-Ṗ (ḢTrans.c t hs) (ḢTrans.c u hs) (cong (next D) (t≐u hs)) xs xs' heq)
 

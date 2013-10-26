@@ -12,7 +12,7 @@ open import Data.List using (List; []; _∷_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst)
 
 
-pc-Ė : ∀ {I J K} {e : J → I} {f : K → I} {is js ks} → Ė e js is → Ė f ks is → Ṗ (InvImage (pull {J} {K} {I} {e} {f})) is
+pc-Ė : ∀ {I J K} {e : J → I} {f : K → I} {is js ks} → Ė e js is → Ė f ks is → Ṗ is (InvImage (pull {J} {K} {I} {e} {f}))
 pc-Ė             []           _            = tt
 pc-Ė {e = e} {f} (eeq ∷ eeqs) (feq ∷ feqs) = ok (from≡ e eeq , from≡ f feq) , pc-Ė eeqs feqs
 
