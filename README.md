@@ -193,6 +193,9 @@ Ordered lists indexed with a lower bound as an ornamentation of lists.
 #### Examples.List.Vec
 Vectors, i.e., length-indexed lists, defined as the optimised predicate for the ornament from natural numbers to lists.
 
+#### Examples.Metamorphism
+Implementing the streaming theorem for list metamorphisms by algebraic ornamentation.
+
 #### Examples.MinCoinChange
 Solving the minimum coin change problem with the Greedy Theorem and algebraic ornamentation.
 

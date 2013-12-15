@@ -50,6 +50,7 @@ import Examples.LeftistHeap
 import Examples.List
 import Examples.List.Ordered
 import Examples.List.Vec
+import Examples.Metamorphism
 import Examples.MinCoinChange
 import Examples.Nat
 import Examples.Nat.TotalOrdering

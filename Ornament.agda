@@ -57,9 +57,9 @@ data Ė {I J : Set} (e : J → I) : List J → List I → Set where
 
 data ROrn {I J : Set} (e : J → I) : RDesc I → RDesc J → Set₁ where
   ṿ   : {js : List J} {is : List I} (eqs : Ė e js is) → ROrn e (ṿ is) (ṿ js)
-  σ   : (S : Set) → ∀ {D E} (O : ∀ s → ROrn e (D s) (E s)) → ROrn e (σ S D) (σ S E)
-  Δ   : (T : Set) → ∀ {D E} (O : ∀ t → ROrn e D (E t)) → ROrn e D (σ T E)
-  ∇   : {S : Set} (s : S) → ∀ {D E} (O : ROrn e (D s) E) → ROrn e (σ S D) E
+  σ   : (S : Set) {D : S → RDesc I} {E : S → RDesc J} (O : (s : S) → ROrn e (D s) (E s)) → ROrn e (σ S D) (σ S E)
+  Δ   : (T : Set) {D : RDesc I} {E : T → RDesc J} (O : (t : T) → ROrn e D (E t)) → ROrn e D (σ T E)
+  ∇   : {S : Set} (s : S) {D : S → RDesc I} {E : RDesc J} (O : ROrn e (D s) E) → ROrn e (σ S D) E
 
 syntax σ S (λ s → O) = σ[ s ∶ S ] O
 syntax Δ T (λ t → O) = Δ[ t ∶ T ] O
@@ -118,7 +118,7 @@ erase'-idROrn (σ S D) f (s , ys) = cong (_,_ s) (erase'-idROrn (D s) f ys)
 record Orn {I J : Set} (e : J → I) (D : Desc I) (E : Desc J) : Set₁ where
   constructor wrap
   field
-    comp : ∀ {i} (j : e ⁻¹ i) → ROrn e (Desc.comp D i) (Desc.comp E (und j))
+    comp : {i : I} (j : e ⁻¹ i) → ROrn e (Desc.comp D i) (Desc.comp E (und j))
 
 idOrn : {I : Set} (D : Desc I) → Orn id D D
 idOrn D = wrap λ { {._} (ok i) → idROrn (Desc.comp D i) }
@@ -126,7 +126,7 @@ idOrn D = wrap λ { {._} (ok i) → idROrn (Desc.comp D i) }
 -- ornamental algebra
 
 ornAlg : {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) → Ḟ E (μ D ∘ e) ⇉ μ D ∘ e
-ornAlg {D = D} O {j} = con ∘ erase (Orn.comp O (ok j))
+ornAlg O {j} = con ∘ erase (Orn.comp O (ok j))
 
 forget : ∀ {I J} {e : J → I} {D E} (O : Orn e D E) → μ E ⇉ μ D ∘ e
 forget O = fold (ornAlg O)
@@ -145,9 +145,9 @@ forget-idOrn {I} {D} = induction D (λ _ x → forget (idOrn D) x ≡ x) (λ i x
 
 data ROrnDesc {I : Set} (J : Set) (e : J → I) : RDesc I → Set₁ where
   ṿ   : {is : List I} (js : Ṗ is (InvImage e)) → ROrnDesc J e (ṿ is)
-  σ   : (S : Set) → ∀ {D} (O : ∀ s → ROrnDesc J e (D s)) → ROrnDesc J e (σ S D)
-  Δ   : (T : Set) → ∀ {D} (O : T → ROrnDesc J e D) → ROrnDesc J e D
-  ∇   : {S : Set} (s : S) → ∀ {D} (O : ROrnDesc J e (D s)) → ROrnDesc J e (σ S D)
+  σ   : (S : Set) {D : S → RDesc I} (O : (s : S) → ROrnDesc J e (D s)) → ROrnDesc J e (σ S D)
+  Δ   : (T : Set) {D : RDesc I} (O : T → ROrnDesc J e D) → ROrnDesc J e D
+  ∇   : {S : Set} (s : S) {D : S → RDesc I} (O : ROrnDesc J e (D s)) → ROrnDesc J e (σ S D)
 
 record OrnDesc {I : Set} (J : Set) (e : J → I) (D : Desc I) : Set₁ where
   constructor wrap

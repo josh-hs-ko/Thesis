@@ -12,13 +12,14 @@ open import Data.List using (List; []; _∷_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst)
 
 
-pc-Ė : ∀ {I J K} {e : J → I} {f : K → I} {is js ks} → Ė e js is → Ė f ks is → Ṗ is (InvImage (pull {J} {K} {I} {e} {f}))
-pc-Ė             []           _            = tt
+pc-Ė : {I J K : Set} {e : J → I} {f : K → I} {is : List I} {js : List J} {ks : List K} →
+       Ė e js is → Ė f ks is → Ṗ is (InvImage (pull {J} {K} {I} {e} {f}))
+pc-Ė             []           []           = tt
 pc-Ė {e = e} {f} (eeq ∷ eeqs) (feq ∷ feqs) = ok (from≡ e eeq , from≡ f feq) , pc-Ė eeqs feqs
 
 mutual
 
-  pcROrn : ∀ {I J K} {e : J → I} {f : K → I} {D E F} → ROrn e D E → ROrn f D F → ROrnDesc (e ⋈ f) pull D
+  pcROrn : ∀ {I J K} {e : J → I} {f : K → I} {D : RDesc I} {E : RDesc J} {F : RDesc K} → ROrn e D E → ROrn f D F → ROrnDesc (e ⋈ f) pull D
   pcROrn (ṿ eeqs) (ṿ feqs) = ṿ (pc-Ė eeqs feqs)
   pcROrn (ṿ eeqs) (Δ T P)  = Δ[ t ∶ T ] pcROrn (ṿ eeqs) (P t)
   pcROrn (σ S O)  (σ .S P) = σ[ s ∶ S ] pcROrn (O s) (P s)
@@ -29,7 +30,7 @@ mutual
   pcROrn (∇ s O)  (Δ T P)  = Δ[ t ∶ T ] pcROrn (∇ s O) (P t)
   pcROrn (∇ s O)  (∇ s' P) = Δ (s ≡ s') (pcROrn-double∇ O P)
 
-  pcROrn-double∇ : ∀ {I J K S} {e : J → I} {f : K → I} {D E F} {s s' : S} →
+  pcROrn-double∇ : {I J K S : Set} {e : J → I} {f : K → I} {D : S → RDesc I} {E : RDesc J} {F : RDesc K} {s s' : S} →
                    ROrn e (D s) E → ROrn f (D s') F → s ≡ s' → ROrnDesc (e ⋈ f) pull (σ S D)
   pcROrn-double∇ {s = s} O P refl = ∇ s (pcROrn O P)
 
