@@ -15,7 +15,7 @@ open import Relation.Fold
 open import Examples.Nat
 open import Examples.List
 
-open import Function using (id; const)
+open import Function using (id; _∘_; const; flip)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; proj₁; proj₂)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; inspect; [_])
@@ -33,68 +33,65 @@ ListAlg A X = Ḟ ⌊ ListOD A ⌋ (const X) ⇉ const X
 ListCoAlg : Set → Set → Set
 ListCoAlg A X = const X ⇉ Ḟ ⌊ ListOD A ⌋ (const X)
 
-nothing : {A X : Set} → Ḟ ⌊ ListOD A ⌋ (const X) tt
-nothing = `nil , tt
-
 next : {A X : Set} → A → X → Ḟ ⌊ ListOD A ⌋ (const X) tt
 next a x = `cons , a , x , tt
 
-foldl-alg : {B X : Set} → (X → B → X) → ListAlg B (X → X)
-foldl-alg g (`nil  ,          tt) = id
-foldl-alg g (`cons , a , g' , tt) = λ x → g' (g x a)
+foldl-alg : {A X : Set} → (X → A → X) → ListAlg A (X → X)
+foldl-alg f (`nil  ,          tt) = id
+foldl-alg f (`cons , a , f' , tt) = f' ∘ flip f a
 
-foldl : {B X : Set} → (X → B → X) → X → List B → X
-foldl g x bs = fold (foldl-alg g) bs x
+foldl : {A X : Set} → (X → A → X) → X → List A → X
+foldl f x as = fold (foldl-alg f) as x
 
-StreamingCondition : {A B X : Set} (f : ListCoAlg A X) (g : X → B → X) → Set
-StreamingCondition {A} {B} {X} f g = (a : A) (b : B) (x x' : X) → f x ≡ next a x' → f (g x b) ≡ next a (g x' b)
+StreamingCondition : {A B X : Set} (f : X → A → X) (g : ListCoAlg B X) → Set
+StreamingCondition {A} {B} {X} f g = (a : A) (b : B) (x x' : X) → g x ≡ next b x' → g (f x a) ≡ next b (f x' a)
 
-data Accessible {A X : Set} (f : ListCoAlg A X) : X → Set where
-  rec : {x : X} → ((a : A) (x' : X) → f x ≡ next a x' → Accessible f x') → Accessible f x
+data Accessible {B X : Set} (g : ListCoAlg B X) : X → Set where
+  rec : {x : X} → ((b : B) (x' : X) → g x ≡ next b x' → Accessible g x') → Accessible g x
 
-WellFounded : {A X : Set} (f : ListCoAlg A X) → Set
-WellFounded {A} {X} f = (x : X) → Accessible f x
+WellFounded : {B X : Set} (g : ListCoAlg B X) → Set
+WellFounded {B} {X} g = (x : X) → Accessible g x
 
-module StreamingTheorem {A B X : Set} (f : ListCoAlg A X) (wf : WellFounded f) (g : X → B → X) (cond : StreamingCondition f g) where
+module StreamingTheorem {A B X : Set} (f : X → A → X) (g : ListCoAlg B X) (wf : WellFounded g) (cond : StreamingCondition f g) where
 
-  streaming-lemma : (a : A) (x x' : X) → f x ≡ next a x' → {h : X → X} (bs : AlgList B (fun (foldl-alg g)) h) → f (h x) ≡ next a (h x')
-  streaming-lemma a x x' eq (con (`nil  ,     tt       , refl ,      tt)) = eq
-  streaming-lemma a x x' eq (con (`cons , b , (h , tt) , refl , bs , tt)) = streaming-lemma a (g x b) (g x' b) (cond a b x x' eq) bs
+  streaming-lemma : (b : B) (x x' : X) → g x ≡ next b x' → {h : X → X} (as : AlgList A (fun (foldl-alg f)) h) → g (h x) ≡ next b (h x')
+  streaming-lemma b x x' eq (con (`nil  ,     tt       , refl ,      tt)) = eq
+  streaming-lemma b x x' eq (con (`cons , a , (h , tt) , refl , as , tt)) = streaming-lemma b (f x a) (f x' a) (cond a b x x' eq) as
 
-  stream-aux : (x : X) → Accessible f x → {h : X → X} → AlgList B (fun (foldl-alg g)) h → AlgList A (fun f º) (h x)
-  stream-aux x acc            bs                                            with f x                | inspect f x
-  stream-aux x acc            (con (`nil  ,     tt       , refl ,      tt)) | (`nil  ,          tt) | [ fxeq ] = con (`nil , tt , fxeq , tt)
-  stream-aux x acc            (con (`cons , b , (h , tt) , refl , bs , tt)) | (`nil  ,          tt) | [ fxeq ] = stream-aux (g x b) (wf (g x b)) bs
-  stream-aux x (rec accs) {h} bs                                            | (`cons , a , x' , tt) | [ fxeq ] = con (`cons , a , (h x' , tt) ,
-                                                                                                                      streaming-lemma a x x' fxeq bs ,
-                                                                                                                      stream-aux x' (accs a x' fxeq) bs , tt)
+  stream-aux : (x : X) → Accessible g x → {h : X → X} → AlgList A (fun (foldl-alg f)) h → AlgList B (fun g º) (h x)
+  stream-aux x acc            as                                            with g x                | inspect g x
+  stream-aux x acc            (con (`nil  ,     tt       , refl ,      tt)) | (`nil  ,          tt) | [ gxeq ] = con (`nil , tt , gxeq , tt)
+  stream-aux x acc            (con (`cons , a , (h , tt) , refl , as , tt)) | (`nil  ,          tt) | [ gxeq ] = stream-aux (f x a) (wf (f x a)) as
+  stream-aux x (rec accs) {h} as                                            | (`cons , b , x' , tt) | [ gxeq ] = con (`cons , b , (h x' , tt) ,
+                                                                                                                      streaming-lemma b x x' gxeq as ,
+                                                                                                                      stream-aux x' (accs b x' gxeq) as , tt)
 
-  stream : (x : X) → {h : X → X} → AlgList B (fun (foldl-alg g)) h → AlgList A (fun f º) (h x)
-  stream x bs = stream-aux x (wf x) bs
+  stream : (x : X) → {h : X → X} → AlgList A (fun (foldl-alg f)) h → AlgList B (fun g º) (h x)
+  stream x as = stream-aux x (wf x) as
 
   {- not considering termination:
 
-  stream : (x : X) {h : X → X} → AlgList B (fun (foldl-alg g)) h → AlgList A (fun f º) (h x)
-  stream f g cond x     bs                                            with f x                | inspect f x
-  stream f g cond x     (con (`nil  ,     tt       , refl ,      tt)) | (`nil  ,          tt) | [ fxeq ] = con (`nil , tt , fxeq , tt)
-  stream f g cond x     (con (`cons , b , (h , tt) , refl , bs , tt)) | (`nil  ,          tt) | [ fxeq ] = stream (g x b) bs
-  stream f g cond x {h} bs                                            | (`cons , a , x' , tt) | [ fxeq ] = con (`cons , a , (h x' , tt) ,
-                                                                                                                streaming-lemma a x x' fxeq bs ,
-                                                                                                                stream f g cond x' bs , tt)
+  stream : (x : X) {h : X → X} → AlgList A (fun (foldl-alg f)) h → AlgList B (fun g º) (h x)
+  stream x     as                                            with g x                | inspect g x
+  stream x     (con (`nil  ,     tt       , refl ,      tt)) | (`nil  ,          tt) | [ gxeq ] = con (`nil , tt , gxeq , tt)
+  stream x     (con (`cons , a , (h , tt) , refl , as , tt)) | (`nil  ,          tt) | [ gxeq ] = stream (f x a) as
+  stream x {h} as                                            | (`cons , b , x' , tt) | [ gxeq ] = con (`cons , b , (h x' , tt) ,
+                                                                                                       streaming-lemma b x x' gxeq as ,
+                                                                                                       stream x' as , tt)
 
   -}
 
-  producer-ref : (x : X) (bs : List B) → Refinement (List A) (AlgList A (fun f º) (foldl g x bs))
-  producer-ref x bs = FRefinement.comp (toFRefinement (algOrn-FSwap ⌊ ListOD A ⌋ (fun f º))) (ok (tt , foldl g x bs))
+  producer-ref : (x : X) (as : List A) → Refinement (List B) (AlgList B (fun g º) (foldl f x as))
+  producer-ref x as = FRefinement.comp (toFRefinement (algOrn-FSwap ⌊ ListOD B ⌋ (fun g º))) (ok (tt , foldl f x as))
 
-  consumer-ref : (bs : List B) → Refinement (List B) (AlgList B (fun (foldl-alg g)) (fold (foldl-alg g) bs))
-  consumer-ref bs = FRefinement.comp (toFRefinement (algOrn-FSwap ⌊ ListOD B ⌋ (fun (foldl-alg g)))) (ok (tt , fold (foldl-alg g) bs))
+  consumer-ref : (as : List A) → Refinement (List A) (AlgList A (fun (foldl-alg f)) (fold (foldl-alg f) as))
+  consumer-ref as = FRefinement.comp (toFRefinement (algOrn-FSwap ⌊ ListOD A ⌋ (fun (foldl-alg f)))) (ok (tt , fold (foldl-alg f) as))
 
-  stream'-aux : (x : X) (bs : List B) → AlgList A (fun f º) (foldl g x bs)
-  stream'-aux x bs = stream x (Iso.from (Refinement.i (consumer-ref bs)) (bs , foldR'-fun-computation (foldl-alg g) bs))
+  stream'-aux : (x : X) (as : List A) → AlgList B (fun g º) (foldl f x as)
+  stream'-aux x as = stream x (Iso.from (Refinement.i (consumer-ref as)) (as , foldR'-fun-computation (foldl-alg f) as))
 
-  stream' : X → List B → List A
-  stream' x bs = Refinement.forget (producer-ref x bs) (stream'-aux x bs)
+  stream' : X → List A → List B
+  stream' x as = Refinement.forget (producer-ref x as) (stream'-aux x as)
 
-  streaming-theorem : (x : X) → foldR (fun f º) º • fun (foldl g x) ⊇ fun (stream' x)
-  streaming-theorem x = wrap λ _ → wrap λ { bs ._ refl → foldl g x bs , refl , proj₂ (Iso.to (Refinement.i (producer-ref x bs)) (stream'-aux x bs)) }
+  streaming-theorem : (x : X) → foldR (fun g º) º • fun (foldl f x) ⊇ fun (stream' x)
+  streaming-theorem x = wrap λ _ → wrap λ { as ._ refl → foldl f x as , refl , proj₂ (Iso.to (Refinement.i (producer-ref x as)) (stream'-aux x as)) }
