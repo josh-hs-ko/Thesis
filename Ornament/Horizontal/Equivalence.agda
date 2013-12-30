@@ -16,11 +16,11 @@ open import Function using (const)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; proj₁; proj₂)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; sym; cong; cong₂; module ≡-Reasoning)
-open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅)
+open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅; ≅-to-≡)
 
 
-ḢROrn-id : {I : Set} {D : RDesc I} → ROrnEq (ḢROrn (ḢTrans-id {I} {D})) (idROrn D)
-ḢROrn-id {I} {D} hs =
+ḢROrn-id : {I : Set} (D : RDesc I) → ROrnEq (ḢROrn (ḢTrans-id {I} {D})) (idROrn D)
+ḢROrn-id {I} D hs =
   ≡-to-≅ (begin
             erase-Ṡ (ḢROrn (ḢTrans-id {I} {D})) hs
               ≡⟨ erase'-ḢROrn (ḢTrans-id {I} {D}) (const !) hs ⟩
@@ -67,6 +67,10 @@ open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅)
             erase-Ṡ (ḢROrn u) hs
           ∎)
   where open ≡-Reasoning
+
+ḢROrn-≅ : {I J : Set} {e e' : J → I} {D D' : RDesc I} {E : RDesc J} (t : ḢTrans e D E) (u : ḢTrans e' D' E) →
+          D ≡ D' → ((h : Ṡ E) → ḢTrans.s t h ≅ ḢTrans.s u h) → ROrnEq (ḢROrn t) (ḢROrn u)
+ḢROrn-≅ t u refl t≅u = ḢROrn-≐ t u (λ hs → ≅-to-≡ (t≅u hs))
 
 ROrnEq-normal : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (O : ROrn e D E) → ROrnEq (normROrn O) O
 ROrnEq-normal {D = D} {E} O hs =

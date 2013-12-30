@@ -1,6 +1,6 @@
 -- Fold fusion theorems for algebraic ornamentation.
 
-module Ornament.Algebraic.Fusion where
+module Examples.Fusion where
 
 
 open import Prelude.Function

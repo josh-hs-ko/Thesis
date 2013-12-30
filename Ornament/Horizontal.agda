@@ -25,6 +25,12 @@ record ḢTrans {I J : Set} (e : J → I) (D : RDesc I) (E : RDesc J) : Set wher
     s : Ṡ E → Ṡ D
     c : (hs : Ṡ E) → Ė e (next E hs) (next D (s hs))
 
+ḢTrans-id : {I : Set} {D : RDesc I} → ḢTrans id D D
+ḢTrans-id = id , λ _ → Ė-refl
+
+_⊡_ : {I J K : Set} {e : J → I} {f : K → J} {D : RDesc I} {E : RDesc J} {F : RDesc K} → ḢTrans e D E → ḢTrans f E F → ḢTrans (e ∘ f) D F
+t ⊡ u = ḢTrans.s t ∘ ḢTrans.s u , λ hs → Ė-trans (ḢTrans.c t (ḢTrans.s u hs)) (ḢTrans.c u hs)
+
 ḢTrans-app' : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (t : ḢTrans e D E)
               {X : List I → Set} {Y : List J → Set} → Erasure e Y X → Σ (Ṡ E) (Y ∘ next E) → Σ (Ṡ D) (X ∘ next D)
 ḢTrans-app' t f (hs , y) = ḢTrans.s t hs , f (ḢTrans.c t hs) y
@@ -40,12 +46,6 @@ cong-ḢTrans-app'-erase-Ṗ {D = D} t u e≐e' t≐u hs xs xs' heq =
              {X : List I → Set} {Y : List J → Set} → Erasure e Y X → Ḣ E Y → Ḣ D X
 ḢTrans-app {e = e} {D} {E} t {X} {Y} f = Ḣ-comp D X ∘ ḢTrans-app' t f ∘ Ḣ-decomp E Y
 
-ḢTrans-id : {I : Set} {D : RDesc I} → ḢTrans id D D
-ḢTrans-id = id , λ _ → Ė-refl
-
-_⊡_ : {I J K : Set} {e : J → I} {f : K → J} {D : RDesc I} {E : RDesc J} {F : RDesc K} → ḢTrans e D E → ḢTrans f E F → ḢTrans (e ∘ f) D F
-t ⊡ u = ḢTrans.s t ∘ ḢTrans.s u , λ hs → Ė-trans (ḢTrans.c t (ḢTrans.s u hs)) (ḢTrans.c u hs)
-
 ḢTrans-app-comp :
   {I J K : Set} {e : J → I} {f : K → J} {D : RDesc I} {E : RDesc J} {F : RDesc K} (t : ḢTrans e D E) (u : ḢTrans f E F) →
   ḢTrans-app (t ⊡ u) {const ⊤} {const ⊤} (const !) ≐ ḢTrans-app t (const !) ∘ ḢTrans-app u (const !)
@@ -55,8 +55,7 @@ t ⊡ u = ḢTrans.s t ∘ ḢTrans.s u , λ hs → Ė-trans (ḢTrans.c t (ḢT
                         (cong proj₁ (sym (Iso.to-from-inverse Fun (Ḣ-iso E (const ⊤)) (ḢTrans.s u (proj₁ (Ḣ-decomp F (const ⊤) hs)) , tt)))))
                   refl)
 
-ḢROrn-∇ :
-  {I J : Set} {e : J → I} {D : RDesc I} {js : List J} → Σ[ hs ∶ Ṡ D ] Ė e js (next D hs) → ROrn e D (ṿ js)
+ḢROrn-∇ : {I J : Set} {e : J → I} {D : RDesc I} {js : List J} → Σ[ hs ∶ Ṡ D ] Ė e js (next D hs) → ROrn e D (ṿ js)
 ḢROrn-∇ {D = ṿ is } (hs       , eqs) = ṿ eqs
 ḢROrn-∇ {D = σ S D} ((s , hs) , eqs) = ∇ s (ḢROrn-∇ {D = D s} (hs , eqs))
 
@@ -64,18 +63,29 @@ t ⊡ u = ḢTrans.s t ∘ ḢTrans.s u , λ hs → Ė-trans (ḢTrans.c t (ḢT
 ḢROrn {E = ṿ js } t = ḢROrn-∇ (ḢTrans.s t tt , ḢTrans.c t tt)
 ḢROrn {E = σ S E} t = Δ[ s ∶ S ] ḢROrn {E = E s} (curry (ḢTrans.s t) s , curry (ḢTrans.c t) s)
 
-erase'-ḢROrn-∇ :
-  {I J : Set} {e : J → I} (D : RDesc I) {js : List J}
-  (hs : Ṡ D) (eqs : Ė e js (next D hs)) {X : List I → Set} {Y : List J → Set} (f : Erasure e Y X) →
-  (y : Y js) → erase' (ḢROrn-∇ {D = D} (hs , eqs)) f y ≡ Ḣ-comp D X (hs , f eqs y)
+erase'-ḢROrn-∇ : {I J : Set} {e : J → I} (D : RDesc I) {js : List J}
+                 (hs : Ṡ D) (eqs : Ė e js (next D hs)) {X : List I → Set} {Y : List J → Set} (f : Erasure e Y X) →
+                 (y : Y js) → erase' (ḢROrn-∇ {D = D} (hs , eqs)) f y ≡ Ḣ-comp D X (hs , f eqs y)
 erase'-ḢROrn-∇ (ṿ is)  hs       eqs f y = refl
 erase'-ḢROrn-∇ (σ S D) (s , hs) eqs f y = cong₂-pair refl (≡-to-≅ (erase'-ḢROrn-∇ (D s) hs eqs f y))
 
-erase'-ḢROrn :
-  {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (t : ḢTrans e D E)
-  {X : List I → Set} {Y : List J → Set} (f : Erasure e Y X) → erase' (ḢROrn t) f ≐ ḢTrans-app t f
+erase'-ḢROrn : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (t : ḢTrans e D E)
+               {X : List I → Set} {Y : List J → Set} (f : Erasure e Y X) → erase' (ḢROrn t) f ≐ ḢTrans-app t f
 erase'-ḢROrn {D = D} {ṿ js } t f y       = erase'-ḢROrn-∇ D (ḢTrans.s t tt) (ḢTrans.c t tt) f y
 erase'-ḢROrn {D = D} {σ S E} t f (s , y) = erase'-ḢROrn {D = D} {E s} (curry (ḢTrans.s t) s , curry (ḢTrans.c t) s) f y
+
+erase-Ṡ-ḢROrn : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (t : ḢTrans e D E) → erase-Ṡ (ḢROrn t) ≐ ḢTrans.s t
+erase-Ṡ-ḢROrn {D = D} {E} t hs =
+  begin
+    erase-Ṡ (ḢROrn t) hs
+      ≡⟨ erase'-ḢROrn t (const !) hs ⟩
+    ḢTrans-app t (const !) hs
+      ≡⟨ Ḣ-comp-Ṡ D (ḢTrans.s t (proj₁ (Ḣ-decomp E (const ⊤) hs))) ⟩
+    ḢTrans.s t (proj₁ (Ḣ-decomp E (const ⊤) hs))
+      ≡⟨ cong (ḢTrans.s t) (cong proj₁ (Ḣ-decomp-Ṡ E hs)) ⟩
+    ḢTrans.s t hs
+  ∎
+  where open ≡-Reasoning
 
 normal-coherence :
   {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (O : ROrn e D E) {X : List J → Set} {Y : List I → Set}

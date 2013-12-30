@@ -127,22 +127,21 @@ NatTrans-id-natural {D = D} F {X} {Y} f =
         open EqReasoning (Morphism (object F X) (object F Y))
 
 Funct : {ℓ₀ ℓ₁ ℓ₂ ℓ₃ ℓ₄ ℓ₅ : Level} (C : Category {ℓ₀} {ℓ₁} {ℓ₂}) (D : Category {ℓ₃} {ℓ₄} {ℓ₅}) → Category
-Funct C D =
-  record { Object   = Functor C D
-         ; Morphism =
-             λ F G → record { Carrier = NatTrans F G
-                            ; _≈_ = λ t u → (X : Object C) → NatTrans.comp t X ≈D NatTrans.comp u X
-                            ; isEquivalence =
-                                record { refl  = λ X → Setoid.refl (Morphism D (object F X) (object G X))
-                                       ; sym   = λ eqs X → Setoid.sym (Morphism D (object F X) (object G X)) (eqs X)
-                                       ; trans = λ eqs eqs' X → Setoid.trans (Morphism D (object F X) (object G X)) (eqs X) (eqs' X) } }
-         ; _·_ = λ t u → record { comp = λ X → NatTrans.comp t X ·D NatTrans.comp u X; naturality = NatTrans-comp-natural t u }
-         ; id  = λ {F} → record { comp = λ X → id D; naturality = NatTrans-id-natural F }
-         ; id-l   = λ t X → id-l D (NatTrans.comp t X)
-         ; id-r   = λ t X → id-r D (NatTrans.comp t X)
-         ; assoc  = λ t u v X → assoc D (NatTrans.comp t X) (NatTrans.comp u X) (NatTrans.comp v X)
-         ; cong-l = λ t eq X → cong-l D (NatTrans.comp t X) (eq X)
-         ; cong-r = λ t eq X → cong-r D (NatTrans.comp t X) (eq X) }
+Funct C D = record
+  { Object   = Functor C D
+  ; Morphism = λ F G → record
+                 { Carrier = NatTrans F G
+                 ; _≈_ = λ t u → (X : Object C) → NatTrans.comp t X ≈D NatTrans.comp u X
+                 ; isEquivalence = record { refl  = λ X → Setoid.refl (Morphism D (object F X) (object G X))
+                                          ; sym   = λ eqs X → Setoid.sym (Morphism D (object F X) (object G X)) (eqs X)
+                                          ; trans = λ eqs eqs' X → Setoid.trans (Morphism D (object F X) (object G X)) (eqs X) (eqs' X) } }
+  ; _·_ = λ t u → record { comp = λ X → NatTrans.comp t X ·D NatTrans.comp u X; naturality = NatTrans-comp-natural t u }
+  ; id  = λ {F} → record { comp = λ X → id D; naturality = NatTrans-id-natural F }
+  ; id-l   = λ t X → id-l D (NatTrans.comp t X)
+  ; id-r   = λ t X → id-r D (NatTrans.comp t X)
+  ; assoc  = λ t u v X → assoc D (NatTrans.comp t X) (NatTrans.comp u X) (NatTrans.comp v X)
+  ; cong-l = λ t eq X → cong-l D (NatTrans.comp t X) (eq X)
+  ; cong-r = λ t eq X → cong-r D (NatTrans.comp t X) (eq X) }
   where open Category
         open Category D using () renaming (_≈_ to _≈D_;_·_ to _·D_)
         open Functor

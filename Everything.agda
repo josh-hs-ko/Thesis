@@ -24,10 +24,10 @@ import Description.Horizontal
 import Ornament
 import Ornament.Algebraic
 import Ornament.Algebraic.EquivalenceTheorem
-import Ornament.Algebraic.Fusion
 import Ornament.Category
 import Ornament.Equivalence
 import Ornament.Horizontal
+import Ornament.Horizontal.Category
 import Ornament.Horizontal.Equivalence
 import Ornament.ParallelComposition
 import Ornament.ParallelComposition.Pullback
@@ -45,6 +45,7 @@ import Relation.Join
 import Relation.Meet
 import Relation.Minimum
 import Examples.BinomialHeap
+import Examples.Fusion
 import Examples.Insertion
 import Examples.LeftistHeap
 import Examples.List

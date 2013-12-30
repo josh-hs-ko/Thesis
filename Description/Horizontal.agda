@@ -12,7 +12,7 @@ open import Function using (id; const; _∘_)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; proj₁; proj₂) renaming (map to _**_)
 open import Data.List using (List; []; _∷_)
-open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; cong₂)
 open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅) renaming (cong to hcong)
 
 
@@ -34,6 +34,14 @@ core (σ S D) (s , hs) = core (D s) hs
 Ḣ-comp : {I : Set} (D : RDesc I) (X : List I → Set) → Σ (Ṡ D) (X ∘ next D) → Ḣ D X
 Ḣ-comp (ṿ is)  X (_        , x) = x
 Ḣ-comp (σ S D) X ((s , hs) , x) = s , Ḣ-comp (D s) X (hs , x)
+
+Ḣ-decomp-Ṡ : {I : Set} (D : RDesc I) (hs : Ṡ D) → Ḣ-decomp D (const ⊤) hs ≡ (hs , tt)
+Ḣ-decomp-Ṡ (ṿ is)  _        = refl
+Ḣ-decomp-Ṡ (σ S D) (s , hs) = cong (_,_ s ** id) (Ḣ-decomp-Ṡ (D s) hs)
+
+Ḣ-comp-Ṡ : {I : Set} (D : RDesc I) (hs : Ṡ D) → Ḣ-comp D (const ⊤) (hs , tt) ≡ hs
+Ḣ-comp-Ṡ (ṿ is)  _        = refl
+Ḣ-comp-Ṡ (σ S D) (s , hs) = cong (_,_ s) (Ḣ-comp-Ṡ (D s) hs)
 
 Ḣ-iso : {I : Set} (D : RDesc I) (X : List I → Set) → Iso Fun (Ḣ D X) (Σ (Ṡ D) (X ∘ next D))
 Ḣ-iso {I} D X =
