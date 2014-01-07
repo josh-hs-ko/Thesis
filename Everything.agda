@@ -45,7 +45,7 @@ import Relation.Join
 import Relation.Meet
 import Relation.Minimum
 import Examples.BinomialHeap
-import Examples.Fusion
+import Examples.FoldFusion
 import Examples.Insertion
 import Examples.LeftistHeap
 import Examples.List

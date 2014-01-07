@@ -11,7 +11,7 @@ open import Prelude.Equality
 
 open import Function using (id; _∘_; const)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; <_,_>; uncurry) renaming (map to _**_)
+open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; <_,_>; uncurry) renaming (map to _**_)
 open import Relation.Binary using (module Setoid)
 import Relation.Binary.EqReasoning as EqReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; cong; sym; trans)
@@ -214,3 +214,17 @@ r ′⇀ s = record { P = λ f → ∀ i j → (c : Upgrade.C (toUpgrade r) i j)
                                 in  Upgrade.u (s i j refl) (f i) (h i j refl)
                 ; c = λ { f h ._ j refl → let i = Refinement.forget r j
                                           in  Upgrade.c (s i j refl) (f i) (h i j refl) } }
+
+new-Σ : (I : Set) {X : Set} {Y : I → Set} → ((i : I) → Upgrade X (Y i)) → Upgrade X (Σ I Y)
+new-Σ I us = record { P = λ x → Σ[ i ∶ I ] Upgrade.P (us i) x
+                    ; C = λ { x (i , y) → Upgrade.C (us i) x y }
+                    ; u = λ { x (i , p) → i , Upgrade.u (us i) x p }
+                    ; c = λ { x (i , p) → Upgrade.c (us i) x p } }
+
+syntax new-Σ I (λ i → u) = Σ⁺[ i ∶ I ] u
+
+_×⁺_ : {X Y : Set} → Upgrade X Y → (Z : Set) → Upgrade X (Y × Z)
+u ×⁺ Z = record { P = λ x → Upgrade.P u x × Z
+                ; C = λ { x (y , z) → Upgrade.C u x y }
+                ; u = λ { x (p , z) → Upgrade.u u x p , z }
+                ; c = λ { x (p , z) → Upgrade.c u x p } }
