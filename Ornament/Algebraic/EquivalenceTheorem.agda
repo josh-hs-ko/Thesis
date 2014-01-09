@@ -21,6 +21,7 @@ open import Ornament.ParallelComposition
 open import Ornament.Equivalence
 open import Ornament.Horizontal
 open import Ornament.Horizontal.Equivalence
+open import Ornament.Horizontal.Category
 open import Ornament.RefinementSemantics
 open import Ornament.Algebraic
 open import Relation
@@ -485,10 +486,8 @@ hom-to-OrnEq D R S h inc =
                        in  subst (((S !!) i º⁻) (h j)) (sym (mapR-fun⁻-unique (Desc.comp D i) h js ks rs)) s) }
 
 
-{-------
+--------
 -- the equivalence theorem
 
-equivalence-theorem : {I : Set} (D : Desc I) → CatEquiv (RAlg' D) (SliceCategory Ōrn (I , D))
+equivalence-theorem : {I : Set} (D : Desc I) → CatEquiv (SliceCategory Ōrn (I , D)) (RAlg D)
 equivalence-theorem D = {!!}
-
--}

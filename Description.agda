@@ -8,7 +8,7 @@ open import Prelude.Function
 open import Prelude.Function.Fam
 open import Prelude.Product
 
-open import Function using (id; flip)
+open import Function using (id; flip; _∘_)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; proj₁; _×_)
 open import Data.List using (List; []; _∷_)
@@ -129,16 +129,40 @@ reflection {I} D = induction D (λ _ x → fold con x ≡ x) (λ i xs all → co
 Ḣ-map-preserves-id (ṿ is)       _        = refl
 Ḣ-map-preserves-id (σ S D)      (s , xs) = cong (_,_ s) (Ḣ-map-preserves-id (D s) xs)
 
+Ḣ-map-preserves-comp : {I : Set} (D : RDesc I) {X Y Z : List I → Set} (f : Y ⇉ Z) (g : X ⇉ Y) →
+                       Ḣ-map D (λ {is} → f {is} ∘ g {is}) ≐ Ḣ-map D f ∘ Ḣ-map D g
+Ḣ-map-preserves-comp (ṿ is)  f g xs       = refl
+Ḣ-map-preserves-comp (σ S D) f g (s , xs) = cong (_,_ s) (Ḣ-map-preserves-comp (D s) f g xs)
+
 mapF : {I : Set} (D : RDesc I) {X Y : I → Set} → (X ⇉ Y) → ⟦ D ⟧ X → ⟦ D ⟧ Y
 mapF D f = Ḣ-map D (λ {is} → Ṗ-map f is)
 
 mapF-preserves-id : {I : Set} (D : RDesc I) {X : I → Set} → mapF D (λ {i} → id {A = X i}) ≐ id
 mapF-preserves-id (ṿ [])       _        = refl
-mapF-preserves-id (ṿ (i ∷ is)) (x , xs) = cong₂ _,_ refl (mapF-preserves-id (ṿ is) xs)
+mapF-preserves-id (ṿ (i ∷ is)) (x , xs) = cong (_,_ x) (mapF-preserves-id (ṿ is) xs)
 mapF-preserves-id (σ S D)      (s , xs) = cong (_,_ s) (mapF-preserves-id (D s) xs)
+
+mapF-preserves-comp : {I : Set} (D : RDesc I) {X Y Z : I → Set} (f : Y ⇉ Z) (g : X ⇉ Y) →
+                      mapF D (λ {i} → f {i} ∘ g {i}) ≐ mapF D f ∘ mapF D g
+mapF-preserves-comp (ṿ [])       f g _        = refl
+mapF-preserves-comp (ṿ (i ∷ is)) f g (x , xs) = cong (_,_ (f (g x))) (mapF-preserves-comp (ṿ is) f g xs)
+mapF-preserves-comp (σ S D)      f g (s , xs) = cong (_,_ s) (mapF-preserves-comp (D s) f g xs)
+
+mapF-preserves-eq : {I : Set} (D : RDesc I) {X Y : I → Set} (f g : X ⇉ Y) → ({i : I} → f {i} ≐ g {i}) → mapF D (λ {i} → f {i}) ≐ mapF D g
+mapF-preserves-eq (ṿ [])       f g fgeq _        = refl
+mapF-preserves-eq (ṿ (i ∷ is)) f g fgeq (x , xs) = cong₂ _,_ (fgeq x) (mapF-preserves-eq (ṿ is) f g fgeq xs)
+mapF-preserves-eq (σ S D)      f g fgeq (s , xs) = cong (_,_ s) (mapF-preserves-eq (D s) f g fgeq xs)
 
 Ḟ-map : {I : Set} (D : Desc I) {X Y : I → Set} → (X ⇉ Y) → Ḟ D X ⇉ Ḟ D Y
 Ḟ-map D f {i} = mapF (Desc.comp D i) f
 
 Ḟ-map-preserves-id : {I : Set} (D : Desc I) {X : I → Set} → (i : I) → Ḟ-map D (λ {i} → id {A = X i}) {i} ≐ id
 Ḟ-map-preserves-id D i = mapF-preserves-id (Desc.comp D i)
+
+Ḟ-map-preserves-comp : {I : Set} (D : Desc I) {X Y Z : I → Set} (f : Y ⇉ Z) (g : X ⇉ Y) →
+                       (i : I) → Ḟ-map D (λ {i} → f {i} ∘ g {i}) {i} ≐ Ḟ-map D f ∘ Ḟ-map D g
+Ḟ-map-preserves-comp D f g i = mapF-preserves-comp (Desc.comp D i) f g
+
+Ḟ-map-preserves-eq : {I : Set} (D : Desc I) {X Y : I → Set} (f g : X ⇉ Y) → ({i : I} → f {i} ≐ g {i}) →
+                     (i : I) → Ḟ-map D (λ {i} → f {i}) {i} ≐ Ḟ-map D g
+Ḟ-map-preserves-eq D f g fgeq i = mapF-preserves-eq (Desc.comp D i) f g fgeq
