@@ -148,7 +148,8 @@ componentwise relations between families of sets, and definition and properties 
 
 #### Relation.AlgCategory
 Let `D : Desc I` be a description.
-The category `RAlg' D` is the wide subcategory of the category of relational `D`-algebras where the morphisms are restricted to be functions.
+The category `RAlg D` is the wide subcategory of the category of relational `D`-algebras where the morphisms are restricted to be functions and are proof-relevant.
+This module also defines the banana-split algebras and proves that they are products in `RAlg D`.
 
 #### Relation.CompChain
 Combinators that help avoiding explicit applications of monotonicity and associativity of relational composition

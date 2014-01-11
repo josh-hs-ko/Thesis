@@ -1,23 +1,27 @@
 -- Let `D : Desc I` be a description.
--- The category `RAlg' D` is the wide subcategory of the category of relational `D`-algebras where the morphisms are restricted to be functions.
+-- The category `RAlg D` is the wide subcategory of the category of relational `D`-algebras where the morphisms are restricted to be functions and are proof-relevant.
+-- This module also defines the banana-split algebras and proves that they are products in `RAlg D`.
 
 open import Description
 
 module Relation.AlgCategory {I : Set} (D : Desc I) where
 
 open import Prelude.Equality
+open import Prelude.Product
 open import Prelude.Category
+open import Prelude.Category.Span
 open import Prelude.Function
 open import Prelude.Function.Fam
 open import Relation
 open import Relation.CompChain
 
 open import Function using (id; _∘_)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
+open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; <_,_>)
 open import Relation.Binary using (Setoid)
 import Relation.Binary.PreorderReasoning as PreorderReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; trans; sym; cong; cong₂)
-open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-subst-removable; module ≅-Reasoning) renaming (refl to hrefl; trans to htrans; sym to hsym)
+open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-subst-removable; module ≅-Reasoning)
+                                                  renaming (refl to hrefl; trans to htrans; sym to hsym)
 
 record RAlgebra : Set₁ where
   constructor _,_
@@ -139,3 +143,39 @@ RAlg = record
   ; assoc  = λ { m n l → frefl , assoc-comm m n l }
   ; cong-l = λ { {R} {S} {T} {n} {l} m nleq → fcong-l (RAlgMorphism.h m) (proj₁ nleq) , cong-l-comm m n l nleq }
   ; cong-r = λ { {R} {S} {T} {m} {n} l mneq → fcong-r (RAlgMorphism.h l) (proj₁ mneq) , cong-r-comm m n l mneq } }
+
+
+--------
+-- banana-split algebras
+
+bs-alg : RAlgebra → RAlgebra → RAlgebra
+bs-alg (X , R) (Y , S) = X ×' Y , wrap λ { i xys (x , y) → (R !!) i (Ḟ-map D proj₁ xys) x × (S !!) i (Ḟ-map D proj₂ xys) y }
+
+bs-alg-proj-l : (R S : RAlgebra) → RAlgMorphism (bs-alg R S) R
+bs-alg-proj-l (X , R) (Y , S) = proj₁ , λ i xys xy → proj₁
+
+bs-alg-proj-r : (R S : RAlgebra) → RAlgMorphism (bs-alg R S) S
+bs-alg-proj-r (X , R) (Y , S) = proj₂ , λ i xys xy → proj₂
+
+bs-alg-span : (R S : RAlgebra) → Span RAlg R S
+bs-alg-span R S = span (bs-alg R S) (bs-alg-proj-l R S) (bs-alg-proj-r R S)
+
+bs-alg-product : (R S : RAlgebra) → Product RAlg R S (bs-alg-span R S)
+bs-alg-product (X , R) (Y , S) (span (Z , T) (l , cl) (r , cr)) =
+  spanMorphism (< l , r > , λ i zs z t → subst (λ xs → (R !!) i xs (l z)) (Ḟ-map-preserves-comp D proj₁ < l , r > i zs) (cl i zs z t) ,
+                                         subst (λ ys → (S !!) i ys (r z)) (Ḟ-map-preserves-comp D proj₂ < l , r > i zs) (cr i zs z t))
+               (frefl , λ i zs z t → htrans (≡-subst-removable (λ xs → (R !!) i xs (l z)) (sym (Ḟ-map-preserves-comp D proj₁ < l , r > i zs))
+                                               (subst (λ xs → (R !!) i xs (l z)) (Ḟ-map-preserves-comp D proj₁ < l , r > i zs) (cl i zs z t)))
+                                            (≡-subst-removable (λ xs → (R !!) i xs (l z)) (Ḟ-map-preserves-comp D proj₁ < l , r > i zs) (cl i zs z t)))
+               (frefl , λ i zs z t → htrans (≡-subst-removable (λ ys → (S !!) i ys (r z)) (sym (Ḟ-map-preserves-comp D proj₂ < l , r > i zs))
+                                               (subst (λ ys → (S !!) i ys (r z)) (Ḟ-map-preserves-comp D proj₂ < l , r > i zs) (cr i zs z t)))
+                                            (≡-subst-removable (λ ys → (S !!) i ys (r z)) (Ḟ-map-preserves-comp D proj₂ < l , r > i zs) (cr i zs z t))) ,
+  λ { (spanMorphism (h , c) (hleq , cleq) (hreq , creq)) →
+      (λ z → cong₂ _,_ (sym (hleq z)) (sym (hreq z))) ,
+      (λ i zs z t → hcong₂-pair
+                      (htrans (htrans (≡-subst-removable (λ xs → (R !!) i xs (l z)) (Ḟ-map-preserves-comp D proj₁ < l , r > i zs) (cl i zs z t))
+                                      (hsym (cleq i zs z t)))
+                              (≡-subst-removable (λ xs → (R !!) i xs (proj₁ (h z))) (sym (Ḟ-map-preserves-comp D proj₁ h i zs)) (proj₁ (c i zs z t))))
+                      (htrans (htrans (≡-subst-removable (λ ys → (S !!) i ys (r z)) (Ḟ-map-preserves-comp D proj₂ < l , r > i zs) (cr i zs z t))
+                                      (hsym (creq i zs z t)))
+                              (≡-subst-removable (λ ys → (S !!) i ys (proj₂ (h z))) (sym (Ḟ-map-preserves-comp D proj₂ h i zs)) (proj₂ (c i zs z t))))) }

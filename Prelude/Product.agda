@@ -15,6 +15,9 @@ open import Relation.Binary.HeterogeneousEquality using (_≅_) renaming (refl t
 cong₂-pair : {A : Set} {B : A → Set} → {a a' : A} {b : B a} {b' : B a'} → a ≡ a' → b ≅ b' → (a , b ∶ Σ A B) ≡ (a' , b')
 cong₂-pair refl hrefl = refl
 
+hcong₂-pair : {A A' B B' : Set} {a : A} {a' : A'} {b : B} {b' : B'} → a ≅ a' → b ≅ b' → (a , b ∶ A × B) ≅ (a' , b' ∶ A' × B')
+hcong₂-pair hrefl hrefl = hrefl
+
 cong-proj₂ : ∀ {a b} {A : Set a} {B : A → Set b} {x : A} {y y' : B x} → (x , y ∶ Σ A B) ≡ (x , y') → y ≡ y'
 cong-proj₂ refl = refl
 
