@@ -42,6 +42,9 @@ data Ė {I J : Set} (e : J → I) : List J → List I → Set where
 Ė-computation e []       = []
 Ė-computation e (j ∷ js) = refl ∷ Ė-computation e js
 
+Ė-computation' : {I J : Set} (e : J → I) {is : List I} (js : List J) → is ≡ map e js → Ė e js is
+Ė-computation' e js refl = Ė-computation e js
+
 Ė-unique : {I J : Set} {e : J → I} {is : List I} {js : List J} → Ė e js is → is ≡ map e js
 Ė-unique []           = refl
 Ė-unique (refl ∷ eqs) = cong₂ _∷_ refl (Ė-unique eqs)
@@ -154,15 +157,18 @@ record OrnDesc {I : Set} (J : Set) (e : J → I) (D : Desc I) : Set₁ where
   field
     comp : ∀ {i} (j : e ⁻¹ i) → ROrnDesc J e (Desc.comp D i)
 
+Ṗ-toList : {I J : Set} {X : I → Set} → (X ⇉ const J) → (is : List I) → Ṗ is X → List J
+Ṗ-toList f []        tt        = []
+Ṗ-toList f (i ∷ is)  (x , xs)  = f x ∷ Ṗ-toList f is xs
+
 und-Ṗ : {I J : Set} {e : J → I} (is : List I) → Ṗ is (InvImage e) → List J
-und-Ṗ []       _        = []
-und-Ṗ (i ∷ is) (j , js) = und j ∷ und-Ṗ is js
+und-Ṗ = Ṗ-toList und
 
 toRDesc : {I J : Set} {e : J → I} {D : RDesc I} → ROrnDesc J e D → RDesc J
-toRDesc (ṿ js)  = ṿ (und-Ṗ _ js)
-toRDesc (σ S O) = σ[ s ∶ S ] toRDesc (O s)
-toRDesc (Δ T O) = σ[ t ∶ T ] toRDesc (O t)
-toRDesc (∇ s O) = toRDesc O
+toRDesc (ṿ {is} js) = ṿ (und-Ṗ is js)
+toRDesc (σ S O)     = σ[ s ∶ S ] toRDesc (O s)
+toRDesc (Δ T O)     = σ[ t ∶ T ] toRDesc (O t)
+toRDesc (∇ s O)     = toRDesc O
 
 ⌊_⌋ : {I J : Set} {e : J → I} {D : Desc I} → OrnDesc J e D → Desc J
 ⌊ wrap O ⌋ = wrap λ j → toRDesc (O (ok j))

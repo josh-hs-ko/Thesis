@@ -4,6 +4,7 @@
 module Ornament.ParallelComposition.Pullback where
 
 open import Prelude.Category
+open import Prelude.Category.Isomorphism
 open import Prelude.Category.Slice
 open import Prelude.Category.Span
 open import Prelude.Category.Pullback
@@ -27,9 +28,87 @@ open import Data.List using (List; []; _∷_)
 open import Relation.Binary using (module Setoid)
 import Relation.Binary.EqReasoning as EqReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; cong; cong₂; sym; trans; proof-irrelevance)
-open import Relation.Binary.HeterogeneousEquality
-  using (_≅_; ≅-to-≡; ≡-to-≅) renaming (refl to hrefl; cong to hcong; sym to hsym; trans to htrans; proof-irrelevance to hproof-irrelevance)
+open import Relation.Binary.HeterogeneousEquality using (_≅_; ≅-to-≡; ≡-to-≅; ≡-subst-removable)
+                                                  renaming (refl to hrefl; cong to hcong; sym to hsym; trans to htrans; proof-irrelevance to hproof-irrelevance)
 
+
+
+Ṡ-pcROrn-decomp : {I J K : Set} {e : J → I} {f : K → I} {D : RDesc I} {E : RDesc J} {F : RDesc K}
+                  (O : ROrn e D E) (P : ROrn f D F) → Ṡ (toRDesc (pcROrn O P)) → Σ[ hs ∶ Ṡ E × Ṡ F ] erase-Ṡ O (proj₁ hs) ≡ erase-Ṡ P (proj₂ hs)
+Ṡ-pcROrn-decomp (ṿ eqs) (ṿ eqs') h          = (tt , tt) , refl
+Ṡ-pcROrn-decomp (ṿ eqs) (Δ T P)  (t , h)    = ((id    ** _,_ t) ** id          ) (Ṡ-pcROrn-decomp (ṿ eqs) (P t) h)
+Ṡ-pcROrn-decomp (σ S O) (σ .S P) (s , h)    = ((_,_ s ** _,_ s) ** cong (_,_ s)) (Ṡ-pcROrn-decomp (O s) (P s) h)
+Ṡ-pcROrn-decomp (σ S O) (Δ T P)  (t , h)    = ((id    ** _,_ t) ** id          ) (Ṡ-pcROrn-decomp (σ S O) (P t) h)
+Ṡ-pcROrn-decomp (σ S O) (∇ s P)  h          = ((_,_ s ** id   ) ** cong (_,_ s)) (Ṡ-pcROrn-decomp (O s) P h)
+Ṡ-pcROrn-decomp (Δ T O) P        (t , h)    = ((_,_ t ** id   ) ** id          ) (Ṡ-pcROrn-decomp (O t) P h)
+Ṡ-pcROrn-decomp (∇ s O) (σ S P)  h          = ((id    ** _,_ s) ** cong (_,_ s)) (Ṡ-pcROrn-decomp O (P s) h)
+Ṡ-pcROrn-decomp (∇ s O) (Δ T P)  (t , h)    = ((id    ** _,_ t) ** id          ) (Ṡ-pcROrn-decomp (∇ s O) (P t) h)
+Ṡ-pcROrn-decomp (∇ s O) (∇ .s P) (refl , h) = ((id    ** id   ) ** cong (_,_ s)) (Ṡ-pcROrn-decomp O P h)
+
+Ṡ-pcROrn-comp : {I J K : Set} {e : J → I} {f : K → I} {D : RDesc I} {E : RDesc J} {F : RDesc K}
+                (O : ROrn e D E) (P : ROrn f D F) → Σ[ hs ∶ Ṡ E × Ṡ F ] erase-Ṡ O (proj₁ hs) ≡ erase-Ṡ P (proj₂ hs) → Ṡ (toRDesc (pcROrn O P))
+Ṡ-pcROrn-comp (ṿ eqs) (ṿ eqs') ((h        , h'       ) , eq) = tt
+Ṡ-pcROrn-comp (ṿ eqs) (Δ T P)  ((h        , (t , h') ) , eq) = t , Ṡ-pcROrn-comp (ṿ eqs) (P t) ((h , h') , eq)
+Ṡ-pcROrn-comp (σ S O) (σ .S P) (((s , h)  , (s' , h')) , eq) with cong proj₁ eq
+Ṡ-pcROrn-comp (σ S O) (σ .S P) (((s , h)  , (.s , h')) , eq) | refl = s , Ṡ-pcROrn-comp (O s) (P s) ((h , h') , cong-proj₂ eq)
+Ṡ-pcROrn-comp (σ S O) (Δ T P)  ((h        , (t , h') ) , eq) = t , Ṡ-pcROrn-comp (σ S O) (P t) ((h , h') , eq)
+Ṡ-pcROrn-comp (σ S O) (∇ s P)  (((s' , h) , h'       ) , eq) with cong proj₁ eq
+Ṡ-pcROrn-comp (σ S O) (∇ s P)  (((.s , h) , h'       ) , eq) | refl = Ṡ-pcROrn-comp (O s) P ((h , h') , cong-proj₂ eq)
+Ṡ-pcROrn-comp (Δ T O) P        (((t , h)  , h'       ) , eq) = t , Ṡ-pcROrn-comp (O t) P ((h , h') , eq)
+Ṡ-pcROrn-comp (∇ s O) (σ S P)  ((h        , (s' , h')) , eq) with cong proj₁ eq
+Ṡ-pcROrn-comp (∇ s O) (σ S P)  ((h        , (.s , h')) , eq) | refl = Ṡ-pcROrn-comp O (P s) ((h , h') , cong-proj₂ eq)
+Ṡ-pcROrn-comp (∇ s O) (Δ T P)  ((h        , (t , h') ) , eq) = t , Ṡ-pcROrn-comp (∇ s O) (P t) ((h , h') , eq)
+Ṡ-pcROrn-comp (∇ s O) (∇ s' P) ((h        , h'       ) , eq) with cong proj₁ eq
+Ṡ-pcROrn-comp (∇ s O) (∇ .s P) ((h        , h'       ) , eq) | refl = refl , Ṡ-pcROrn-comp O P ((h , h') , cong-proj₂ eq)
+
+Ṡ-pcROrn-decomp-comp-inverse :
+  {I J K : Set} {e : J → I} {f : K → I} {D : RDesc I} {E : RDesc J} {F : RDesc K}
+  (O : ROrn e D E) (P : ROrn f D F) (hs : Σ[ hs ∶ Ṡ E × Ṡ F ] erase-Ṡ O (proj₁ hs) ≡ erase-Ṡ P (proj₂ hs)) →
+  proj₁ (Ṡ-pcROrn-decomp O P (Ṡ-pcROrn-comp O P hs)) ≡ proj₁ hs
+Ṡ-pcROrn-decomp-comp-inverse (ṿ eqs) (ṿ eqs') ((h        , h'       ) , eq) = refl
+Ṡ-pcROrn-decomp-comp-inverse (ṿ eqs) (Δ T P)  ((h        , (t , h') ) , eq) = cong (id ** _,_ t) (Ṡ-pcROrn-decomp-comp-inverse (ṿ eqs) (P t) ((h , h') , eq))
+Ṡ-pcROrn-decomp-comp-inverse (σ S O) (σ .S P) (((s , h)  , (s' , h')) , eq) with cong proj₁ eq
+Ṡ-pcROrn-decomp-comp-inverse (σ S O) (σ .S P) (((s , h)  , (.s , h')) , eq) | refl = cong (_,_ s ** _,_ s)
+                                                                                          (Ṡ-pcROrn-decomp-comp-inverse (O s) (P s) ((h , h') , cong-proj₂ eq))
+Ṡ-pcROrn-decomp-comp-inverse (σ S O) (Δ T P)  ((h        , (t , h') ) , eq) = cong (id ** _,_ t) (Ṡ-pcROrn-decomp-comp-inverse (σ S O) (P t) ((h , h') , eq))
+Ṡ-pcROrn-decomp-comp-inverse (σ S O) (∇ s P)  (((s' , h) , h'       ) , eq) with cong proj₁ eq
+Ṡ-pcROrn-decomp-comp-inverse (σ S O) (∇ s P)  (((.s , h) , h'       ) , eq) | refl = cong (_,_ s ** id) (Ṡ-pcROrn-decomp-comp-inverse (O s) P ((h , h') , cong-proj₂ eq))
+Ṡ-pcROrn-decomp-comp-inverse (Δ T O) P        (((t , h)  , h'       ) , eq) = cong (_,_ t ** id) (Ṡ-pcROrn-decomp-comp-inverse (O t) P ((h , h') , eq))
+Ṡ-pcROrn-decomp-comp-inverse (∇ s O) (σ S P)  ((h        , (s' , h')) , eq) with cong proj₁ eq
+Ṡ-pcROrn-decomp-comp-inverse (∇ s O) (σ S P)  ((h        , (.s , h')) , eq) | refl = cong (id ** _,_ s) (Ṡ-pcROrn-decomp-comp-inverse O (P s) ((h , h') , cong-proj₂ eq))
+Ṡ-pcROrn-decomp-comp-inverse (∇ s O) (Δ T P)  ((h        , (t , h') ) , eq) = cong (id ** _,_ t) (Ṡ-pcROrn-decomp-comp-inverse (∇ s O) (P t) ((h , h') , eq))
+Ṡ-pcROrn-decomp-comp-inverse (∇ s O) (∇ s' P) ((h        , h'       ) , eq) with cong proj₁ eq
+Ṡ-pcROrn-decomp-comp-inverse (∇ s O) (∇ .s P) ((h        , h'       ) , eq) | refl = Ṡ-pcROrn-decomp-comp-inverse O P ((h , h') , cong-proj₂ eq)
+
+Ṡ-pcROrn-comp-decomp-inverse :
+  {I J K : Set} {e : J → I} {f : K → I} {D : RDesc I} {E : RDesc J} {F : RDesc K}
+  (O : ROrn e D E) (P : ROrn f D F) (h : Ṡ (toRDesc (pcROrn O P))) →
+  let ((h' , h'') , _) = Ṡ-pcROrn-decomp O P h in (eq : erase-Ṡ O h' ≡ erase-Ṡ P h'') → Ṡ-pcROrn-comp O P ((h' , h'') , eq) ≡ h
+Ṡ-pcROrn-comp-decomp-inverse (ṿ eqs) (ṿ eqs') h          eq = refl
+Ṡ-pcROrn-comp-decomp-inverse (ṿ eqs) (Δ T P)  (t , h)    eq = cong (_,_ t) (Ṡ-pcROrn-comp-decomp-inverse (ṿ eqs) (P t) h eq)
+Ṡ-pcROrn-comp-decomp-inverse (σ S O) (σ .S P) (s , h)    eq with cong proj₁ eq 
+Ṡ-pcROrn-comp-decomp-inverse (σ S O) (σ .S P) (s , h)    eq | refl = cong (_,_ s) (Ṡ-pcROrn-comp-decomp-inverse (O s) (P s) h (cong-proj₂ eq))
+Ṡ-pcROrn-comp-decomp-inverse (σ S O) (Δ T P)  (t , h)    eq = cong (_,_ t) (Ṡ-pcROrn-comp-decomp-inverse (σ S O) (P t) h eq)
+Ṡ-pcROrn-comp-decomp-inverse (σ S O) (∇ s P)  h          eq with cong proj₁ eq
+Ṡ-pcROrn-comp-decomp-inverse (σ S O) (∇ s P)  h          eq | refl = Ṡ-pcROrn-comp-decomp-inverse (O s) P h (cong-proj₂ eq)
+Ṡ-pcROrn-comp-decomp-inverse (Δ T O) P        (t , h)    eq = cong (_,_ t) (Ṡ-pcROrn-comp-decomp-inverse (O t) P h eq)
+Ṡ-pcROrn-comp-decomp-inverse (∇ s O) (σ S P)  h          eq with cong proj₁ eq
+Ṡ-pcROrn-comp-decomp-inverse (∇ s O) (σ S P)  h          eq | refl = Ṡ-pcROrn-comp-decomp-inverse O (P s) h (cong-proj₂ eq)
+Ṡ-pcROrn-comp-decomp-inverse (∇ s O) (Δ T P)  (t , h)    eq = cong (_,_ t) (Ṡ-pcROrn-comp-decomp-inverse (∇ s O) (P t) h eq)
+Ṡ-pcROrn-comp-decomp-inverse (∇ s O) (∇ .s P) (refl , h) eq with cong proj₁ eq 
+Ṡ-pcROrn-comp-decomp-inverse (∇ s O) (∇ .s P) (refl , h) eq | refl = cong (_,_ refl) (Ṡ-pcROrn-comp-decomp-inverse O P h (cong-proj₂ eq))
+
+Ṡ-pcROrn-iso : {I J K : Set} {e : J → I} {f : K → I} {D : RDesc I} {E : RDesc J} {F : RDesc K}
+               (O : ROrn e D E) (P : ROrn f D F) → Iso Fun (Ṡ (toRDesc (pcROrn O P))) (Σ[ hs ∶ Ṡ E × Ṡ F ] erase-Ṡ O (proj₁ hs) ≡ erase-Ṡ P (proj₂ hs))
+Ṡ-pcROrn-iso O P = record
+  { to   = Ṡ-pcROrn-decomp O P
+  ; from = Ṡ-pcROrn-comp O P
+  ; from-to-inverse = λ h → Ṡ-pcROrn-comp-decomp-inverse O P h (proj₂ (Ṡ-pcROrn-decomp O P h))
+  ; to-from-inverse = λ hs → cong₂-pair (Ṡ-pcROrn-decomp-comp-inverse O P hs)
+                                        (htrans (≡-to-≅ (proof-irrelevance _ _))
+                                                (≡-subst-removable (λ hs' → erase-Ṡ O (proj₁ hs') ≡ erase-Ṡ P (proj₂ hs'))
+                                                                   (sym (Ṡ-pcROrn-decomp-comp-inverse O P hs))
+                                                                   (proj₂ hs))) }
 
 triangle-l : ∀ {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P : Orn f D F) → OrnEq (O ⊙ diffOrn-l O P) ⌈ O ⊗ P ⌉
 triangle-l {I} {J} {K} {e} {f} O P = (λ { (ok j , k) → refl }) , (λ { (ok j , k) hs → ≡-to-≅ (aux (Orn.comp O (ok j)) (Orn.comp P k) hs) })

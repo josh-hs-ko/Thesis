@@ -4,6 +4,7 @@
 module Ornament.Algebraic.EquivalenceTheorem where
 
 open import Prelude.Equality
+open import Prelude.Category
 open import Prelude.Category.Isomorphism
 open import Prelude.Category.WCat
 open import Prelude.Category.Slice
@@ -96,19 +97,19 @@ clsP-iso O = record { to   = to-clsP O
                     ; from-to-inverse = from-to-clsP-inverse O
                     ; to-from-inverse = to-from-clsP-inverse O }
 
-erase'-from-clsP : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (O : ROrn e D E) (js : ⟦ D ⟧ (InvImage e)) (p : clsP O js) →
-                   erase' O (const !) (from-clsP O js p) ≡ Ḣ-map D ! js
-erase'-from-clsP (ṿ eqs)  _        _          = refl
-erase'-from-clsP (σ S O) (s , js)  p          = cong (_,_ s) (erase'-from-clsP (O s) js p)
-erase'-from-clsP (Δ T O) js        (t , p)    = erase'-from-clsP (O t) js p
-erase'-from-clsP (∇ s O) (.s , js) (refl , p) = cong (_,_ s) (erase'-from-clsP O js p)
+erase-Ṡ-from-clsP : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (O : ROrn e D E) (js : ⟦ D ⟧ (InvImage e)) (p : clsP O js) →
+                   erase-Ṡ O (from-clsP O js p) ≡ Ḣ-map D ! js
+erase-Ṡ-from-clsP (ṿ eqs)  _        _          = refl
+erase-Ṡ-from-clsP (σ S O) (s , js)  p          = cong (_,_ s) (erase-Ṡ-from-clsP (O s) js p)
+erase-Ṡ-from-clsP (Δ T O) js        (t , p)    = erase-Ṡ-from-clsP (O t) js p
+erase-Ṡ-from-clsP (∇ s O) (.s , js) (refl , p) = cong (_,_ s) (erase-Ṡ-from-clsP O js p)
 
-erase'-to-clsP : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (O : ROrn e D E) (hs : Ṡ E) →
-                 erase' O (const !) hs ≡ Ḣ-map D ! (proj₁ (to-clsP O hs))
-erase'-to-clsP (ṿ eqs) hs       = refl
-erase'-to-clsP (σ S O) (s , hs) = cong (_,_ s) (erase'-to-clsP (O s) hs)
-erase'-to-clsP (Δ T O) (t , hs) = erase'-to-clsP (O t) hs
-erase'-to-clsP (∇ s O) hs       = cong (_,_ s) (erase'-to-clsP O hs)
+erase-Ṡ-to-clsP : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (O : ROrn e D E) (hs : Ṡ E) →
+                 erase-Ṡ O hs ≡ Ḣ-map D ! (proj₁ (to-clsP O hs))
+erase-Ṡ-to-clsP (ṿ eqs) hs       = refl
+erase-Ṡ-to-clsP (σ S O) (s , hs) = cong (_,_ s) (erase-Ṡ-to-clsP (O s) hs)
+erase-Ṡ-to-clsP (Δ T O) (t , hs) = erase-Ṡ-to-clsP (O t) hs
+erase-Ṡ-to-clsP (∇ s O) hs       = cong (_,_ s) (erase-Ṡ-to-clsP O hs)
 
 -- isomorphism about algROrn
 
@@ -134,18 +135,18 @@ algROrn-iso D X P = record { to   = algROrn-decomp D X P
                            ; from-to-inverse = algROrn-comp-decomp-inverse D X P
                            ; to-from-inverse = algROrn-decomp-comp-inverse D X P }
 
-erase'-algROrn-decomp : {I : Set} (D : RDesc I) (X : I → Set) (P : ℘ (⟦ D ⟧ X)) (hs : Ṡ (toRDesc (algROrn D P))) →
-                        erase' (toROrn (algROrn D P)) (const !) hs ≡ Ḣ-map D ! (proj₁ (algROrn-decomp D X P hs))
-erase'-algROrn-decomp (ṿ is)  X P _        = refl
-erase'-algROrn-decomp (σ S D) X P (s , hs) = cong (_,_ s) (erase'-algROrn-decomp (D s) X (curry P s) hs)
+erase-Ṡ-algROrn-decomp : {I : Set} (D : RDesc I) (X : I → Set) (P : ℘ (⟦ D ⟧ X)) (hs : Ṡ (toRDesc (algROrn D P))) →
+                        erase-Ṡ (toROrn (algROrn D P)) hs ≡ Ḣ-map D ! (proj₁ (algROrn-decomp D X P hs))
+erase-Ṡ-algROrn-decomp (ṿ is)  X P _        = refl
+erase-Ṡ-algROrn-decomp (σ S D) X P (s , hs) = cong (_,_ s) (erase-Ṡ-algROrn-decomp (D s) X (curry P s) hs)
 
-erase'-algROrn-comp : {I : Set} (D' : RDesc I) (X : I → Set) (P : ℘ (⟦ D' ⟧ X)) (xs : ⟦ D' ⟧ X) (p : P xs) →
-                      erase' (toROrn (algROrn D' P)) (const !) (algROrn-comp D' X P xs p) ≡ Ḣ-map D' ! xs
-erase'-algROrn-comp (ṿ is)  X P xs       p = refl
-erase'-algROrn-comp (σ S D) X P (s , xs) p = cong (_,_ s) (erase'-algROrn-comp (D s) X (curry P s) xs p)
+erase-Ṡ-algROrn-comp : {I : Set} (D' : RDesc I) (X : I → Set) (P : ℘ (⟦ D' ⟧ X)) (xs : ⟦ D' ⟧ X) (p : P xs) →
+                      erase-Ṡ (toROrn (algROrn D' P)) (algROrn-comp D' X P xs p) ≡ Ḣ-map D' ! xs
+erase-Ṡ-algROrn-comp (ṿ is)  X P xs       p = refl
+erase-Ṡ-algROrn-comp (σ S D) X P (s , xs) p = cong (_,_ s) (erase-Ṡ-algROrn-comp (D s) X (curry P s) xs p)
 
 
-{-------
+--------
 -- algebraic ornamentation by a classifying algebra produces an isomorphic datatype
 
 module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) where
@@ -198,9 +199,9 @@ module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) 
                    (ḢROrn-comp (ḢTrans-normal (Orn.comp O (ok j))) (toAlgOrn-t (e j) (ok j))))
                 (ḢROrn-≐ (ḢTrans-normal (Orn.comp O (ok j)) ⊡ toAlgOrn-t (e j) (ok j))
                          (ḢTrans-normal (Orn.comp ⌈ algOrn D (clsAlg O) ⌉ (ok (e j , ok j))))
-                   (λ hs → trans (uncurry (erase'-from-clsP (Orn.comp O (ok j)))
+                   (λ hs → trans (uncurry (erase-Ṡ-from-clsP (Orn.comp O (ok j)))
                                     (algROrn-decomp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º⁻) (ok j)) hs))
-                                 (sym (erase'-algROrn-decomp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º⁻) (ok j)) hs)))) })
+                                 (sym (erase-Ṡ-algROrn-decomp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º⁻) (ok j)) hs)))) })
          (OrnEq-normal ⌈ algOrn D (clsAlg O) ⌉))
 
   fromAlgOrn-c-ṿ : {is : List I} {js : List J} (eqs : Ė e js is) →
@@ -239,9 +240,9 @@ module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) 
                      (ḢROrn-comp (ḢTrans-normal (Orn.comp ⌈ algOrn D (clsAlg O) ⌉ (ok (e j , ok j)))) (fromAlgOrn-t j)))
                   (ḢROrn-≐ (ḢTrans-normal (Orn.comp ⌈ algOrn D (clsAlg O) ⌉ (ok (e j , ok j))) ⊡ fromAlgOrn-t j)
                            (ḢTrans-normal (Orn.comp O (ok j)))
-                     (λ hs → trans (uncurry (erase'-algROrn-comp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º⁻) (ok j)))
+                     (λ hs → trans (uncurry (erase-Ṡ-algROrn-comp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º⁻) (ok j)))
                                       (to-clsP (Orn.comp O (ok j)) hs))
-                                   (sym (erase'-to-clsP (Orn.comp O (ok j)) hs)))))
+                                   (sym (erase-Ṡ-to-clsP (Orn.comp O (ok j)) hs)))))
          (OrnEq-normal O))
 
   toAlgOrn-fromAlgOrn-inverse : OrnEq (toAlgOrn ⊙ fromAlgOrn) (idOrn E)
@@ -256,7 +257,7 @@ module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) 
                               (fcong-r (to-clsP (Orn.comp O (ok j)))
                                  (algROrn-decomp-comp-inverse (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º⁻) (ok j)))))
                            (from-to-clsP-inverse (Orn.comp O (ok j))))))
-             (ḢROrn-id {J} {Desc.comp E j}))
+             (ḢROrn-id (Desc.comp E j)))
 
   fromAlgOrn-toAlgOrn-inverse : OrnEq (fromAlgOrn ⊙ toAlgOrn) (idOrn ⌊ algOrn D (clsAlg O) ⌋)
   fromAlgOrn-toAlgOrn-inverse =
@@ -275,7 +276,7 @@ module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) 
                             (fcong-r (algROrn-decomp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º⁻) (ok j)))
                                (to-from-clsP-inverse (Orn.comp O (ok j)))))
                          (algROrn-comp-decomp-inverse (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º⁻) (ok j))))))
-           (ḢROrn-id {Σ I (InvImage e)} {Desc.comp ⌊ algOrn D (clsAlg O) ⌋ (e j , ok j)}) })
+           (ḢROrn-id (Desc.comp ⌊ algOrn D (clsAlg O) ⌋ (e j , ok j))) })
 
 
 --------
@@ -365,16 +366,6 @@ module CAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝ J) where
           setoid = ≃-Setoid (Ḟ D (InvImage proj₁)) J
           open EqReasoning setoid renaming (begin_ to begin′_; _≈⟨_⟩_ to _≃⟨_⟩_; _∎ to _∎′)
 
--}
-
-erase-Ṡ-from-clsP :
-  {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (O : ROrn e D E) (js : ⟦ D ⟧ (InvImage e)) (p : clsP O js) →
-  erase-Ṡ O (from-clsP O js p) ≡ proj₁ (Ḣ-decomp D (flip Ṗ (InvImage e)) js)
-erase-Ṡ-from-clsP (ṿ eqs) js        p          = refl
-erase-Ṡ-from-clsP (σ S O) (s , js)  p          = cong (_,_ s) (erase-Ṡ-from-clsP (O s) js p)
-erase-Ṡ-from-clsP (Δ T O) js        (t , p)    = erase-Ṡ-from-clsP (O t) js p
-erase-Ṡ-from-clsP (∇ s O) (.s , js) (refl , p) = cong (_,_ s) (erase-Ṡ-from-clsP O js p)
-
 next-from-clsP-ṿ :
   {I J : Set} {e : J → I} {is : List I} {js : List J} (eqs : Ė e js is) (js' : Ṗ is (InvImage e)) → clsP-Ṗ eqs js' → js ≡ und-Ṗ is js'
 next-from-clsP-ṿ []           _         _          = refl
@@ -428,8 +419,6 @@ next-from-clsP-lemma e f g eeq (ṿ (._ ∷ is)) (ok j , js) = cong₂ _∷_ (sy
                                                                      (next-from-clsP-lemma e f g eeq (ṿ is) js)
 next-from-clsP-lemma e f g eeq (σ S D)       (s , js)    = next-from-clsP-lemma e f g eeq (D s) js
 
-{-
-
 OrnEq-to-hom-aux :
   {I J K : Set} {e : J → I} {f : K → I} {D D' : RDesc I} {E : RDesc J} {F F' : RDesc K}
   (O : ROrn e D E) (P : ROrn f D' F) (P' : ROrn f D F') → D ≡ D' → F ≡ F' → P ≅ P' →
@@ -438,7 +427,8 @@ OrnEq-to-hom-aux :
 OrnEq-to-hom-aux {e = e} {f} {D} O P .P refl refl hrefl {g} Q eeq js p eraseeq =
   make-clsP P (mapF D (InvImage-lift e f g eeq) js) (erase-Ṡ Q (from-clsP O js p))
     (trans (sym (erase-Ṡ-scROrn P Q (from-clsP O js p)))
-           (trans (≅-to-≡ eraseeq) (trans (erase-Ṡ-from-clsP O js p) (Ḣ-map-preserves-shape D (flip Ṗ (InvImage e)) (flip Ṗ (InvImage f)) _ js))))
+           (trans (≅-to-≡ eraseeq) (trans (trans (erase-Ṡ-from-clsP O js p) (Ḣ-map-to-Ḣ-decomp D (flip Ṗ (InvImage e)) js))
+                                          (Ḣ-map-preserves-shape D (flip Ṗ (InvImage e)) (flip Ṗ (InvImage f)) _ js))))
     (trans (next-erase-Ṡ Q (from-clsP O js p)) (trans (cong (map g) (next-from-clsP O js p)) (next-from-clsP-lemma e f g eeq D js)))
 
 OrnEq-to-hom :
@@ -457,11 +447,6 @@ OrnEq-to-hom {I} {J} {K} {e} {f} {D} {E} {F} O P {g} Q (eeq , roeq) =
                                (eeq j) (λ { ._ hrefl → hrefl }) (from≡ f (trans (eeq j) refl))
                                (hsym (und≡' (from≡ f (trans (eeq j) refl)) (sym (und-from≡ f (trans (eeq j) refl))))))
                         (Orn.comp Q (ok j)) eeq js p (roeq j (from-clsP (Orn.comp O (ok j)) js p))
-
-InvImage-lift : {I J K : Set} (e : J → I) (f : K → I) (g : J → K) → f ∘ g ≐ e → InvImage e ⇉ InvImage f
-InvImage-lift e f g eeq j = from≡ f (trans (eeq (und j)) (to≡ j))
-
--}
 
 hom-to-OrnEq-aux-ṿ :
   {I : Set} (is : List I) {J K : I → Set} (js : Ṗ is J) (h : J ⇉ K) →
@@ -484,10 +469,3 @@ hom-to-OrnEq D R S h inc =
            hom-to-OrnEq-aux (Desc.comp D i) (((R !!) i º⁻) j) (((S !!) i º⁻) (h j)) h
              (λ js r → let (ks , rs , s) = modus-ponens-⊆ inc i js (h j) (j , r , refl)
                        in  subst (((S !!) i º⁻) (h j)) (sym (mapR-fun⁻-unique (Desc.comp D i) h js ks rs)) s) }
-
-
---------
--- the equivalence theorem
-
-equivalence-theorem : {I : Set} (D : Desc I) → CatEquiv (SliceCategory Ōrn (I , D)) (RAlg D)
-equivalence-theorem D = {!!}

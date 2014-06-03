@@ -80,6 +80,24 @@ terminal-iso X Y tx ty =
                (Setoid.sym (Morphism Y Y) (proj₂ (ty Y) (proj₁ (ty X) · proj₁ (tx Y))))
                (proj₂ (ty Y) id) }
 
+iso-terminal : (X Y : Object) → Terminal C X → Iso X Y → Terminal C Y
+iso-terminal X Y tx i Z =
+  let (m , u) = tx Z
+  in  Iso.to i · m ,
+      λ n → begin
+              Iso.to i · m
+                ≈⟨ cong-l (Iso.to i) (u (Iso.from i · n)) ⟩
+              Iso.to i · (Iso.from i · n)
+                ≈⟨ Setoid.sym setoid (assoc (Iso.to i) (Iso.from i) n) ⟩
+              (Iso.to i · Iso.from i) · n
+                ≈⟨ cong-r n (Iso.to-from-inverse i) ⟩
+              id · n
+                ≈⟨ id-l n ⟩
+              n
+            ∎
+  where setoid = Morphism Z Y
+        open EqReasoning setoid
+
 record PartOfIso {X Y : Object} (to : X ==> Y) : Set (ℓ₁ ⊔ ℓ₂) where
   field
     from : Y ==> X

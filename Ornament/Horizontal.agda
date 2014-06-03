@@ -89,14 +89,14 @@ erase-Ṡ-ḢROrn {D = D} {E} t hs =
 
 normal-coherence :
   {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (O : ROrn e D E) {X : List J → Set} {Y : List I → Set}
-  (f : {is : List I} {js : List J} → Ė e js is → X js → Y is) (hs : Ḣ E X) → Ė e (next E hs) (next D (erase' O f hs))
+  (f : Erasure e X Y) (hs : Ḣ E X) → Ė e (next E hs) (next D (erase' O f hs))
 normal-coherence (ṿ eqs) f hs       = eqs
 normal-coherence (σ S O) f (s , hs) = normal-coherence (O s) f hs
 normal-coherence (Δ T O) f (t , hs) = normal-coherence (O t) f hs
 normal-coherence (∇ s O) f hs       = normal-coherence O f hs
 
 ḢTrans-normal : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (O : ROrn e D E) → ḢTrans e D E
-ḢTrans-normal O = erase' O (const !) , normal-coherence O (const !)
+ḢTrans-normal O = erase-Ṡ O , normal-coherence O (const !)
 
 ḢTrans-app-normal :
   {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (O : ROrn e D E)

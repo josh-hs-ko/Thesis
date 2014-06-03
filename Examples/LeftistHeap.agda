@@ -66,6 +66,12 @@ preorder : {A : Set} → ITree A → List A
 preorder (con (`nil ,              _)) = []
 preorder (con (`node , x , t , u , _)) = x ∷ preorder t ++ preorder u
 
+toList : {A I : Set} {D : Desc I} → Orn ! ⌊ ITreeOD A ⌋ D → {i : I} → μ D i → List A
+toList {A} {I} {D} O = Upgrade.u upg preorder (λ _ _ → tt)
+  where
+    upg : Upgrade (ITree A → List A) ({i : I} → μ D i → List A)
+    upg = ∀⁺[[ i ∶ I ]] FRefinement.comp (RSem' O) (ok i) ⇀ toUpgrade Ref-refl
+
 
 --------
 -- heap-ordered trees
@@ -97,15 +103,12 @@ LHeapD = ⌊ TreeD-HeapD ⊗ ⌈ LTreeOD ⌉ ⌋
 LHeap : Val → Nat → Set
 LHeap b r = μ LHeapD (ok b , ok r)
 
-toList : {b : Val} {r : Nat} → LHeap b r → List Val
-toList = preorder ∘ forget (⌈ HeapOD ⌉ ⊙ diffOrn-l TreeD-HeapD ⌈ LTreeOD ⌉)
-
 lhrelax : {b b' : Val} → b' ≤ b → {r : Nat} → LHeap b r → LHeap b' r
-lhrelax {b} {b'} b'≤b {r} = Upgrade.u upg id (λ _ → relax b'≤b ** id)
+lhrelax = Upgrade.u upg id (λ b'≤b _ → relax b'≤b ** id)
   where ref : (b : Val) (r : Nat) → Refinement Tree (LHeap b r)
         ref b r = FRefinement.comp (toFRefinement (⊗-FSwap TreeD-HeapD ⌈ LTreeOD ⌉ id-FSwap id-FSwap)) (ok (ok b , ok r))
-        upg : Upgrade (Tree → Tree) (LHeap b r → LHeap b' r)
-        upg = ref b r ⇀ toUpgrade (ref b' r)
+        upg : Upgrade (Tree → Tree) ({b b' : Val} → b' ≤ b → {r : Nat} → LHeap b r → LHeap b' r)
+        upg = ∀⁺[[ b ∶ Val ]] ∀⁺[[ b' ∶ Val ]] ∀⁺[ _ ∶ b' ≤ b ] ∀⁺[[ r ∶ Nat ]] ref b r ⇀ toUpgrade (ref b' r)
 
 makeT : (x : Val) {r₀ : Nat} → LHeap x r₀ → {r₁ : Nat} → LHeap x r₁ → Σ[ r ∶ Nat ] LHeap x r
 makeT x {r₀} h₀ {r₁} h₁ with r₀ ≤'? r₁
@@ -161,9 +164,6 @@ WLHeapD = ⌊ TreeD-HeapD ⊗ ⌈ WLTreeOD ⌉ ⌋
 
 WLHeap : Val → Nat → Set
 WLHeap b n = μ WLHeapD (ok b , ok n)
-
-toList-W : {b : Val} {n : Nat} → WLHeap b n → List Val
-toList-W = preorder ∘ forget (⌈ HeapOD ⌉ ⊙ diffOrn-l TreeD-HeapD ⌈ WLTreeOD ⌉)
 
 wlhrelax : {b b' : Val} → b' ≤ b → {n : Nat} → WLHeap b n → WLHeap b' n
 wlhrelax = Upgrade.u upg id λ { b'≤b _ → relax b'≤b ** id }

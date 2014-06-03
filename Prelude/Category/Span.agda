@@ -87,6 +87,20 @@ SpanMap F =
          ; id-preserving   = id-preserving F
          ; comp-preserving = λ f g → comp-preserving F (SpanMorphism.m f) (SpanMorphism.m g) }
 
+span-mid-iso : {ℓ₀ ℓ₁ ℓ₂ : Level} {C : Category {ℓ₀} {ℓ₁} {ℓ₂}} {L R : Category.Object C} →
+               (s : Span C L R) (X : Category.Object C) (i : Iso C (Span.M s) X) → Σ (Span C L R) (Iso (SpanCategory C L R) s)
+span-mid-iso {C = C} {L} {R} (span M l r) X i =
+  span X (l · Iso.from C i) (r · Iso.from C i) ,
+  record { to   = spanMorphism (Iso.to C i)
+                               (Setoid.trans (Morphism M L) (assoc l (Iso.from C i) (Iso.to C i))
+                                                            (Setoid.trans (Morphism M L) (cong-l l (Iso.from-to-inverse C i)) (id-r l)))
+                               (Setoid.trans (Morphism M R) (assoc r (Iso.from C i) (Iso.to C i))
+                                                            (Setoid.trans (Morphism M R) (cong-l r (Iso.from-to-inverse C i)) (id-r r)))
+         ; from = spanMorphism (Iso.from C i) (Setoid.refl (Morphism X L)) (Setoid.refl (Morphism X R))
+         ; from-to-inverse = Iso.from-to-inverse C i
+         ; to-from-inverse = Iso.to-from-inverse C i }
+  where open Category C
+
 Product : {ℓ₀ ℓ₁ ℓ₂ : Level} (C : Category {ℓ₀} {ℓ₁} {ℓ₂}) (L R : Category.Object C) → Span C L R → Set (ℓ₀ ⊔ ℓ₁ ⊔ ℓ₂)
 Product C L R = Terminal (SpanCategory C L R)
 

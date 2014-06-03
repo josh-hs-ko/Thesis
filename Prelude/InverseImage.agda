@@ -2,16 +2,18 @@
 
 module Prelude.InverseImage where
 
+open import Prelude.Equality
 open import Prelude.Category
 open import Prelude.Category.Isomorphism
 open import Prelude.Category.Slice
 open import Prelude.Category.Span
 open import Prelude.Category.Pullback
 open import Prelude.Function
+open import Prelude.Product
 
 open import Function using (_∘_; type-signature)
-open import Data.Product using (Σ; _,_)
-open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; sym; trans)
+open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; sym; trans; cong₂)
 open import Relation.Binary.HeterogeneousEquality using (_≅_; ≅-to-≡) renaming (refl to hrefl)
 
 
@@ -81,10 +83,35 @@ decouple {f = f} {g} {ok a , b} {ok .a , b'} refl eq = cong (_,_ {c = f a} (ok a
 ⋈-square : {A B C : Set} (f : A → C) (g : B → C) → Square Fun (slice A f) (slice B g)
 ⋈-square f g = span (slice (f ⋈ g) pull) (sliceMorphism π₁ (λ { (ok a , b) → refl })) (sliceMorphism π₂ (λ { (a , ok b) → refl }))
 
-⋈-is-Pullback : {A B C : Set} (f : A → C) (g : B → C) → Pullback Fun (slice A f) (slice B g) (⋈-square f g)
-⋈-is-Pullback {A} {B} {C} f g s =
+⋈-is-pullback : {A B C : Set} (f : A → C) (g : B → C) → Pullback Fun (slice A f) (slice B g) (⋈-square f g)
+⋈-is-pullback {A} {B} {C} f g s =
   spanMorphism (sliceMorphism (λ t → from≡ f (SliceMorphism.triangle (Span.l s) t) , from≡ g (SliceMorphism.triangle (Span.r s) t)) frefl)
                (λ t → und-from≡ f (SliceMorphism.triangle (Span.l s) t))
                (λ t → und-from≡ g (SliceMorphism.triangle (Span.r s) t)) ,
   (λ m t → decouple (trans (und-from≡ f (SliceMorphism.triangle (Span.l s) t)) (sym (SpanMorphism.triangle-l m t)))
                     (trans (und-from≡ g (SliceMorphism.triangle (Span.r s) t)) (sym (SpanMorphism.triangle-r m t))))
+
+
+--------
+-- canonical set-theoretic pullback
+
+STP-square : {A B C : Set} (f : A → C) (g : B → C) → Square Fun (slice A f) (slice B g)
+STP-square {A} {B} {C} f g = span (slice (Σ[ p ∶ A × B ] f (proj₁ p) ≡ g (proj₂ p)) (g ∘ proj₂ ∘ proj₁))
+                                  (sliceMorphism (proj₁ ∘ proj₁) proj₂)
+                                  (sliceMorphism (proj₂ ∘ proj₁) frefl)
+
+STP-decouple : {A B C : Set} (f : A → C) (g : B → C) → let s = STP-square f g in {p q : Square-T s} →
+               SliceMorphism.m (Span.l s) p ≡ SliceMorphism.m (Span.l s) q → SliceMorphism.m (Span.r s) p ≡ SliceMorphism.m (Span.r s) q → p ≡ q
+STP-decouple f g leq req = cong₂-pair (cong₂ _,_ leq req) (proof-irrelevance' (cong f leq) (cong g req))
+
+STP-is-pullback : {A B C : Set} (f : A → C) (g : B → C) → Pullback Fun (slice A f) (slice B g) (STP-square f g)
+STP-is-pullback f g s = spanMorphism (sliceMorphism (λ p → (SliceMorphism.m (Span.l s) p , SliceMorphism.m (Span.r s) p) ,
+                                                           trans (SliceMorphism.triangle (Span.l s) p) (sym (SliceMorphism.triangle (Span.r s) p)))
+                                                    (SliceMorphism.triangle (Span.r s))) frefl frefl ,
+                        λ m p → STP-decouple f g (sym (SpanMorphism.triangle-l m p)) (sym (SpanMorphism.triangle-r m p))
+
+decouple' : {A B C : Set} (f : A → C) (g : B → C) (s : Square Fun (slice A f) (slice B g)) → Pullback Fun (slice A f) (slice B g) s →
+            {p q : Square-T s} → SliceMorphism.m (Span.l s) p ≡ SliceMorphism.m (Span.l s) q → SliceMorphism.m (Span.r s) p ≡ SliceMorphism.m (Span.r s) q → p ≡ q
+decouple' f g s ps {p} {q} leq req =
+  let iso = pullback-iso Fun (slice _ f) (slice _ g) s (STP-square f g) ps (STP-is-pullback f g)
+  in  trans (sym (Iso.from-to-inverse Fun iso p)) (trans (cong (Iso.from Fun iso) (STP-decouple f g leq req)) (Iso.from-to-inverse Fun iso q))

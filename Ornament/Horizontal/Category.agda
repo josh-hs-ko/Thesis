@@ -4,6 +4,7 @@
 module Ornament.Horizontal.Category where
 
 open import Prelude.Function
+open import Prelude.Function.Fam
 open import Prelude.InverseImage
 open import Prelude.Category
 open import Prelude.Category.Isomorphism
@@ -49,6 +50,22 @@ record FḢTrans {I J : Set} (e : J → I) (D : Desc I) (E : Desc J) : Set₁ wh
                                        ḢTrans.s (FḢTrans.comp v (e j)) h' ≅ ḢTrans.s (FḢTrans.comp v i) h'')
                             (efeq j) (λ { h' .h' hrefl → hrefl }) (ḢTrans.s (FḢTrans.comp t j) h) (ḢTrans.s (FḢTrans.comp u j) h) (tueqs j h)) }
   ; cong-r = λ { (e , t) (fgeq , uveqs) → (λ k → fgeq (e k)) , (λ k h → uveqs (e k) (ḢTrans.s (FḢTrans.comp t k) h)) } }
+
+ḞḢTransF : Functor ḞḢTrans Fun
+ḞḢTransF = record
+  { object   = proj₁
+  ; morphism = proj₁
+  ; ≈-respecting    = proj₁
+  ; id-preserving   = frefl
+  ; comp-preserving = λ _ _ → frefl }
+
+Shape : Functor ḞḢTrans Fam
+Shape = record
+  { object   = λ { (I , D) → I , Ṡ ∘ Desc.comp D }
+  ; morphism = λ { (e , ts) → e , λ {j} → ḢTrans.s (FḢTrans.comp ts j) }
+  ; ≈-respecting    = λ { (eeq , tseq) → eeq , λ { {j} h .h hrefl → tseq j h } }
+  ; id-preserving   = frefl , λ _ _ → id
+  ; comp-preserving = λ f g → frefl , λ { h .h hrefl → hrefl } }
 
 Norm : Functor Ōrn ḞḢTrans
 Norm = record

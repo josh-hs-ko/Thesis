@@ -4,6 +4,7 @@ module Prelude.Category.Slice where
 
 open import Prelude.Equality
 open import Prelude.Category
+open import Prelude.Category.Isomorphism
 
 open import Level
 open import Function using ()
@@ -78,3 +79,15 @@ SliceMap {D = D} F {B} =
          ; ≈-respecting    = ≈-respecting F
          ; id-preserving   = id-preserving F
          ; comp-preserving = λ f g → comp-preserving F (SliceMorphism.m f) (SliceMorphism.m g) }
+
+slice-tip-iso : {ℓ₀ ℓ₁ ℓ₂ : Level} {C : Category {ℓ₀} {ℓ₁} {ℓ₂}} {B : Category.Object C} →
+                (s : Slice C B) (X : Category.Object C) (i : Iso C (Slice.T s) X) → Σ (Slice C B) (Iso (SliceCategory C B) s)
+slice-tip-iso {C = C} {B} (slice T m) X i =
+  slice X (m · Iso.from C i) ,
+  record { to   = sliceMorphism (Iso.to C i)
+                                (Setoid.trans (Morphism T B) (assoc m (Iso.from C i) (Iso.to C i))
+                                                             (Setoid.trans (Morphism T B) (cong-l m (Iso.from-to-inverse C i)) (id-r m)))
+         ; from = sliceMorphism (Iso.from C i) (Setoid.refl (Morphism X B))
+         ; from-to-inverse = Iso.from-to-inverse C i
+         ; to-from-inverse = Iso.to-from-inverse C i }
+  where open Category C

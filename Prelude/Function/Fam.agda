@@ -14,6 +14,7 @@ open import Prelude.Category.Span
 open import Prelude.Category.Pullback
 open import Prelude.Function
 open import Prelude.Product
+open import Prelude.InverseImage
 
 open import Function using (_∘_; type-signature)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; <_,_>) renaming (map to _**_)
@@ -311,97 +312,13 @@ Mix-square f g = CanonicalPullback.p f g
 canonPullback : {B : Category.Object Fam} (f g : Slice Fam B) → Pullback Fam f g (Mix-square f g)
 canonPullback f g = < CanonicalPullback.Universality.p'-to-p f g , CanonicalPullback.Universality.uniqueness f g >
 
-module PullbackPreserving
-  {B : Category.Object Fam} (f g : Slice Fam B)
-  (p : Span (SliceCategory Fam B) f g) (term-p : Terminal (SpanCategory (SliceCategory Fam B) f g) p) where
-
-  B' : Set
-  B' = object FamF B
-
-  f' : Slice Fun B'
-  f' = object (SliceMap FamF) f
-
-  g' : Slice Fun B'
-  g' = object (SliceMap FamF) g
-
-  p' : Span (SliceCategory Fun B') f' g'
-  p' = object (SpanMap (SliceMap FamF)) p
-
-  c : Span (SliceCategory Fam B) f g
-  c = CanonicalPullback.p f g
-
-  c' : Span (SliceCategory Fun B') f' g'
-  c' = CanonicalPullbackInFun.p f g
-
-  p-to-c : SpanMorphism (SliceCategory Fam B) f g p c
-  p-to-c = CanonicalPullback.Universality.p'-to-p f g p
-
-  p'-to-c' : SpanMorphism (SliceCategory Fun B') f' g' p' c'
-  p'-to-c' = morphism (SpanMap (SliceMap FamF)) p-to-c
-
-  module Universality (q' : Span (SliceCategory Fun B') f' g') where
-
-    open Category (SpanCategory (SliceCategory Fun B') f' g')
-
-    q'-to-c' : SpanMorphism (SliceCategory Fun B') f' g' q' c'
-    q'-to-c' = CanonicalPullbackInFun.Universality.p'-to-p f g q'
-
-    c-to-p : SpanMorphism (SliceCategory Fam B) f g c p
-    c-to-p = proj₁ (term-p c)
-
-    c'-to-p' : SpanMorphism (SliceCategory Fun B') f' g' c' p'
-    c'-to-p' = morphism (SpanMap (SliceMap FamF)) c-to-p
-
-    q'-to-p' : SpanMorphism (SliceCategory Fun B') f' g' q' p'
-    q'-to-p' = c'-to-p' · q'-to-c'
-
-    module Uniqueness (q'-to'-p' : SpanMorphism (SliceCategory Fun B') f' g' q' p') where
-
-      q'-to'-c' : SpanMorphism (SliceCategory Fun B') f' g' q' c'
-      q'-to'-c' = p'-to-c' · q'-to'-p'
-
-      inverse : c'-to-p' · p'-to-c' ≈ id
-      inverse =
-        begin
-          c'-to-p' · p'-to-c'
-            ≈⟨ Setoid.refl (Morphism p' p') {c'-to-p' · p'-to-c'} ⟩
-          morphism (SpanMap (SliceMap FamF)) c-to-p · morphism (SpanMap (SliceMap FamF)) p-to-c
-            ≈⟨ Setoid.sym setoid
-                 {morphism (SpanMap (SliceMap FamF)) (c-to-p ·′ p-to-c)}
-                 {morphism (SpanMap (SliceMap FamF)) c-to-p · morphism (SpanMap (SliceMap FamF)) p-to-c}
-                 (comp-preserving (SpanMap (SliceMap FamF)) c-to-p p-to-c) ⟩
-          morphism (SpanMap (SliceMap FamF)) (c-to-p ·′ p-to-c)
-            ≈⟨ ≈-respecting (SpanMap (SliceMap FamF)) {_} {_} {c-to-p ·′ p-to-c} {id′}
-                 (equal (Category.Morphism (SpanCategory (SliceCategory Fam B) f g) p p) (term-p p) (c-to-p ·′ p-to-c) id′) ⟩
-          morphism (SpanMap (SliceMap FamF)) {p} id′
-            ≈⟨ id-preserving (SpanMap (SliceMap FamF)) {p} ⟩
-          id
-        ∎
-        where open Category (SpanCategory (SliceCategory Fam B) f g) using () renaming (_·_ to _·′_; id to id′)
-              setoid = Morphism p' p'
-              open EqReasoning setoid
-
-      uniqueness : q'-to-p' ≈ q'-to'-p'
-      uniqueness =
-        begin
-          q'-to-p'
-            ≈⟨ Setoid.refl (Morphism q' p') {q'-to-p'} ⟩
-          c'-to-p' · q'-to-c'
-            ≈⟨ cong-l {_} {_} {_} {q'-to-c'} {p'-to-c' · q'-to'-p'} c'-to-p'
-                 (CanonicalPullbackInFun.Universality.uniqueness f g q' q'-to'-c') ⟩
-          c'-to-p' · (p'-to-c' · q'-to'-p')
-            ≈⟨ Setoid.sym setoid
-                 {(c'-to-p' · p'-to-c') · q'-to'-p'} {c'-to-p' · (p'-to-c' · q'-to'-p')}
-                 (assoc c'-to-p' p'-to-c' q'-to'-p') ⟩
-          (c'-to-p' · p'-to-c') · q'-to'-p'
-            ≈⟨ cong-r {_} {_} {_} {c'-to-p' · p'-to-c'} {id} q'-to'-p' inverse ⟩
-          id · q'-to'-p'
-            ≈⟨ id-l q'-to'-p' ⟩
-          q'-to'-p'
-        ∎
-        where setoid = Morphism q' p'
-              open EqReasoning setoid
+canonPullback-in-Fun : {B : Category.Object Fam} (f g : Slice Fam B) →
+                       Pullback Fun (object (SliceMap FamF) f) (object (SliceMap FamF) g) (object (SquareMap FamF) (Mix-square f g))
+canonPullback-in-Fun f g = < CanonicalPullbackInFun.Universality.p'-to-p f g , CanonicalPullbackInFun.Universality.uniqueness f g >
 
 FamF-preserves-pullback : Pullback-preserving FamF
-FamF-preserves-pullback f g p pull-p =
-  < PullbackPreserving.Universality.q'-to-p' f g p pull-p , PullbackPreserving.Universality.Uniqueness.uniqueness f g p pull-p >
+FamF-preserves-pullback = particular-pullback-preservation FamF (λ f g → Mix-square f g , canonPullback f g , canonPullback-in-Fun f g)
+
+FamI-preserves-pullback : Pullback-preserving FamI
+FamI-preserves-pullback =
+  particular-pullback-preservation FamI (λ f g → Mix-square f g , canonPullback f g , STP-is-pullback (FamMorphism.e (Slice.s f)) (FamMorphism.e (Slice.s g)))
