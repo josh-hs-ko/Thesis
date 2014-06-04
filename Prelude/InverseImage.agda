@@ -1,4 +1,4 @@
--- Definition of inverse images of a function, and definition of set-theoretic pullbacks in terms of inverse images.
+-- Definition of inverse images of a function, and definitions of set-theoretic pullbacks in terms of inverse images and quotients.
 
 module Prelude.InverseImage where
 

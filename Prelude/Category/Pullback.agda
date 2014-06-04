@@ -1,6 +1,8 @@
 -- A pullback is defined to be a terminal object in the category of spans over a slice category.
 -- Any two pullback objects are isomorphic.
--- Pullback preservation of functors is also defined.
+-- Pullback preservation and reflection of functors are also defined.
+-- A functor preserves pullback if it preserves a particular pullback.
+-- Composition of two pullback-reflecting functors is also pullback-reflecting.
 
 module Prelude.Category.Pullback where
 
