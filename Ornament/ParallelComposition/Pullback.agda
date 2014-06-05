@@ -16,12 +16,14 @@ open import Prelude.Product
 open import Description
 open import Description.Horizontal
 open import Ornament
+open import Ornament.Horizontal.Category
+open import Ornament.Horizontal.Pullback
 open import Ornament.ParallelComposition
 open import Ornament.SequentialComposition
 open import Ornament.Equivalence
 open import Ornament.Category
 
-open import Function using (id; _∘_; const)
+open import Function using (id; _∘_; const; type-signature)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_) renaming (map to _**_)
 open import Data.List using (List; []; _∷_)
@@ -31,6 +33,7 @@ open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; con
 open import Relation.Binary.HeterogeneousEquality using (_≅_; ≅-to-≡; ≡-to-≅; ≡-subst-removable)
                                                   renaming (refl to hrefl; cong to hcong; sym to hsym; trans to htrans; proof-irrelevance to hproof-irrelevance)
 
+open Functor
 
 
 Ṡ-pcROrn-decomp : {I J K : Set} {e : J → I} {f : K → I} {D : RDesc I} {E : RDesc J} {F : RDesc K}
@@ -110,36 +113,192 @@ open import Relation.Binary.HeterogeneousEquality using (_≅_; ≅-to-≡; ≡-
                                                                    (sym (Ṡ-pcROrn-decomp-comp-inverse O P hs))
                                                                    (proj₂ hs))) }
 
+med-triangle-l : {I J K : Set} {e : J → I} {f : K → I} {D : RDesc I} {E : RDesc J} {F : RDesc K} (O : ROrn e D E) (P : ROrn f D F) →
+                 erase-Ṡ (diffROrn-l O P) ≐ proj₁ ∘ proj₁ ∘ Iso.to Fun (Ṡ-pcROrn-iso O P)
+med-triangle-l (ṿ eqs) (ṿ eqs') h          = refl
+med-triangle-l (ṿ eqs) (Δ T O)  (t , h)    = med-triangle-l (ṿ eqs) (O t) h
+med-triangle-l (σ S O) (σ .S P) (s , h)    = cong (_,_ s) (med-triangle-l (O s) (P s) h)
+med-triangle-l (σ S O) (Δ T P)  (t , h)    = med-triangle-l (σ S O) (P t) h
+med-triangle-l (σ S O) (∇ s P)  h          = cong (_,_ s) (med-triangle-l (O s) P h)
+med-triangle-l (Δ T O) P        (t , h)    = cong (_,_ t) (med-triangle-l (O t) P h)
+med-triangle-l (∇ s O) (σ S P)  h          = med-triangle-l O (P s) h
+med-triangle-l (∇ s O) (Δ T P)  (t , h)    = med-triangle-l (∇ s O) (P t) h
+med-triangle-l (∇ s O) (∇ .s P) (refl , h) = med-triangle-l O P h
+
+med-triangle-r : {I J K : Set} {e : J → I} {f : K → I} {D : RDesc I} {E : RDesc J} {F : RDesc K} (O : ROrn e D E) (P : ROrn f D F) →
+                 erase-Ṡ (diffROrn-r O P) ≐ proj₂ ∘ proj₁ ∘ Iso.to Fun (Ṡ-pcROrn-iso O P)
+med-triangle-r (ṿ eqs) (ṿ eqs') h          = refl
+med-triangle-r (ṿ eqs) (Δ T O)  (t , h)    = cong (_,_ t) (med-triangle-r (ṿ eqs) (O t) h)
+med-triangle-r (σ S O) (σ .S P) (s , h)    = cong (_,_ s) (med-triangle-r (O s) (P s) h)
+med-triangle-r (σ S O) (Δ T P)  (t , h)    = cong (_,_ t) (med-triangle-r (σ S O) (P t) h)
+med-triangle-r (σ S O) (∇ s P)  h          = med-triangle-r (O s) P h
+med-triangle-r (Δ T O) P        (t , h)    = med-triangle-r (O t) P h
+med-triangle-r (∇ s O) (σ S P)  h          = cong (_,_ s) (med-triangle-r O (P s) h)
+med-triangle-r (∇ s O) (Δ T P)  (t , h)    = cong (_,_ t) (med-triangle-r (∇ s O) (P t) h)
+med-triangle-r (∇ s O) (∇ .s P) (refl , h) = med-triangle-r O P h
+
+triangle-l' : {I J K : Set} {e : J → I} {f : K → I} {D' : RDesc I} {E' : RDesc J} {F' : RDesc K} (O' : ROrn e D' E') (P' : ROrn f D' F') →
+              erase-Ṡ (scROrn O' (diffROrn-l O' P')) ≐ erase-Ṡ (toROrn (pcROrn O' P'))
+triangle-l' (ṿ eeqs) (ṿ feqs)  _           = refl
+triangle-l' (ṿ eeqs) (Δ T P')  (t , hs)    = triangle-l' (ṿ eeqs) (P' t) hs
+triangle-l' (σ S O') (σ .S P') (s , hs)    = cong (_,_ s) (triangle-l' (O' s) (P' s) hs)
+triangle-l' (σ S O') (Δ T P')  (t , hs)    = triangle-l' (σ S O') (P' t) hs
+triangle-l' (σ S O') (∇ s P')  hs          = cong (_,_ s) (triangle-l' (O' s) P' hs)
+triangle-l' (Δ T O') P'        (t , hs)    = triangle-l' (O' t) P' hs
+triangle-l' (∇ s O') (σ S P')  hs          = cong (_,_ s) (triangle-l' O' (P' s) hs)
+triangle-l' (∇ s O') (Δ T P')  (t , hs)    = trans (cong (_,_ s) (shift-Δ O' (λ t → diffROrn-l (∇ s O') (P' t)) (const !) (t , hs)))
+                                                   (triangle-l' (∇ s O') (P' t) hs)
+triangle-l' (∇ s O') (∇ .s P') (refl , hs) = cong (_,_ s) (trans (shift-Δ O' (diffROrn-l-double∇ O' P') (const !) (refl , hs)) (triangle-l' O' P' hs))
+
 triangle-l : ∀ {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P : Orn f D F) → OrnEq (O ⊙ diffOrn-l O P) ⌈ O ⊗ P ⌉
-triangle-l {I} {J} {K} {e} {f} O P = (λ { (ok j , k) → refl }) , (λ { (ok j , k) hs → ≡-to-≅ (aux (Orn.comp O (ok j)) (Orn.comp P k) hs) })
-  where
-    aux : {D' : RDesc I} {E' : RDesc J} {F' : RDesc K} (O' : ROrn e D' E') (P' : ROrn f D' F')
-          (hs : Ṡ (toRDesc (pcROrn O' P'))) → erase-Ṡ (scROrn O' (diffROrn-l O' P')) hs ≡ erase-Ṡ (toROrn (pcROrn O' P')) hs
-    aux (ṿ eeqs) (ṿ feqs)  _           = refl
-    aux (ṿ eeqs) (Δ T P')  (t , hs)    = aux (ṿ eeqs) (P' t) hs
-    aux (σ S O') (σ .S P') (s , hs)    = cong (_,_ s) (aux (O' s) (P' s) hs)
-    aux (σ S O') (Δ T P')  (t , hs)    = aux (σ S O') (P' t) hs
-    aux (σ S O') (∇ s P')  hs          = cong (_,_ s) (aux (O' s) P' hs)
-    aux (Δ T O') P'        (t , hs)    = aux (O' t) P' hs
-    aux (∇ s O') (σ S P')  hs          = cong (_,_ s) (aux O' (P' s) hs)
-    aux (∇ s O') (Δ T P')  (t , hs)    = trans (cong (_,_ s) (shift-Δ O' (λ t → diffROrn-l (∇ s O') (P' t)) (const !) (t , hs)))
-                                               (aux (∇ s O') (P' t) hs)
-    aux (∇ s O') (∇ .s P') (refl , hs) = cong (_,_ s) (trans (shift-Δ O' (diffROrn-l-double∇ O' P') (const !) (refl , hs)) (aux O' P' hs))
+triangle-l {I} {J} {K} {e} {f} O P = (λ { (ok j , k) → refl }) , (λ { (ok j , k) hs → ≡-to-≅ (triangle-l' (Orn.comp O (ok j)) (Orn.comp P k) hs) })
+
+triangle-r' : {I J K : Set} {e : J → I} {f : K → I} {D' : RDesc I} {E' : RDesc J} {F' : RDesc K} (O' : ROrn e D' E') (P' : ROrn f D' F') →
+              erase-Ṡ (scROrn P' (diffROrn-r O' P')) ≐ erase-Ṡ (toROrn (pcROrn O' P'))
+triangle-r' (ṿ eeqs) (ṿ feqs)  _           = refl
+triangle-r' (ṿ eeqs) (Δ T P')  (t , hs)    = triangle-r' (ṿ eeqs) (P' t) hs
+triangle-r' (σ S O') (σ .S P') (s , hs)    = cong (_,_ s) (triangle-r' (O' s) (P' s) hs)
+triangle-r' (σ S O') (Δ T P')  (t , hs)    = triangle-r' (σ S O') (P' t) hs
+triangle-r' (σ S O') (∇ s P')  hs          = cong (_,_ s) (triangle-r' (O' s) P' hs)
+triangle-r' (Δ T O') P'        (t , hs)    = trans (shift-Δ P' (λ t → diffROrn-r (O' t) P') (const !) (t , hs)) (triangle-r' (O' t) P' hs)
+triangle-r' (∇ s O') (σ S P')  hs          = cong (_,_ s) (triangle-r' O' (P' s) hs)
+triangle-r' (∇ s O') (Δ T P')  (t , hs)    = triangle-r' (∇ s O') (P' t) hs
+triangle-r' (∇ s O') (∇ .s P') (refl , hs) = cong (_,_ s) (trans (shift-Δ P' (diffROrn-r-double∇ O' P') (const !) (refl , hs)) (triangle-r' O' P' hs))
 
 triangle-r : ∀ {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P : Orn f D F) → OrnEq (P ⊙ diffOrn-r O P) ⌈ O ⊗ P ⌉
-triangle-r {I} {J} {K} {e} {f} O P = (λ { (j , ok k) → refl }) , (λ { (j , ok k) hs → ≡-to-≅ (aux (Orn.comp O j) (Orn.comp P (ok k)) hs) })
-  where
-    aux : {D' : RDesc I} {E' : RDesc J} {F' : RDesc K} (O' : ROrn e D' E') (P' : ROrn f D' F')
-          (hs : Ṡ (toRDesc (pcROrn O' P'))) → erase-Ṡ (scROrn P' (diffROrn-r O' P')) hs ≡ erase-Ṡ (toROrn (pcROrn O' P')) hs
-    aux (ṿ eeqs) (ṿ feqs)  _           = refl
-    aux (ṿ eeqs) (Δ T P')  (t , hs)    = aux (ṿ eeqs) (P' t) hs
-    aux (σ S O') (σ .S P') (s , hs)    = cong (_,_ s) (aux (O' s) (P' s) hs)
-    aux (σ S O') (Δ T P')  (t , hs)    = aux (σ S O') (P' t) hs
-    aux (σ S O') (∇ s P')  hs          = cong (_,_ s) (aux (O' s) P' hs)
-    aux (Δ T O') P'        (t , hs)    = trans (shift-Δ P' (λ t → diffROrn-r (O' t) P') (const !) (t , hs)) (aux (O' t) P' hs)
-    aux (∇ s O') (σ S P')  hs          = cong (_,_ s) (aux O' (P' s) hs)
-    aux (∇ s O') (Δ T P')  (t , hs)    = aux (∇ s O') (P' t) hs
-    aux (∇ s O') (∇ .s P') (refl , hs) = cong (_,_ s) (trans (shift-Δ P' (diffROrn-r-double∇ O' P') (const !) (refl , hs)) (aux O' P' hs))
+triangle-r {I} {J} {K} {e} {f} O P = (λ { (j , ok k) → refl }) , (λ { (j , ok k) hs → ≡-to-≅ (triangle-r' (Orn.comp O j) (Orn.comp P (ok k)) hs) })
+
+Ōrn-slice : {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} → Orn e D E → Slice Ōrn (I , D)
+Ōrn-slice {I} {J} {e} {D} {E} O = slice (J , E) (e , O)
+
+erase-Ṡ-ok-und : {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) {i : I} (j : e ⁻¹ i) (h : Ṡ (Desc.comp E (und j))) →
+                 erase-Ṡ (Orn.comp O (ok (und j))) h ≅ erase-Ṡ (Orn.comp O j) h
+erase-Ṡ-ok-und O (ok j) h = hrefl
+
+module PullbackInŌrn {I J K : Set} {e : J → I} {f : K → I} {D : Desc I} {E : Desc J} {F : Desc K} (O : Orn e D E) (P  : Orn f D F) where
+
+  Ōrn-square : Square Ōrn (Ōrn-slice O) (Ōrn-slice P)
+  Ōrn-square = span (slice (e ⋈ f , ⌊ O ⊗ P ⌋) (pull , ⌈ O ⊗ P ⌉))
+                    (sliceMorphism (π₁ , diffOrn-l O P) (triangle-l O P))
+                    (sliceMorphism (π₂ , diffOrn-r O P) (triangle-r O P))
+  
+  iso-in-Fam-to : {F' : RDesc K} {i : I} (P' : ROrn f (Desc.comp D i) F') {j : J} (jkeq : e j ≡ i)
+                  (h : Ṡ (Desc.comp E j)) (h' : Ṡ F') → erase-Ṡ (Orn.comp O (ok j)) h ≅ erase-Ṡ P' h' → Ṡ (toRDesc (pcROrn (Orn.comp O (from≡ e jkeq)) P'))
+  iso-in-Fam-to P' {j} refl h h' heq = Iso.from Fun (Ṡ-pcROrn-iso (Orn.comp O (ok j)) P') ((h , h') , ≅-to-≡ heq)
+
+  iso-in-Fam-to-triangle-c :
+    {F' : RDesc K} {i : I} (P' : ROrn f (Desc.comp D i) F') {j : J} (jkeq : e j ≡ i)
+    (h : Ṡ (Desc.comp E j)) (h' : Ṡ F') (heq : erase-Ṡ (Orn.comp O (ok j)) h ≅ erase-Ṡ P' h') →
+    erase-Ṡ (toROrn (pcROrn (Orn.comp O (from≡ e jkeq)) P')) ≐ erase-Ṡ P' ∘ erase-Ṡ (diffROrn-r (Orn.comp O (from≡ e jkeq)) P') →
+    erase-Ṡ (toROrn (pcROrn (Orn.comp O (from≡ e jkeq)) P')) (iso-in-Fam-to P' jkeq h h' heq) ≅ erase-Ṡ P' h'
+  iso-in-Fam-to-triangle-c P' {j} refl h h' heq eeq =
+    let O' = Orn.comp O (ok j)
+    in  ≡-to-≅ (trans (eeq (Ṡ-pcROrn-comp O' P' ((h , h') , ≅-to-≡ heq)))
+                      (cong (erase-Ṡ P') (trans (med-triangle-r O' P' (Ṡ-pcROrn-comp (Orn.comp O (ok j)) P' ((h , h') , ≅-to-≡ heq)))
+                                                (cong (proj₂ ∘ proj₁) (Iso.to-from-inverse Fun (Ṡ-pcROrn-iso O' P') ((h , h') , ≅-to-≡ heq))))))
+
+  iso-in-Fam-to-triangle-l :
+    {F' : RDesc K} {i : I} (P' : ROrn f (Desc.comp D i) F') {j : J} (jkeq : e j ≡ i)
+    (h : Ṡ (Desc.comp E j)) (h' : Ṡ F') (heq : erase-Ṡ (Orn.comp O (ok j)) h ≅ erase-Ṡ P' h') →
+    erase-Ṡ (diffROrn-l (Orn.comp O (from≡ e jkeq)) P') (iso-in-Fam-to P' jkeq h h' heq) ≅ h
+  iso-in-Fam-to-triangle-l P' {j} refl h h' heq =
+    let O' = Orn.comp O (ok j)
+    in  ≡-to-≅ (trans (med-triangle-l O' P' (Ṡ-pcROrn-comp (Orn.comp O (ok j)) P' ((h , h') , ≅-to-≡ heq)))
+                      (cong (proj₁ ∘ proj₁) (Iso.to-from-inverse Fun (Ṡ-pcROrn-iso O' P') ((h , h') , ≅-to-≡ heq))))
+
+  iso-in-Fam-to-triangle-r :
+    {F' : RDesc K} {i : I} (P' : ROrn f (Desc.comp D i) F') {j : J} (jkeq : e j ≡ i)
+    (h : Ṡ (Desc.comp E j)) (h' : Ṡ F') (heq : erase-Ṡ (Orn.comp O (ok j)) h ≅ erase-Ṡ P' h') →
+    erase-Ṡ (diffROrn-r (Orn.comp O (from≡ e jkeq)) P') (iso-in-Fam-to P' jkeq h h' heq) ≅ h'
+  iso-in-Fam-to-triangle-r P' {j} refl h h' heq =
+    let O' = Orn.comp O (ok j)
+    in  ≡-to-≅ (trans (med-triangle-r O' P' (Ṡ-pcROrn-comp (Orn.comp O (ok j)) P' ((h , h') , ≅-to-≡ heq)))
+                      (cong (proj₂ ∘ proj₁) (Iso.to-from-inverse Fun (Ṡ-pcROrn-iso O' P') ((h , h') , ≅-to-≡ heq))))
+
+  iso-in-Fam-from :
+    {i : I} {j : e ⁻¹ i} {k : f ⁻¹ i} (p : Ṡ (toRDesc (pcROrn (Orn.comp O j) (Orn.comp P k)))) →
+    Σ[ hs ∶ Ṡ (Desc.comp E (und j)) × Ṡ (Desc.comp F (und k)) ] erase-Ṡ (Orn.comp O (ok (und j))) (proj₁ hs) ≅ erase-Ṡ (Orn.comp P (ok (und k))) (proj₂ hs)
+  iso-in-Fam-from {i} {j} {k} p =
+    let ((h , h') , heq) = Iso.to Fun (Ṡ-pcROrn-iso (Orn.comp O j) (Orn.comp P k)) p
+    in  (h , h') , htrans (erase-Ṡ-ok-und O j (proj₁ (proj₁ (Ṡ-pcROrn-decomp (Orn.comp O j) (Orn.comp P k) p))))
+                          (htrans (≡-to-≅ heq) (hsym (erase-Ṡ-ok-und P k (proj₂ (proj₁ (Ṡ-pcROrn-decomp (Orn.comp O j) (Orn.comp P k) p))))))
+
+  iso-in-Fam-from-to-inverse :
+    {F' : RDesc K} {i : I} (P' : ROrn f (Desc.comp D i) F') {j : J} (jkeq : e j ≡ i)
+    (h : Ṡ (Desc.comp E j)) (h' : Ṡ F') (heq : erase-Ṡ (Orn.comp O (ok j)) h ≅ erase-Ṡ P' h') →
+    (proj₁ (Ṡ-pcROrn-decomp (Orn.comp O (from≡ e jkeq)) P' (iso-in-Fam-to P' jkeq h h' heq)) ,
+     htrans (erase-Ṡ-ok-und O (from≡ e jkeq) (proj₁ (proj₁ (Ṡ-pcROrn-decomp (Orn.comp O (from≡ e jkeq)) P' (iso-in-Fam-to P' jkeq h h' heq)))))
+            (htrans (≡-to-≅ (proj₂ (Ṡ-pcROrn-decomp (Orn.comp O (from≡ e jkeq)) P' (iso-in-Fam-to P' jkeq h h' heq)))) hrefl)
+       ∶ (Σ[ hs ∶ Ṡ (Desc.comp E (und (from≡ e jkeq))) × Ṡ F' ] erase-Ṡ (Orn.comp O (ok (und (from≡ e jkeq)))) (proj₁ hs) ≅ erase-Ṡ P' (proj₂ hs)))
+      ≅ ((h , h') , heq ∶ (Σ[ hs ∶ Ṡ (Desc.comp E j) × Ṡ F' ] erase-Ṡ (Orn.comp O (ok j)) (proj₁ hs) ≅ erase-Ṡ P' (proj₂ hs)))
+  iso-in-Fam-from-to-inverse {F'} P' {j} refl h h' heq =
+    ≡-to-≅ (elim-≡ (λ {hs} _ → (proj₁ hs , htrans (≡-to-≅ (proj₂ hs)) hrefl)
+                                 ≡ ((h , h') , heq ∶ (Σ[ hs' ∶ Ṡ (Desc.comp E j) × Ṡ F' ] erase-Ṡ (Orn.comp O (ok j)) (proj₁ hs') ≅ erase-Ṡ P' (proj₂ hs'))))
+                   (cong₂-pair refl (≡-to-≅ (hproof-irrelevance (htrans (≡-to-≅ (≅-to-≡ heq)) hrefl) heq)))
+                   (sym (Iso.to-from-inverse Fun (Ṡ-pcROrn-iso (Orn.comp O (ok j)) P') ((h , h') , ≅-to-≡ heq))))
+
+  iso-in-Fam-to-ok-und :
+    {i : I} {j : J} (k : f ⁻¹ i) (jkeq : e j ≡ f (und k)) (jkeq' : e j ≡ i)
+    (h : Ṡ (Desc.comp E j)) (h' : Ṡ (Desc.comp F (und k)))
+    (heq : erase-Ṡ (Orn.comp O (ok j)) h ≅ erase-Ṡ (Orn.comp P (ok (und k))) h') (heq' : erase-Ṡ (Orn.comp O (ok j)) h ≅ erase-Ṡ (Orn.comp P k) h') →
+    iso-in-Fam-to (Orn.comp P (ok (und k))) jkeq h h' heq ≅ iso-in-Fam-to (Orn.comp P k) jkeq' h h' heq'
+  iso-in-Fam-to-ok-und (ok k) jkeq jkeq' h h' heq heq' =
+    elim-≡ (λ {jkeq''} _ → iso-in-Fam-to (Orn.comp P (ok k)) jkeq h h' heq ≅ iso-in-Fam-to (Orn.comp P (ok k)) jkeq'' h h' heq')
+           (≡-to-≅ (cong (iso-in-Fam-to (Orn.comp P (ok k)) jkeq h h') (hproof-irrelevance heq heq')))
+           (proof-irrelevance jkeq jkeq')
+
+  iso-in-Fam : Iso (SquareCategory Fam (object (SliceMap Shape) (object (SliceMap Norm) (Ōrn-slice O)))
+                                       (object (SliceMap Shape) (object (SliceMap Norm) (Ōrn-slice P))))
+                   (Mix-square (object (SliceMap Shape) (object (SliceMap Norm) (Ōrn-slice O))) (object (SliceMap Shape) (object (SliceMap Norm) (Ōrn-slice P))))
+                   (object (SquareMap Shape) (object (SquareMap Norm) Ōrn-square))
+  iso-in-Fam = record
+    { to   = spanMorphism
+               (sliceMorphism (SquareMorphism-m (Iso.to   _ idx-iso) ,
+                               λ { {(j , k) , jkeq} ((h , h') , heq) → iso-in-Fam-to (Orn.comp P (ok k)) jkeq h h' heq })
+                              (SliceMorphism.triangle (SpanMorphism.m (Iso.to _ idx-iso)) ,
+                               λ { {(j , k) , jkeq} ((h , h') , heq) ._ hrefl →
+                                   iso-in-Fam-to-triangle-c (Orn.comp P (ok k)) jkeq h h' heq
+                                     (λ h'' → trans (sym (triangle-r' (Orn.comp O (from≡ e jkeq)) (Orn.comp P (ok k)) h''))
+                                                    (erase-Ṡ-scROrn (Orn.comp P (ok k)) (diffROrn-r (Orn.comp O (from≡ e jkeq)) (Orn.comp P (ok k))) h'')) }))
+               (SpanMorphism.triangle-l (Iso.to _ idx-iso) ,
+                λ { {(j , k) , jkeq} ((h , h') , heq) ._ hrefl → iso-in-Fam-to-triangle-l (Orn.comp P (ok k)) jkeq h h' heq })
+               (SpanMorphism.triangle-r (Iso.to _ idx-iso) ,
+                λ { {(j , k) , jkeq} ((h , h') , heq) ._ hrefl → iso-in-Fam-to-triangle-r (Orn.comp P (ok k)) jkeq h h' heq })
+    ; from = spanMorphism
+               (sliceMorphism (SquareMorphism-m (Iso.from _ idx-iso) , iso-in-Fam-from)
+                              (SliceMorphism.triangle (SpanMorphism.m (Iso.from _ idx-iso)) ,
+                               λ { {j , k} h ._ hrefl →
+                                   htrans (erase-Ṡ-ok-und P k (proj₂ (proj₁ (Ṡ-pcROrn-decomp (Orn.comp O j) (Orn.comp P k) h))))
+                                          (≡-to-≅ (trans (trans (cong (erase-Ṡ (Orn.comp P k)) (sym (med-triangle-r (Orn.comp O j) (Orn.comp P k) h)))
+                                                                (sym (erase-Ṡ-scROrn (Orn.comp P k) (diffROrn-r (Orn.comp O j) (Orn.comp P k)) h)))
+                                                         (triangle-r' (Orn.comp O j) (Orn.comp P k) h))) }))
+               ((SpanMorphism.triangle-l (Iso.from _ idx-iso)) ,
+                λ { {j , k} h ._ hrefl → ≡-to-≅ (sym (med-triangle-l (Orn.comp O j) (Orn.comp P k) h)) })
+               ((SpanMorphism.triangle-r (Iso.from _ idx-iso)) ,
+                λ { {j , k} h ._ hrefl → ≡-to-≅ (sym (med-triangle-r (Orn.comp O j) (Orn.comp P k) h)) })
+    ; from-to-inverse = Iso.from-to-inverse _ idx-iso ,
+                        λ { {(j , k) , jkeq} ((h , h') , heq) ._ hrefl → iso-in-Fam-from-to-inverse (Orn.comp P (ok k)) jkeq h h' heq }
+    ; to-from-inverse = Iso.to-from-inverse _ idx-iso ,
+                        λ { {ok j , k} h ._ hrefl →
+                            htrans (iso-in-Fam-to-ok-und k _ refl
+                                      (proj₁ (proj₁ (Ṡ-pcROrn-decomp (Orn.comp O (ok j)) (Orn.comp P k) h)))
+                                      (proj₂ (proj₁ (Ṡ-pcROrn-decomp (Orn.comp O (ok j)) (Orn.comp P k) h))) _
+                                      (≡-to-≅ (proj₂ (Ṡ-pcROrn-decomp (Orn.comp O (ok j)) (Orn.comp P k) h))))
+                                   (≡-to-≅ (trans (cong (Ṡ-pcROrn-comp (Orn.comp O (ok j)) (Orn.comp P k)) (cong₂-pair refl (≡-to-≅ (proof-irrelevance _ _))))
+                                                  (Iso.from-to-inverse Fun (Ṡ-pcROrn-iso (Orn.comp O (ok j)) (Orn.comp P k)) h))) } }
+    where idx-iso : Iso (SquareCategory Fun (slice J e) (slice K f)) (STP-square e f) (⋈-square e f)
+          idx-iso = terminal-iso (SquareCategory Fun (slice J e) (slice K f)) (STP-square e f) (⋈-square e f) (STP-is-pullback e f) (⋈-is-pullback e f)
+
+  Fam-pullback : Pullback Fam (object (SliceMap Shape) (object (SliceMap Norm) (Ōrn-slice O))) (object (SliceMap Shape) (object (SliceMap Norm) (Ōrn-slice P)))
+                              (object (SquareMap Shape) (object (SquareMap Norm) Ōrn-square))
+  Fam-pullback = let s = object (SliceMap Shape) (object (SliceMap Norm) (Ōrn-slice O))
+                     t = object (SliceMap Shape) (object (SliceMap Norm) (Ōrn-slice P))
+                 in  iso-terminal (SquareCategory Fam s t) (Mix-square s t) (object (SquareMap Shape) (object (SquareMap Norm) Ōrn-square))
+                                                           (canonPullback s t) iso-in-Fam
+
+  ḞḢTrans-pullback : Pullback ḞḢTrans (object (SliceMap Norm) (Ōrn-slice O)) (object (SliceMap Norm) (Ōrn-slice P)) (object (SquareMap Norm) Ōrn-square)
+  ḞḢTrans-pullback = Shape-reflects-pullback (object (SliceMap Norm) (Ōrn-slice O)) (object (SliceMap Norm) (Ōrn-slice P))
+                                             (object (SquareMap Norm) Ōrn-square) Fam-pullback
 
 module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P : Orn f D F) where
 
@@ -338,7 +497,7 @@ module IsPullback {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P
     L-square = object (SpanMap (SliceMap FamI)) (span p' p'-to-l p'-to-r)
 
     L-to-⋈ : SpanMorphism (SliceCategory Fun I) (slice J e) (slice K f) L-square (⋈-square e f)
-    L-to-⋈ = proj₁ (⋈-is-Pullback e f L-square)
+    L-to-⋈ = proj₁ (⋈-is-pullback e f L-square)
 
     integrate :
       {i : L} → (t : proj₂ (Slice.T p') i) →
@@ -401,7 +560,7 @@ module IsPullback {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P
                                   (span p' p'-to-l p'-to-r) (span p p-to-l p-to-r))
                         p'-to-p
     uniqueness med' =
-      proj₂ (⋈-is-Pullback e f L-square)
+      proj₂ (⋈-is-pullback e f L-square)
         (spanMorphism
            (sliceMorphism (FamMorphism.e (SliceMorphism.m (SpanMorphism.m med')))
                           (FamMorphismEq.e (SliceMorphism.triangle (SpanMorphism.m med'))))
@@ -429,7 +588,7 @@ module IsPullback {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P
                                         (FamMorphism.e (SliceMorphism.m (SpanMorphism.m med')) i) refl refl)
                        (≡-to-≅ (Integration.integrate-inv O P _ _ _ _)))))
 
-  ⊗-is-Pullback : Pullback Fam l r ⊗-square
-  ⊗-is-Pullback (span p' l' r') = Universality.p'-to-p p' l' r' , Universality.uniqueness p' l' r'
+  ⊗-is-pullback : Pullback Fam l r ⊗-square
+  ⊗-is-pullback (span p' l' r') = Universality.p'-to-p p' l' r' , Universality.uniqueness p' l' r'
 
-open IsPullback public using (⊗-is-Pullback)
+open IsPullback public using (⊗-is-pullback)

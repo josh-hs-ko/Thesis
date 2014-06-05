@@ -29,7 +29,9 @@ If each of the components of a natural transformation from `F` to `G` is part of
 #### Prelude.Category.Pullback
 A pullback is defined to be a terminal object in the category of spans over a slice category.
 Any two pullback objects are isomorphic.
-Pullback preservation of functors is also defined.
+Pullback preservation and reflection of functors are also defined.
+A functor preserves pullback if it preserves a particular pullback.
+Composition of two pullback-reflecting functors is also pullback-reflecting.
 
 #### Prelude.Category.Pullback.Midpoint
 *The Midpoint Lemma:*
@@ -69,7 +71,7 @@ The forgetful functor from `Fam` to `Fun` preserves this pullback, and is hence 
 Various ways to construct isomorphisms in `Fun`.
 
 #### Prelude.InverseImage
-Definition of inverse images of a function, and definition of set-theoretic pullbacks in terms of inverse images.
+Definition of inverse images of a function, and definitions of set-theoretic pullbacks in terms of inverse images and quotients.
 
 #### Prelude.Preorder
 Converse of preorders, setoids derived from preorders, implication as a preorder, and indirect reasoning combinators.
@@ -121,6 +123,9 @@ the equivalence between this category and the category `Ōrn` of descriptions an
 
 #### Ornament.Horizontal.Equivalence
 Ornamental equivalences about horizontal ornaments.
+
+#### Ornament.Horizontal.Pullback
+`Shape : Functor ḞḢTrans Fam` reflects pullbacks.
 
 #### Ornament.ParallelComposition
 Parallel composition of ornaments.

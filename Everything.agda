@@ -29,6 +29,7 @@ import Ornament.Equivalence
 import Ornament.Horizontal
 import Ornament.Horizontal.Category
 import Ornament.Horizontal.Equivalence
+import Ornament.Horizontal.Pullback
 import Ornament.ParallelComposition
 import Ornament.ParallelComposition.Pullback
 import Ornament.ParallelComposition.Swap

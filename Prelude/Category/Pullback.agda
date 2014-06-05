@@ -61,34 +61,13 @@ particular-pullback-preservation :
   {ℓ₀ ℓ₁ ℓ₂ ℓ₃ ℓ₄ ℓ₅ : Level} {C : Category {ℓ₀} {ℓ₁} {ℓ₂}} {D : Category {ℓ₃} {ℓ₄} {ℓ₅}} (F : Functor C D) →
   ({B : Object C} (f g : Slice C B) → Σ[ s ∶ Square C f g ] Pullback C f g s × Pullback D (object (SliceMap F) f) (object (SliceMap F) g) (object (SquareMap F) s)) →
   Pullback-preserving F
-particular-pullback-preservation {C = C} {D} F particular {B} f g s' ps' s'' =
-  Iso.to D' iso ·D' proj₁ (pFs s'') ,
-  λ m → begin
-          Iso.to D' iso ·D' proj₁ (pFs s'')
-            ≈⟨ cong-l D' {f = proj₁ (pFs s'')} {Iso.from D' iso ·D' m} (Iso.to D' iso) (proj₂ (pFs s'') (Iso.from D' iso ·D' m)) ⟩
-          Iso.to D' iso ·D' (Iso.from D' iso ·D' m)
-            ≈⟨ Setoid.sym setoid {(Iso.to D' iso ·D' Iso.from D' iso) ·D' m} {Iso.to D' iso ·D' (Iso.from D' iso ·D' m)}
-                 (assoc D' (Iso.to D' iso) (Iso.from D' iso) m) ⟩
-          (Iso.to D' iso ·D' Iso.from D' iso) ·D' m
-            ≈⟨ cong-r D' {f = Iso.to D' iso ·D' Iso.from D' iso} {id D'} m (Iso.to-from-inverse D' iso) ⟩
-          id D' ·D' m
-            ≈⟨ id-l D' m ⟩
-          m
-        ∎
-  where
-    D'  : Category
-    D'  = SquareCategory D (object (SliceMap F) f) (object (SliceMap F) g)
-    open Category D' using () renaming (_·_ to _·D'_)
-    s   : Square C f g
-    s   = proj₁ (particular f g)
-    ps  : Pullback C f g s
-    ps  = proj₁ (proj₂ (particular f g))
-    pFs : Pullback D (object (SliceMap F) f) (object (SliceMap F) g) (object (SquareMap F) s)
-    pFs = proj₂ (proj₂ (particular f g))
-    iso : Iso D' (object (SquareMap F) s) (object (SquareMap F) s')
-    iso = iso-preserving (SquareMap F) (terminal-iso (SquareCategory C f g) s s' ps ps')
-    setoid = Morphism D' s'' (object (SquareMap F) s')
-    open EqReasoning setoid
+particular-pullback-preservation {C = C} {D} F particular {B} f g s' ps' =
+  let s   = proj₁ (particular f g)
+  in  iso-terminal (SquareCategory D (object (SliceMap F) f) (object (SliceMap F) g))
+                   (object (SquareMap F) s)
+                   (object (SquareMap F) s')
+                   (proj₂ (proj₂ (particular f g)))
+                   (iso-preserving (SquareMap F) (terminal-iso (SquareCategory C f g) s s' (proj₁ (proj₂ (particular f g))) ps'))
 
 Pullback-reflecting :
   {ℓ₀ ℓ₁ ℓ₂ ℓ₃ ℓ₄ ℓ₅ : Level} {C : Category {ℓ₀} {ℓ₁} {ℓ₂}} {D : Category {ℓ₃} {ℓ₄} {ℓ₅}} → (F : Functor C D) → Set (ℓ₀ ⊔ ℓ₁ ⊔ ℓ₂ ⊔ ℓ₃ ⊔ ℓ₄ ⊔ ℓ₅)

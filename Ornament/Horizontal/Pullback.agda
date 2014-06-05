@@ -123,9 +123,7 @@ module ShapeReflectsPullback
                                                          ḢTrans.s (FḢTrans.comp (proj₂ (SquareMorphism-m med')) l) h
     FḢTrans-unique l h = FamMorphismEq.u Fam-med-equals-med' h h hrefl
 
-
 Shape-reflects-pullback : Pullback-reflecting Shape
 Shape-reflects-pullback f g s p s' =
   ShapeReflectsPullback.med f g s p s' ,
-  λ med' → ShapeReflectsPullback.Uniqueness.index-unique   f g s p s' med' ,
-           ShapeReflectsPullback.Uniqueness.FḢTrans-unique f g s p s' med'
+  λ med' → ShapeReflectsPullback.Uniqueness.index-unique f g s p s' med' , ShapeReflectsPullback.Uniqueness.FḢTrans-unique f g s p s' med'

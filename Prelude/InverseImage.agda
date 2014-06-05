@@ -47,6 +47,9 @@ und≡ {f = f} {x = ok x} {x'} eq = ≅-to-≡ (und≡' x' eq)
 elim-⁻¹ : {A B : Set} {f : A → B} (P : ∀ {b} → f ⁻¹ b → Set) → (∀ a → P (ok a)) → ∀ {b} (a : f ⁻¹ b) → P a
 elim-⁻¹ P p (ok a) = p a
 
+ok-und : {A B : Set} {f : A → B} {y : B} (x : f ⁻¹ y) → ok {f = f} (und x) ≅ x
+ok-und (ok x) = hrefl
+
 
 --------
 -- set-theoretic pullbacks
