@@ -2,7 +2,6 @@
 -- Any two pullback objects are isomorphic.
 -- Pullback preservation and reflection of functors are also defined.
 -- A functor preserves pullback if it preserves a particular pullback.
--- Composition of two pullback-reflecting functors is also pullback-reflecting.
 
 module Prelude.Category.Pullback where
 
@@ -74,13 +73,3 @@ Pullback-reflecting :
 Pullback-reflecting {C = C} {D} F =
   {B : Object C} (f g : Slice C B) (s : Square C f g) →
   Pullback D (object (SliceMap F) f) (object (SliceMap F) g) (object (SpanMap (SliceMap F)) s) → Pullback C f g s
-
-Pullback-reflecting-comp :
-  {ℓ₀ ℓ₁ ℓ₂ ℓ₃ ℓ₄ ℓ₅ ℓ₆ ℓ₇ ℓ₈ : Level}
-  {C : Category {ℓ₀} {ℓ₁} {ℓ₂}} {D : Category {ℓ₃} {ℓ₄} {ℓ₅}}  {E : Category {ℓ₆} {ℓ₇} {ℓ₈}} →
-  (F : Functor D E) → Pullback-reflecting F → (G : Functor C D) → Pullback-reflecting G → Pullback-reflecting (F ⋆ G)
-Pullback-reflecting-comp F prF G prG f g s p =
-  prG f g s
-    (prF (object (SliceMap G) f) (object (SliceMap G) g) (object (SquareMap G) s)
-      (λ s' → spanMorphism (SpanMorphism.m (proj₁ (p s'))) (SpanMorphism.triangle-l (proj₁ (p s'))) (SpanMorphism.triangle-r (proj₁ (p s'))) ,
-              λ { (spanMorphism m l r) → proj₂ (p s') (spanMorphism m l r) }))

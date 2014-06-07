@@ -71,13 +71,13 @@ module OptimisedPredicate {I J} {e : J → I} {D E} (O : Orn e D E) where
   μE-pullback  p = μE-med p , μE-med-unique p
 
   OptP-square : Square Fun l r
-  OptP-square = object (SpanMap (SliceMap FamF)) (IsPullback.⊗-square O ⌈ singOrn D ⌉)
+  OptP-square = object (SpanMap (SliceMap FamF)) (⊗-Fam-square O ⌈ singOrn D ⌉)
 
   OptP-pullback : Pullback Fun l r OptP-square
   OptP-pullback = FamF-preserves-pullback (object (SliceMap Ind) (slice _ (_ , O)))
                                           (object (SliceMap Ind) (slice _ (_ , ⌈ singOrn D ⌉)))
                                           _
-                                          (⊗-is-Pullback O ⌈ singOrn D ⌉)
+                                          (⊗-is-Fam-pullback O ⌈ singOrn D ⌉)
 
   wholeIso : Iso Fun (Σ (e ⋈ proj₁) (μ OptPD)) (Σ J (μ E))
   wholeIso = pullback-iso Fun l r OptP-square μE-square OptP-pullback μE-pullback

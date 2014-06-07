@@ -43,29 +43,29 @@ private
   r : Slice Fam (object Ind (Σ I (μ D) , ⌊ singOrn D ⌋))
   r = object (SliceMap Ind) (slice _ (_ , diffOrn-r P ⌈ singOrn D ⌉))
 
-  O⊗P-square : Square Fam (IsPullback.l O P) (IsPullback.r O P)
-  O⊗P-square = IsPullback.⊗-square O P
+  O⊗P-square : Square Fam (object (SliceMap Ind) (Ōrn-slice O)) (object (SliceMap Ind) (Ōrn-slice P))
+  O⊗P-square = ⊗-Fam-square O P
 
-  O⊗P-terminal : Pullback Fam (IsPullback.l O P) (IsPullback.r O P) O⊗P-square
-  O⊗P-terminal = ⊗-is-Pullback O P
+  O⊗P-terminal : Pullback Fam (object (SliceMap Ind) (Ōrn-slice O)) (object (SliceMap Ind) (Ōrn-slice P)) O⊗P-square
+  O⊗P-terminal = ⊗-is-Fam-pullback O P
 
-  OptP-O-square : Square Fam (IsPullback.l O ⌈ singOrn D ⌉) (IsPullback.r O ⌈ singOrn D ⌉)
-  OptP-O-square = IsPullback.⊗-square O ⌈ singOrn D ⌉
+  OptP-O-square : Square Fam (object (SliceMap Ind) (Ōrn-slice O)) (object (SliceMap Ind) (Ōrn-slice ⌈ singOrn D ⌉))
+  OptP-O-square = ⊗-Fam-square O ⌈ singOrn D ⌉
 
-  OptP-O-terminal : Pullback Fam (IsPullback.l O ⌈ singOrn D ⌉) (IsPullback.r O ⌈ singOrn D ⌉) OptP-O-square
-  OptP-O-terminal = ⊗-is-Pullback O ⌈ singOrn D ⌉
+  OptP-O-terminal : Pullback Fam (object (SliceMap Ind) (Ōrn-slice O)) (object (SliceMap Ind) (Ōrn-slice ⌈ singOrn D ⌉)) OptP-O-square
+  OptP-O-terminal = ⊗-is-Fam-pullback O ⌈ singOrn D ⌉
 
-  OptP-P-square : Square Fam (IsPullback.l P ⌈ singOrn D ⌉) (IsPullback.r P ⌈ singOrn D ⌉)
-  OptP-P-square = IsPullback.⊗-square P ⌈ singOrn D ⌉
+  OptP-P-square : Square Fam (object (SliceMap Ind) (Ōrn-slice P)) (object (SliceMap Ind) (Ōrn-slice ⌈ singOrn D ⌉))
+  OptP-P-square = ⊗-Fam-square P ⌈ singOrn D ⌉
 
-  OptP-P-terminal : Pullback Fam (IsPullback.l P ⌈ singOrn D ⌉) (IsPullback.r P ⌈ singOrn D ⌉) OptP-P-square
-  OptP-P-terminal = ⊗-is-Pullback P ⌈ singOrn D ⌉
+  OptP-P-terminal : Pullback Fam (object (SliceMap Ind) (Ōrn-slice P)) (object (SliceMap Ind) (Ōrn-slice ⌈ singOrn D ⌉)) OptP-P-square
+  OptP-P-terminal = ⊗-is-Fam-pullback P ⌈ singOrn D ⌉
 
-  OptP-O⊗P-square : Square Fam (IsPullback.l ⌈ O ⊗ P ⌉ ⌈ singOrn D ⌉) (IsPullback.r ⌈ O ⊗ P ⌉ ⌈ singOrn D ⌉)
-  OptP-O⊗P-square = IsPullback.⊗-square ⌈ O ⊗ P ⌉ ⌈ singOrn D ⌉
+  OptP-O⊗P-square : Square Fam (object (SliceMap Ind) (Ōrn-slice ⌈ O ⊗ P ⌉)) (object (SliceMap Ind) (Ōrn-slice ⌈ singOrn D ⌉))
+  OptP-O⊗P-square = ⊗-Fam-square ⌈ O ⊗ P ⌉ ⌈ singOrn D ⌉
 
-  OptP-O⊗P-terminal : Pullback Fam (IsPullback.l ⌈ O ⊗ P ⌉ ⌈ singOrn D ⌉) (IsPullback.r ⌈ O ⊗ P ⌉ ⌈ singOrn D ⌉) OptP-O⊗P-square
-  OptP-O⊗P-terminal = ⊗-is-Pullback ⌈ O ⊗ P ⌉ ⌈ singOrn D ⌉
+  OptP-O⊗P-terminal : Pullback Fam (object (SliceMap Ind) (Ōrn-slice ⌈ O ⊗ P ⌉)) (object (SliceMap Ind) (Ōrn-slice ⌈ singOrn D ⌉)) OptP-O⊗P-square
+  OptP-O⊗P-terminal = ⊗-is-Fam-pullback ⌈ O ⊗ P ⌉ ⌈ singOrn D ⌉
 
   mp-square : Square Fam l r
   mp-square = object (SpanMap (SliceMap SliceU))
@@ -92,7 +92,7 @@ private
   l' : pull {J} {K} {I} {e} {f} ⋈ proj₁ {A = I} {μ D} → e ⋈ proj₁ {A = I} {μ D}
   l' = SliceMorphism.m
          (SpanMorphism.m
-          (proj₁ (⋈-is-Pullback e (proj₁ {A = I} {μ D})
+          (proj₁ (⋈-is-pullback e (proj₁ {A = I} {μ D})
             (let X×Y×Z = ⋈-square (pull {J} {K} {I} {e} {f}) (proj₁ {A = I} {μ D})
                  X×Y   = ⋈-square e f
              in span (Span.M X×Y×Z) (Category._·_ (SliceCategory Fun I) (Span.l X×Y) (Span.l X×Y×Z)) (Span.r X×Y×Z)))))
@@ -100,7 +100,7 @@ private
   r' : pull {J} {K} {I} {e} {f} ⋈ proj₁ {A = I} {μ D} → f ⋈ proj₁ {A = I} {μ D}
   r' = SliceMorphism.m
          (SpanMorphism.m
-          (proj₁ (⋈-is-Pullback f (proj₁ {A = I} {μ D})
+          (proj₁ (⋈-is-pullback f (proj₁ {A = I} {μ D})
             (let X×Y×Z = ⋈-square (pull {J} {K} {I} {e} {f}) (proj₁ {A = I} {μ D})
                  X×Y   = ⋈-square e f
              in span (Span.M X×Y×Z) (Category._·_ (SliceCategory Fun I) (Span.r X×Y) (Span.l X×Y×Z)) (Span.r X×Y×Z)))))

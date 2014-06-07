@@ -67,16 +67,16 @@ Shape = record
   ; id-preserving   = frefl , λ _ _ → id
   ; comp-preserving = λ f g → frefl , λ { h .h hrefl → hrefl } }
 
-Norm : Functor Ōrn ḞḢTrans
-Norm = record
+Erase : Functor Ōrn ḞḢTrans
+Erase = record
   { object   = id
   ; morphism = λ { {J , E} {I , D} (e , O) → e , wrap λ j → ḢTrans-normal (Orn.comp O (ok j)) }
   ; ≈-respecting    = id
   ; id-preserving   = λ { {I , D} → frefl , λ i h → ≡-to-≅ (trans (erase'-idROrn (Desc.comp D i) (const !) h) (Ḣ-map-preserves-id (Desc.comp D i) h)) }
   ; comp-preserving = λ { {K , F} {J , E} {I , D} (e , O) (f , P) → frefl , λ k h → ≡-to-≅ (erase-Ṡ-scROrn (Orn.comp O (ok (f k))) (Orn.comp P (ok k)) h) } }
 
-ḢOrn : Functor ḞḢTrans Ōrn
-ḢOrn = record
+Normal : Functor ḞḢTrans Ōrn
+Normal = record
   { object   = id
   ; morphism = λ { (e , ts) → e , wrap λ { {._} (ok j) → ḢROrn (FḢTrans.comp ts j) } }
   ; ≈-respecting    = λ { {J , E} {I , D} {e , ts} {f , us} (efeq , tueqs) →
@@ -84,8 +84,8 @@ Norm = record
   ; id-preserving   = λ { {I , D} → frefl , λ i → ḢROrn-id (Desc.comp D i) }
   ; comp-preserving = λ { (e , ts) (f , us) → frefl , λ k → ḢROrn-comp (FḢTrans.comp ts (f k)) (FḢTrans.comp us k) } }
 
-ḢOrn-Norm-inverse : Iso (Funct Ōrn Ōrn) (ḢOrn ⋆ Norm) (idF Ōrn)
-ḢOrn-Norm-inverse = record
+Normal-Erase-inverse : Iso (Funct Ōrn Ōrn) (Normal ⋆ Erase) (idF Ōrn)
+Normal-Erase-inverse = record
   { to   = record { comp = λ { (I , D) → id , idOrn D }
                   ; naturality =  λ { {J , E} {I , D} (e , O) →
                                       OrnEq-trans (O ⊙ idOrn E) O (idOrn D ⊙ normOrn O)
@@ -104,8 +104,8 @@ Norm = record
   ; from-to-inverse = λ { (I , D) → ⊙-id-l (idOrn D) }
   ; to-from-inverse = λ { (I , D) → ⊙-id-l (idOrn D) } }
 
-Norm-ḢOrn-inverse : Iso (Funct ḞḢTrans ḞḢTrans) (Norm ⋆ ḢOrn) (idF ḞḢTrans)
-Norm-ḢOrn-inverse = record
+Erase-Normal-inverse : Iso (Funct ḞḢTrans ḞḢTrans) (Erase ⋆ Normal) (idF ḞḢTrans)
+Erase-Normal-inverse = record
   { to   = record { comp = λ { (I , D) → id , wrap λ i → ḢTrans-id }
                   ; naturality = λ { (e , ts) → frefl , λ j h → ≡-to-≅ (sym (erase-Ṡ-ḢROrn (FḢTrans.comp ts j) h)) } }
   ; from = record { comp = λ { (I , D) → id , wrap λ i → ḢTrans-id }
@@ -115,7 +115,7 @@ Norm-ḢOrn-inverse = record
 
 Ōrn-ḞḢTrans-equiv : CatEquiv Ōrn ḞḢTrans
 Ōrn-ḞḢTrans-equiv = record
-  { to   = Norm
-  ; from = ḢOrn
-  ; from-to-inverse = ḢOrn-Norm-inverse
-  ; to-from-inverse = Norm-ḢOrn-inverse }
+  { to   = Erase
+  ; from = Normal
+  ; from-to-inverse = Normal-Erase-inverse
+  ; to-from-inverse = Erase-Normal-inverse }

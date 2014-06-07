@@ -1,4 +1,5 @@
--- `Shape : Functor ḞḢTrans Fam` reflects pullbacks.
+-- `Shape : Functor ḞḢTrans Fam` and `Erase : Functor Ōrn ḞḢTrans` reflect pullbacks.
+-- This file can take a long time to typecheck.
 
 module Ornament.Horizontal.Pullback where
 
@@ -12,6 +13,7 @@ open import Prelude.Category.Pullback
 open import Description
 open import Description.Horizontal
 open import Ornament
+open import Ornament.SequentialComposition
 open import Ornament.Equivalence
 open import Ornament.Category
 open import Ornament.Horizontal
@@ -21,7 +23,7 @@ open import Function using (_∘_)
 open import Data.Product using (Σ; _,_; proj₁; proj₂)
 open import Data.List using (List; []; _∷_; map)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; trans; sym)
-open import Relation.Binary.HeterogeneousEquality using (_≅_) renaming (refl to hrefl)
+open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅) renaming (refl to hrefl; trans to htrans)
 
 open Functor
 
@@ -127,3 +129,28 @@ Shape-reflects-pullback : Pullback-reflecting Shape
 Shape-reflects-pullback f g s p s' =
   ShapeReflectsPullback.med f g s p s' ,
   λ med' → ShapeReflectsPullback.Uniqueness.index-unique f g s p s' med' , ShapeReflectsPullback.Uniqueness.FḢTrans-unique f g s p s' med'
+
+Erase-reflects-pullback : Pullback-reflecting Erase
+Erase-reflects-pullback f g s ps s' =
+  let m = proj₁ (ps (object (SquareMap Erase) s'))
+  in  spanMorphism (sliceMorphism (proj₁ (SquareMorphism-m m) , wrap λ { {._} (ok l) → ḢROrn (FḢTrans.comp (proj₂ (SquareMorphism-m m)) l) })
+                                  (proj₁ (SliceMorphism.triangle (SpanMorphism.m m)) ,
+                                   λ j hs → htrans (≡-to-≅ (erase-Ṡ-scROrn (Orn.comp (proj₂ (Slice.s (Span.M s))) (ok (proj₁ (SquareMorphism-m m) j)))
+                                                                           (ḢROrn (FḢTrans.comp (proj₂ (SquareMorphism-m m)) j)) hs))
+                                                   (htrans (≡-to-≅ (cong (erase-Ṡ (Orn.comp (proj₂ (Slice.s (Span.M s))) (ok (proj₁ (SquareMorphism-m m) j))))
+                                                                         (erase-Ṡ-ḢROrn (FḢTrans.comp (proj₂ (SquareMorphism-m m)) j) hs)))
+                                                           (proj₂ (SliceMorphism.triangle (SpanMorphism.m m)) j hs))))
+                   (proj₁ (SpanMorphism.triangle-l m) ,
+                    λ j hs → htrans (≡-to-≅ (erase-Ṡ-scROrn (Orn.comp (proj₂ (SliceMorphism.m (Span.l s))) (ok (proj₁ (SquareMorphism-m m) j)))
+                                                            (ḢROrn (FḢTrans.comp (proj₂ (SquareMorphism-m m)) j)) hs))
+                                    (htrans (≡-to-≅ (cong (erase-Ṡ (Orn.comp (proj₂ (SliceMorphism.m (Span.l s))) (ok (proj₁ (SquareMorphism-m m) j))))
+                                                          (erase-Ṡ-ḢROrn (FḢTrans.comp (proj₂ (SquareMorphism-m m)) j) hs)))
+                                            (proj₂ (SpanMorphism.triangle-l m) j hs)))
+                   (proj₁ (SpanMorphism.triangle-r m) ,
+                    λ j hs → htrans (≡-to-≅ (erase-Ṡ-scROrn (Orn.comp (proj₂ (SliceMorphism.m (Span.r s))) (ok (proj₁ (SquareMorphism-m m) j)))
+                                                            (ḢROrn (FḢTrans.comp (proj₂ (SquareMorphism-m m)) j)) hs))
+                                    (htrans (≡-to-≅ (cong (erase-Ṡ (Orn.comp (proj₂ (SliceMorphism.m (Span.r s))) (ok (proj₁ (SquareMorphism-m m) j))))
+                                                          (erase-Ṡ-ḢROrn (FḢTrans.comp (proj₂ (SquareMorphism-m m)) j) hs)))
+                                            (proj₂ (SpanMorphism.triangle-r m) j hs))) ,
+      λ m' → let meq = proj₂ (ps (object (SquareMap Erase) s')) (morphism (SquareMap Erase) m')
+             in  proj₁ meq , λ j hs → htrans (≡-to-≅ (erase-Ṡ-ḢROrn (FḢTrans.comp (proj₂ (SquareMorphism-m m)) j) hs)) (proj₂ meq j hs)

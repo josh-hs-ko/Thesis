@@ -1,4 +1,4 @@
--- Parallel composition of ornaments, when mapped to `Fam` by the functor `Ind`, forms a pullback.
+-- Parallel composition of ornaments gives rise to a pullback square in `Ōrn`, which is also a pullback when mapped to `Fam` by the functor `Ind`.
 -- This file can take a long time to typecheck.
 
 module Ornament.ParallelComposition.Pullback where
@@ -151,7 +151,8 @@ triangle-l' (∇ s O') (Δ T P')  (t , hs)    = trans (cong (_,_ s) (shift-Δ O'
 triangle-l' (∇ s O') (∇ .s P') (refl , hs) = cong (_,_ s) (trans (shift-Δ O' (diffROrn-l-double∇ O' P') (const !) (refl , hs)) (triangle-l' O' P' hs))
 
 triangle-l : ∀ {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P : Orn f D F) → OrnEq (O ⊙ diffOrn-l O P) ⌈ O ⊗ P ⌉
-triangle-l {I} {J} {K} {e} {f} O P = (λ { (ok j , k) → refl }) , (λ { (ok j , k) hs → ≡-to-≅ (triangle-l' (Orn.comp O (ok j)) (Orn.comp P k) hs) })
+triangle-l {I} {J} {K} {e} {f} O P = SliceMorphism.triangle (Span.l (⋈-square e f)) ,
+                                     λ { (ok j , k) hs → ≡-to-≅ (triangle-l' (Orn.comp O (ok j)) (Orn.comp P k) hs) }
 
 triangle-r' : {I J K : Set} {e : J → I} {f : K → I} {D' : RDesc I} {E' : RDesc J} {F' : RDesc K} (O' : ROrn e D' E') (P' : ROrn f D' F') →
               erase-Ṡ (scROrn P' (diffROrn-r O' P')) ≐ erase-Ṡ (toROrn (pcROrn O' P'))
@@ -166,7 +167,8 @@ triangle-r' (∇ s O') (Δ T P')  (t , hs)    = triangle-r' (∇ s O') (P' t) hs
 triangle-r' (∇ s O') (∇ .s P') (refl , hs) = cong (_,_ s) (trans (shift-Δ P' (diffROrn-r-double∇ O' P') (const !) (refl , hs)) (triangle-r' O' P' hs))
 
 triangle-r : ∀ {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P : Orn f D F) → OrnEq (P ⊙ diffOrn-r O P) ⌈ O ⊗ P ⌉
-triangle-r {I} {J} {K} {e} {f} O P = (λ { (j , ok k) → refl }) , (λ { (j , ok k) hs → ≡-to-≅ (triangle-r' (Orn.comp O j) (Orn.comp P (ok k)) hs) })
+triangle-r {I} {J} {K} {e} {f} O P = SliceMorphism.triangle (Span.r (⋈-square e f)) ,
+                                     λ { (j , ok k) hs → ≡-to-≅ (triangle-r' (Orn.comp O j) (Orn.comp P (ok k)) hs) }
 
 Ōrn-slice : {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} → Orn e D E → Slice Ōrn (I , D)
 Ōrn-slice {I} {J} {e} {D} {E} O = slice (J , E) (e , O)
@@ -247,10 +249,10 @@ module PullbackInŌrn {I J K : Set} {e : J → I} {f : K → I} {D : Desc I} {E 
            (≡-to-≅ (cong (iso-in-Fam-to (Orn.comp P (ok k)) jkeq h h') (hproof-irrelevance heq heq')))
            (proof-irrelevance jkeq jkeq')
 
-  iso-in-Fam : Iso (SquareCategory Fam (object (SliceMap Shape) (object (SliceMap Norm) (Ōrn-slice O)))
-                                       (object (SliceMap Shape) (object (SliceMap Norm) (Ōrn-slice P))))
-                   (Mix-square (object (SliceMap Shape) (object (SliceMap Norm) (Ōrn-slice O))) (object (SliceMap Shape) (object (SliceMap Norm) (Ōrn-slice P))))
-                   (object (SquareMap Shape) (object (SquareMap Norm) Ōrn-square))
+  iso-in-Fam : Iso (SquareCategory Fam (object (SliceMap Shape) (object (SliceMap Erase) (Ōrn-slice O)))
+                                       (object (SliceMap Shape) (object (SliceMap Erase) (Ōrn-slice P))))
+                   (Mix-square (object (SliceMap Shape) (object (SliceMap Erase) (Ōrn-slice O))) (object (SliceMap Shape) (object (SliceMap Erase) (Ōrn-slice P))))
+                   (object (SquareMap Shape) (object (SquareMap Erase) Ōrn-square))
   iso-in-Fam = record
     { to   = spanMorphism
                (sliceMorphism (SquareMorphism-m (Iso.to   _ idx-iso) ,
@@ -289,16 +291,19 @@ module PullbackInŌrn {I J K : Set} {e : J → I} {f : K → I} {D : Desc I} {E 
     where idx-iso : Iso (SquareCategory Fun (slice J e) (slice K f)) (STP-square e f) (⋈-square e f)
           idx-iso = terminal-iso (SquareCategory Fun (slice J e) (slice K f)) (STP-square e f) (⋈-square e f) (STP-is-pullback e f) (⋈-is-pullback e f)
 
-  Fam-pullback : Pullback Fam (object (SliceMap Shape) (object (SliceMap Norm) (Ōrn-slice O))) (object (SliceMap Shape) (object (SliceMap Norm) (Ōrn-slice P)))
-                              (object (SquareMap Shape) (object (SquareMap Norm) Ōrn-square))
-  Fam-pullback = let s = object (SliceMap Shape) (object (SliceMap Norm) (Ōrn-slice O))
-                     t = object (SliceMap Shape) (object (SliceMap Norm) (Ōrn-slice P))
-                 in  iso-terminal (SquareCategory Fam s t) (Mix-square s t) (object (SquareMap Shape) (object (SquareMap Norm) Ōrn-square))
+  Fam-pullback : Pullback Fam (object (SliceMap Shape) (object (SliceMap Erase) (Ōrn-slice O))) (object (SliceMap Shape) (object (SliceMap Erase) (Ōrn-slice P)))
+                              (object (SquareMap Shape) (object (SquareMap Erase) Ōrn-square))
+  Fam-pullback = let s = object (SliceMap Shape) (object (SliceMap Erase) (Ōrn-slice O))
+                     t = object (SliceMap Shape) (object (SliceMap Erase) (Ōrn-slice P))
+                 in  iso-terminal (SquareCategory Fam s t) (Mix-square s t) (object (SquareMap Shape) (object (SquareMap Erase) Ōrn-square))
                                                            (canonPullback s t) iso-in-Fam
 
-  ḞḢTrans-pullback : Pullback ḞḢTrans (object (SliceMap Norm) (Ōrn-slice O)) (object (SliceMap Norm) (Ōrn-slice P)) (object (SquareMap Norm) Ōrn-square)
-  ḞḢTrans-pullback = Shape-reflects-pullback (object (SliceMap Norm) (Ōrn-slice O)) (object (SliceMap Norm) (Ōrn-slice P))
-                                             (object (SquareMap Norm) Ōrn-square) Fam-pullback
+  ḞḢTrans-pullback : Pullback ḞḢTrans (object (SliceMap Erase) (Ōrn-slice O)) (object (SliceMap Erase) (Ōrn-slice P)) (object (SquareMap Erase) Ōrn-square)
+  ḞḢTrans-pullback = Shape-reflects-pullback (object (SliceMap Erase) (Ōrn-slice O)) (object (SliceMap Erase) (Ōrn-slice P))
+                                             (object (SquareMap Erase) Ōrn-square) Fam-pullback
+
+  Ōrn-pullback : Pullback Ōrn (Ōrn-slice O) (Ōrn-slice P) Ōrn-square
+  Ōrn-pullback = Erase-reflects-pullback (Ōrn-slice O) (Ōrn-slice P) Ōrn-square ḞḢTrans-pullback
 
 module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P : Orn f D F) where
 
@@ -429,7 +434,7 @@ module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (
                       (j , from≡ f feq) refl (und-from≡ f feq)) ≡ p
       aux' j eeq refl p ih heq eeqs feqs ps = ih _ refl refl
       aux : ∀ {D' E' F'} (O' : ROrn e D' E') (P' : ROrn f D' F') (ps : ⟦ toRDesc (pcROrn O' P') ⟧ (μ ⌊ O ⊗ P ⌋)) →
-            All (toRDesc (pcROrn O' P')) integrate-inv-Ind ps →(eq : _) →
+            All (toRDesc (pcROrn O' P')) integrate-inv-Ind ps → (eq : _) →
             proj₁ (integrate-aux O' P'
                     (erase (diffROrn-l O' P')
                            (mapFold ⌊ O ⊗ P ⌋ (toRDesc (pcROrn O' P')) (λ {jk} → ornAlg (diffOrn-l O P) {jk}) ps))
@@ -454,34 +459,28 @@ module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (
       aux (∇ s O')          (∇ s' P')        ps          ihs        eq with cong proj₁ eq
       aux (∇ s O')          (∇ .s P')        (refl , ps) ihs        eq | refl = cong (_,_ refl) (aux O' P' ps ihs (cong-proj₂ eq))
 
-module IsPullback {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P : Orn f D F) where
+module PullbackInFam {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P : Orn f D F) where
 
   open Category
   open Functor
 
   l : Slice Fam (object Ind (I , D))
-  l = slice (object Ind (J , E)) (morphism Ind (e , O))
+  l = object (SliceMap Ind) (Ōrn-slice O)
 
   r : Slice Fam (object Ind (I , D))
-  r = slice (object Ind (K , F)) (morphism Ind (f , P))
-
-  p : Slice Fam (object Ind (I , D))
-  p = slice (object Ind (e ⋈ f , ⌊ O ⊗ P ⌋)) (morphism Ind (pull , ⌈ O ⊗ P ⌉))
-
-  p-to-l : SliceMorphism Fam (object Ind (I , D)) p l
-  p-to-l = sliceMorphism (π₁ , forget (diffOrn-l O P))
-                         (SliceMorphism.triangle (Span.l (⋈-square e f)) ,
-                          ≑-trans refl (≑-sym (≐-to-≑ (forget-after-forget O (diffOrn-l O P))))
-                                       (pointwise (OrnEq-forget (O ⊙ diffOrn-l O P) ⌈ O ⊗ P ⌉ (triangle-l O P))))
-
-  p-to-r : SliceMorphism Fam (object Ind (I , D)) p r
-  p-to-r = sliceMorphism (π₂ , forget (diffOrn-r O P))
-                         (SliceMorphism.triangle (Span.r (⋈-square e f)) ,
-                          ≑-trans refl (≑-sym (≐-to-≑ (forget-after-forget P (diffOrn-r O P))))
-                                       (pointwise (OrnEq-forget (P ⊙ diffOrn-r O P) ⌈ O ⊗ P ⌉ (triangle-r O P))))
+  r = object (SliceMap Ind) (Ōrn-slice P)
 
   ⊗-square : Square Fam l r
-  ⊗-square = span p p-to-l p-to-r
+  ⊗-square = object (SquareMap Ind) (PullbackInŌrn.Ōrn-square O P)
+
+  p : Slice Fam (object Ind (I , D))
+  p = Span.M ⊗-square
+
+  p-to-l : SliceMorphism Fam (object Ind (I , D)) p l
+  p-to-l = Span.l ⊗-square
+
+  p-to-r : SliceMorphism Fam (object Ind (I , D)) p r
+  p-to-r = Span.r ⊗-square
 
   module Universality (p' : Slice Fam (object Ind (I , D)))
                       (p'-to-l : SliceMorphism Fam (object Ind (I , D)) p' l)
@@ -591,4 +590,9 @@ module IsPullback {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (P
   ⊗-is-pullback : Pullback Fam l r ⊗-square
   ⊗-is-pullback (span p' l' r') = Universality.p'-to-p p' l' r' , Universality.uniqueness p' l' r'
 
-open IsPullback public using (⊗-is-pullback)
+open PullbackInFam public using () renaming (⊗-square to ⊗-Fam-square; ⊗-is-pullback to ⊗-is-Fam-pullback)
+
+Ind-preserves-pullback : Pullback-preserving Ind
+Ind-preserves-pullback =
+  particular-pullback-preservation Ind λ { (slice _ (_ , O)) (slice _ (_ , P)) → PullbackInŌrn.Ōrn-square O P ,
+                                                                                 PullbackInŌrn.Ōrn-pullback O P , ⊗-is-Fam-pullback O P }

@@ -31,7 +31,6 @@ A pullback is defined to be a terminal object in the category of spans over a sl
 Any two pullback objects are isomorphic.
 Pullback preservation and reflection of functors are also defined.
 A functor preserves pullback if it preserves a particular pullback.
-Composition of two pullback-reflecting functors is also pullback-reflecting.
 
 #### Prelude.Category.Pullback.Midpoint
 *The Midpoint Lemma:*
@@ -125,13 +124,14 @@ the equivalence between this category and the category `Ōrn` of descriptions an
 Ornamental equivalences about horizontal ornaments.
 
 #### Ornament.Horizontal.Pullback
-`Shape : Functor ḞḢTrans Fam` reflects pullbacks.
+`Shape : Functor ḞḢTrans Fam` and `Erase : Functor Ōrn ḞḢTrans` reflect pullbacks.
+This file can take a long time to typecheck.
 
 #### Ornament.ParallelComposition
 Parallel composition of ornaments.
 
 #### Ornament.ParallelComposition.Pullback
-Parallel composition of ornaments, when mapped to `Fam` by the functor `Ind`, forms a pullback.
+Parallel composition of ornaments gives rise to a pullback square in `Ōrn`, which is also a pullback when mapped to `Fam` by the functor `Ind`.
 This file can take a long time to typecheck.
 
 #### Ornament.ParallelComposition.Swap
