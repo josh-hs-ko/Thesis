@@ -6,7 +6,7 @@ open import Relation.Binary using (Preorder; module Preorder; Setoid; module Set
 
 open import Level
 open import Function using (id; _∘_; flip)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; swap)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_; swap)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl) renaming (setoid to ≡-Setoid)
 
 

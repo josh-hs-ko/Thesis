@@ -9,7 +9,7 @@ open import Ornament hiding ([]; _∷_)
 open import Examples.Nat
 
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_)
+open import Data.Product using (Σ; Σ-syntax; _,_)
 
 
 --------
@@ -17,7 +17,7 @@ open import Data.Product using (Σ; _,_)
 
 ListOD : Set → OrnDesc ⊤ ! NatD
 ListOD A = wrap λ _ → σ ListTag λ { `nil   → ṿ tt
-                                  ; `cons  → Δ[ _ ∶ A ] ṿ (ok tt , tt) }
+                                  ; `cons  → Δ[ _ ∈ A ] ṿ (ok tt , tt) }
 
 List : Set → Set
 List A = μ ⌊ ListOD A ⌋ tt

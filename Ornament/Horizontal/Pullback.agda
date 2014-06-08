@@ -20,7 +20,7 @@ open import Ornament.Horizontal
 open import Ornament.Horizontal.Category
 
 open import Function using (_∘_)
-open import Data.Product using (Σ; _,_; proj₁; proj₂)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂)
 open import Data.List using (List; []; _∷_; map)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; trans; sym)
 open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅) renaming (refl to hrefl; trans to htrans)

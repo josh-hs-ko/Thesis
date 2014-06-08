@@ -11,7 +11,7 @@ open import Ornament.Equivalence
 
 open import Function using (_∘_; const; id)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; proj₁; proj₂)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂)
 open import Data.List using (List; []; _∷_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; sym; trans; cong; cong₂; module ≡-Reasoning)
 open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅; ≅-to-≡; module ≅-Reasoning) renaming (refl to hrefl)
@@ -19,12 +19,12 @@ open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅; ≅-
 
 scROrn : ∀ {I J K} {e : J → I} {f : K → J} {D E F} → ROrn e D E → ROrn f E F → ROrn (e ∘ f) D F
 scROrn (ṿ eeqs) (ṿ feqs) = ṿ (Ė-trans eeqs feqs)
-scROrn (ṿ eeqs) (Δ T P)  = Δ[ t ∶ T ] scROrn (ṿ eeqs) (P t)
+scROrn (ṿ eeqs) (Δ T P)  = Δ[ t ∈ T ] scROrn (ṿ eeqs) (P t)
 scROrn (σ S O)  (σ .S P) = σ S λ s → scROrn (O s) (P s)
-scROrn (σ S O)  (Δ T P)  = Δ[ t ∶ T ] scROrn (σ S O) (P t)
+scROrn (σ S O)  (Δ T P)  = Δ[ t ∈ T ] scROrn (σ S O) (P t)
 scROrn (σ S O)  (∇ s P)  = ∇ s (scROrn (O s) P)
-scROrn (Δ T O)  (σ .T P) = Δ[ t ∶ T ] scROrn (O t) (P t)
-scROrn (Δ T O)  (Δ T' P) = Δ[ t ∶ T' ] scROrn (Δ T O) (P t)
+scROrn (Δ T O)  (σ .T P) = Δ[ t ∈ T ] scROrn (O t) (P t)
+scROrn (Δ T O)  (Δ T' P) = Δ[ t ∈ T' ] scROrn (Δ T O) (P t)
 scROrn (Δ T O)  (∇ t P)  = scROrn (O t) P
 scROrn (∇ s O)  P        = ∇ s (scROrn O P)
 

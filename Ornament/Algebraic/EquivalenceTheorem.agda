@@ -32,7 +32,7 @@ open import Relation.AlgCategory
 
 open import Function using (id; const; flip; _∘_)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; curry; uncurry) renaming (map to _**_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_; curry; uncurry) renaming (map to _**_)
 open import Data.List using (List; []; _∷_; map)
 open import Relation.Binary using (module Setoid)
 import Relation.Binary.PreorderReasoning as PreorderReasoning
@@ -458,8 +458,8 @@ hom-to-OrnEq-aux :
   {I : Set} (D : RDesc I) {J K : I → Set} (P : ℘ (⟦ D ⟧ J)) (Q : ℘ (⟦ D ⟧ K))
   (h : J ⇉ K) → ((js : ⟦ D ⟧ J) → P js → Q (mapF D h js)) →
   ROrn (id ** h) (toRDesc (algROrn D Q)) (toRDesc (algROrn D P))
-hom-to-OrnEq-aux (ṿ is)  {J} P Q h p-to-q = Δ[ js ∶ Ṗ is J ] ∇ (Ṗ-map h is js) (Δ[ p ∶ P js ] ∇ (p-to-q js p) (ṿ (hom-to-OrnEq-aux-ṿ is js h)))
-hom-to-OrnEq-aux (σ S D)     P Q h p-to-q = σ[ s ∶ S ] hom-to-OrnEq-aux (D s) (curry P s) (curry Q s) h (curry p-to-q s)
+hom-to-OrnEq-aux (ṿ is)  {J} P Q h p-to-q = Δ[ js ∈ Ṗ is J ] ∇ (Ṗ-map h is js) (Δ[ p ∈ P js ] ∇ (p-to-q js p) (ṿ (hom-to-OrnEq-aux-ṿ is js h)))
+hom-to-OrnEq-aux (σ S D)     P Q h p-to-q = σ[ s ∈ S ] hom-to-OrnEq-aux (D s) (curry P s) (curry Q s) h (curry p-to-q s)
 
 hom-to-OrnEq :
   {I : Set} (D : Desc I) {J K : I → Set} (R : Ḟ D J ↝ J) (S : Ḟ D K ↝ K)

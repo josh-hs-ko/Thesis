@@ -13,7 +13,7 @@ open import Prelude.Category.Span
 
 open import Level
 open import Function using (_∘_)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_)
 open import Relation.Binary using (module Setoid)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 import Relation.Binary.EqReasoning as EqReasoning
@@ -58,7 +58,7 @@ Pullback-preserving {C = C} {D} F =
 
 particular-pullback-preservation :
   {ℓ₀ ℓ₁ ℓ₂ ℓ₃ ℓ₄ ℓ₅ : Level} {C : Category {ℓ₀} {ℓ₁} {ℓ₂}} {D : Category {ℓ₃} {ℓ₄} {ℓ₅}} (F : Functor C D) →
-  ({B : Object C} (f g : Slice C B) → Σ[ s ∶ Square C f g ] Pullback C f g s × Pullback D (object (SliceMap F) f) (object (SliceMap F) g) (object (SquareMap F) s)) →
+  ({B : Object C} (f g : Slice C B) → Σ[ s ∈ Square C f g ] Pullback C f g s × Pullback D (object (SliceMap F) f) (object (SliceMap F) g) (object (SquareMap F) s)) →
   Pullback-preserving F
 particular-pullback-preservation {C = C} {D} F particular {B} f g s' ps' =
   let s   = proj₁ (particular f g)

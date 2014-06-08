@@ -14,7 +14,7 @@ open import Ornament.Equivalence
 
 open import Function using (const)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; proj₁; proj₂)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; sym; cong; cong₂; module ≡-Reasoning)
 open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅; ≅-to-≡)
 
@@ -27,7 +27,7 @@ open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅; ≅-
             ḢTrans-app (ḢTrans-id {I} {D}) (const !) hs
               ≡⟨ refl ⟩
             Ḣ-comp D (const ⊤) (Ḣ-decomp D (const ⊤) hs)
-              ≡⟨ Iso.from-to-inverse Fun (Ḣ-iso D (const ⊤)) hs ⟩
+              ≡⟨ Iso.from-to-inverse (Ḣ-iso D (const ⊤)) hs ⟩
             hs
               ≡⟨ sym (Ḣ-map-preserves-id D hs) ⟩
             Ḣ-map D ! hs

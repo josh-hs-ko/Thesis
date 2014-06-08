@@ -1,6 +1,6 @@
 -- The ordering property and balancing properties of leftist heaps are treated separately when needed.
 
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_) renaming (map to _**_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_) renaming (map to _**_)
 open import Relation.Nullary using (¬_; Dec; yes; no)
 
 module Examples.LeftistHeap
@@ -49,7 +49,7 @@ Tree = μ TreeD tt
 
 LTreeOD : OrnDesc Nat ! TreeD
 LTreeOD = wrap λ { (ok (con (`nil  ,     _))) → ∇ `nil  (ṿ tt)
-                 ; (ok (con (`cons , r , _))) → ∇ `node (Δ[ r' ∶ Nat ] Δ[ _ ∶ r ≤' r' ] ṿ (ok r' , ok r , tt)) }
+                 ; (ok (con (`cons , r , _))) → ∇ `node (Δ[ r' ∈ Nat ] Δ[ _ ∈ r ≤' r' ] ṿ (ok r' , ok r , tt)) }
 
 
 --------
@@ -57,7 +57,7 @@ LTreeOD = wrap λ { (ok (con (`nil  ,     _))) → ∇ `nil  (ṿ tt)
 
 ITreeOD : Set → OrnDesc ⊤ ! TreeD
 ITreeOD A = wrap λ _ → σ TreeTag λ { `nil  → ṿ tt
-                                   ; `node → Δ[ _ ∶ A ] ṿ (ok tt , ok tt , tt) }
+                                   ; `node → Δ[ _ ∈ A ] ṿ (ok tt , ok tt , tt) }
 
 ITree : Set → Set
 ITree A = μ ⌊ ITreeOD A ⌋ tt
@@ -70,7 +70,7 @@ toList : {A I : Set} {D : Desc I} → Orn ! ⌊ ITreeOD A ⌋ D → {i : I} → 
 toList {A} {I} {D} O = Upgrade.u upg preorder (λ _ _ → tt)
   where
     upg : Upgrade (ITree A → List A) ({i : I} → μ D i → List A)
-    upg = ∀⁺[[ i ∶ I ]] FRefinement.comp (RSem' O) (ok i) ⇀ toUpgrade Ref-refl
+    upg = ∀⁺[[ i ∈ I ]] FRefinement.comp (RSem' O) (ok i) ⇀ toUpgrade Ref-refl
 
 
 --------
@@ -78,7 +78,7 @@ toList {A} {I} {D} O = Upgrade.u upg preorder (λ _ _ → tt)
 
 HeapOD : OrnDesc Val ! ⌊ ITreeOD Val ⌋
 HeapOD = wrap λ { (ok b) → σ TreeTag λ { `nil  → ṿ tt
-                                       ; `node → σ[ x ∶ Val ] Δ[ _ ∶ b ≤ x ] ṿ (ok x , ok x , tt) } }
+                                       ; `node → σ[ x ∈ Val ] Δ[ _ ∈ b ≤ x ] ṿ (ok x , ok x , tt) } }
 
 Heap : Val → Set
 Heap = μ ⌊ HeapOD ⌋
@@ -108,9 +108,9 @@ lhrelax = Upgrade.u upg id (λ b'≤b _ → relax b'≤b ** id)
   where ref : (b : Val) (r : Nat) → Refinement Tree (LHeap b r)
         ref b r = FRefinement.comp (toFRefinement (⊗-FSwap TreeD-HeapD ⌈ LTreeOD ⌉ id-FSwap id-FSwap)) (ok (ok b , ok r))
         upg : Upgrade (Tree → Tree) ({b b' : Val} → b' ≤ b → {r : Nat} → LHeap b r → LHeap b' r)
-        upg = ∀⁺[[ b ∶ Val ]] ∀⁺[[ b' ∶ Val ]] ∀⁺[ _ ∶ b' ≤ b ] ∀⁺[[ r ∶ Nat ]] ref b r ⇀ toUpgrade (ref b' r)
+        upg = ∀⁺[[ b ∈ Val ]] ∀⁺[[ b' ∈ Val ]] ∀⁺[ _ ∈ b' ≤ b ] ∀⁺[[ r ∈ Nat ]] ref b r ⇀ toUpgrade (ref b' r)
 
-makeT : (x : Val) {r₀ : Nat} → LHeap x r₀ → {r₁ : Nat} → LHeap x r₁ → Σ[ r ∶ Nat ] LHeap x r
+makeT : (x : Val) {r₀ : Nat} → LHeap x r₀ → {r₁ : Nat} → LHeap x r₁ → Σ[ r ∈ Nat ] LHeap x r
 makeT x {r₀} h₀ {r₁} h₁ with r₀ ≤'? r₁
 makeT x {r₀} h₀ {r₁} h₁ | yes r₀≤r₁ = suc r₀ , con (x , ≤-refl , r₁ , r₀≤r₁ , h₁ , h₀ , tt)
 makeT x {r₀} h₀ {r₁} h₁ | no  r₀≰r₁ = suc r₁ , con (x , ≤-refl , r₀ , ≰'-invert r₀≰r₁ , h₀ , h₁ , tt)
@@ -119,13 +119,13 @@ mutual
 
   merge : {b₀ : Val} {r₀ : Nat} → LHeap b₀ r₀ →
           {b₁ : Val} {r₁ : Nat} → LHeap b₁ r₁ →
-          {b : Val} → b ≤ b₀ → b ≤ b₁ → Σ[ r ∶ Nat ] LHeap b r
+          {b : Val} → b ≤ b₀ → b ≤ b₁ → Σ[ r ∈ Nat ] LHeap b r
   merge {b₀} {con (`nil  ,      _)} h₀ h₁ b≤b₀ b≤b₁ = _ , lhrelax b≤b₁ h₁
   merge {b₀} {con (`cons , r₀ , _)} h₀ h₁ b≤b₀ b≤b₁ = merge' h₀ h₁ b≤b₀ b≤b₁
 
   merge' : {b₀ : Val} {r₀ : Nat} → LHeap b₀ (suc r₀) →
            {b₁ : Val} {r₁ : Nat} → LHeap b₁ r₁ →
-           {b : Val} → b ≤ b₀ → b ≤ b₁ → Σ[ r ∶ Nat ] LHeap b r
+           {b : Val} → b ≤ b₀ → b ≤ b₁ → Σ[ r ∈ Nat ] LHeap b r
   merge' h₀ {b₁} {con (`nil , _)} h₁ b≤b₀ b≤b₁ = _ , lhrelax b≤b₀ h₀
   merge' (con (x₀  , b₀≤x₀   , l₀  , r₀≤l₀   , t₀  , u₀  , _))
          {b₁} {con (`cons , r₁ , _)} (con (x₁ , b₁≤x₁ , l₁ , r₁≤l₁ , t₁ , u₁ , _)) b≤b₀ b≤b₁ =
@@ -136,7 +136,7 @@ mutual
   merge'-with :
     {b₀ : Val} {r₀ : Nat} → (x₀ : Val) (b₀≤x₀ : b₀ ≤ x₀) (l₀ : Nat) (r₀≤l₀ : r₀ ≤' l₀) (t₀ : LHeap x₀ l₀) (u₀ : LHeap x₀ r₀) →
     {b₁ : Val} {r₁ : Nat} → (x₁ : Val) (b₁≤x₁ : b₁ ≤ x₁) (l₁ : Nat) (r₁≤l₁ : r₁ ≤' l₁) (t₁ : LHeap x₁ l₁) (u₁ : LHeap x₁ r₁) →
-    {b : Val} → b ≤ b₀ → b ≤ b₁ → Dec (x₀ ≤ x₁) → Σ[ r ∶ Nat ] LHeap b r
+    {b : Val} → b ≤ b₀ → b ≤ b₁ → Dec (x₀ ≤ x₁) → Σ[ r ∈ Nat ] LHeap b r
   merge'-with {b₀} {r₀} x₀ b₀≤x₀ l₀ r₀≤l₀ t₀ u₀ {b₁} {r₁} x₁ b₁≤x₁ l₁ r₁≤l₁ t₁ u₁ b≤b₀ b≤b₁ (yes x₀≤x₁) =
     _ , lhrelax (≤-trans b≤b₀ b₀≤x₀)
           (proj₂ (makeT x₀ t₀ (proj₂ (merge u₀ {r₁ = suc r₁} (con (x₁ , x₀≤x₁ , l₁ , r₁≤l₁ , t₁ , u₁ , tt)) ≤-refl ≤-refl))))
@@ -144,7 +144,7 @@ mutual
     _ , lhrelax (≤-trans b≤b₁ b₁≤x₁)
           (proj₂ (makeT x₁ t₁ (proj₂ (merge' {r₀ = r₀} (con (x₀ , ≰-invert x₀≰x₁ , l₀ , r₀≤l₀ , t₀ , u₀ , tt)) u₁ ≤-refl ≤-refl))))
 
-insert : (y : Val) {b : Val} {r : Nat} → LHeap b r → {b' : Val} → b' ≤ b → b' ≤ y → Σ[ r' ∶ Nat ] LHeap b' r'
+insert : (y : Val) {b : Val} {r : Nat} → LHeap b r → {b' : Val} → b' ≤ b → b' ≤ y → Σ[ r' ∈ Nat ] LHeap b' r'
 insert y h = merge h {r₁ = suc zero} (con (y , ≤-refl , zero , ≤'-refl , con tt , con tt , tt))
 
 
@@ -153,7 +153,7 @@ insert y h = merge h {r₁ = suc zero} (con (y , ≤-refl , zero , ≤'-refl , c
 
 WLTreeOD : OrnDesc Nat ! TreeD
 WLTreeOD = wrap λ { (ok (con (`nil  ,     _))) → ∇ `nil  (ṿ tt)
-                  ; (ok (con (`cons , n , _))) → ∇ `node (Δ[ l ∶ Nat ] Δ[ r ∶ Nat ] Δ[ _ ∶ r ≤' l ] Δ[ _ ∶ n ≡ l + r ] ṿ (ok l , ok r , tt)) }
+                  ; (ok (con (`cons , n , _))) → ∇ `node (Δ[ l ∈ Nat ] Δ[ r ∈ Nat ] Δ[ _ ∈ r ≤' l ] Δ[ _ ∈ n ≡ l + r ] ṿ (ok l , ok r , tt)) }
 
 
 --------
@@ -170,7 +170,7 @@ wlhrelax = Upgrade.u upg id λ { b'≤b _ → relax b'≤b ** id }
   where ref : (b : Val) (n : Nat) → Refinement Tree (WLHeap b n)
         ref b r = FRefinement.comp (toFRefinement (⊗-FSwap TreeD-HeapD ⌈ WLTreeOD ⌉ id-FSwap id-FSwap)) (ok (ok b , ok r))
         upg : Upgrade (Tree → Tree) ({b b' : Val} → b' ≤ b → {n : Nat} → WLHeap b n → WLHeap b' n)
-        upg = ∀⁺[[ b ∶ Val ]] ∀⁺[[ b' ∶ Val ]] ∀⁺[ _ ∶ b' ≤ b ] ∀⁺[[ n ∶ Nat ]] ref b n ⇀ toUpgrade (ref b' n)
+        upg = ∀⁺[[ b ∈ Val ]] ∀⁺[[ b' ∈ Val ]] ∀⁺[ _ ∈ b' ≤ b ] ∀⁺[[ n ∈ Nat ]] ref b n ⇀ toUpgrade (ref b' n)
 
 
 {-# NO_TERMINATION_CHECK #-}  -- to skip the construction of the well-ordering (_<'_) on natural numbers

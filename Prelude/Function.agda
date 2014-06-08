@@ -7,9 +7,9 @@ module Prelude.Function where
 open import Prelude.Category
 
 open import Level
-open import Function using (_∘_; const; type-signature)
+open import Function using (_∘_; const)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_) renaming (map to _**_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_) renaming (map to _**_)
 open import Relation.Binary using (Setoid)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; sym; trans)
 open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅) renaming (refl to hrefl; cong to hcong; sym to hsym; trans to htrans)
@@ -45,7 +45,7 @@ fcong-r h feq = λ x → feq (h x)
 --------
 -- pointwise heterogeneous equality of functions
 
-_≑_ : ∀ {a b} {A A' : Set a} {B B' : Set b} → (A → B) → (A' → B') → Set a
+_≑_ : ∀ {a b} {A A' : Set a} {B B' : Set b} → (A → B) → (A' → B') → Set (a ⊔ b)
 _≑_ {A = A} {A'} f g = (x : A) (x' : A') → x ≅ x' → f x ≅ g x'
 
 infix 1 _≑_

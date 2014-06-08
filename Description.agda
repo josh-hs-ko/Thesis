@@ -10,7 +10,7 @@ open import Prelude.Product
 
 open import Function using (id; flip; _∘_)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; proj₁; _×_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; _×_)
 open import Data.List using (List; []; _∷_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; cong₂)
 
@@ -19,11 +19,11 @@ data RDesc (I : Set) : Set₁ where
   ṿ   : (is : List I) → RDesc I
   σ   : (S : Set) (D : S → RDesc I) → RDesc I
 
-syntax σ S (λ s → D) = σ[ s ∶ S ] D
+syntax σ S (λ s → D) = σ[ s ∈ S ] D
 
 Ḣ : {I : Set} → RDesc I → (List I → Set) → Set
 Ḣ (ṿ is)  X = X is
-Ḣ (σ S D) X = Σ[ s ∶ S ] Ḣ (D s) X
+Ḣ (σ S D) X = Σ[ s ∈ S ] Ḣ (D s) X
 
 Ṗ : {I : Set} → List I → (I → Set) → Set
 Ṗ []       X = ⊤

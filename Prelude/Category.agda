@@ -9,7 +9,7 @@ open import Prelude.Equality
 
 open import Level
 open import Function using (_∘_)
-open import Data.Product using (Σ; _,_; _×_)
+open import Data.Product using (Σ; Σ-syntax; _,_; _×_)
 open import Relation.Binary using (Setoid)
 import Relation.Binary.EqReasoning as EqReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
@@ -36,7 +36,7 @@ record Category {ℓ₀ ℓ₁ ℓ₂ : Level} : Set (suc (ℓ₀ ⊔ ℓ₁ ⊔
     cong-r : ∀ {X Y Z} {f g : Y ==> Z} (h : X ==> Y) → f ≈ g → (f · h) ≈ (g · h)
 
 Terminal : {ℓ₀ ℓ₁ ℓ₂ : Level} (C : Category {ℓ₀} {ℓ₁} {ℓ₂}) → Category.Object C → Set (ℓ₀ ⊔ ℓ₁ ⊔ ℓ₂)
-Terminal C X = (Y : Object) → Σ[ f ∶ (Y ==> X) ] Unique (Morphism Y X) f
+Terminal C X = (Y : Object) → Σ[ f ∈ (Y ==> X) ] Unique (Morphism Y X) f
   where open Category C
 
 record Functor {ℓ₀ ℓ₁ ℓ₂ ℓ₃ ℓ₄ ℓ₅ : Level} (C : Category {ℓ₀} {ℓ₁} {ℓ₂}) (D : Category {ℓ₃} {ℓ₄} {ℓ₅}) : Set (ℓ₀ ⊔ ℓ₁ ⊔ ℓ₂ ⊔ ℓ₃ ⊔ ℓ₄ ⊔ ℓ₅) where

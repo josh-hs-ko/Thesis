@@ -13,7 +13,7 @@ open import Description.Horizontal
 
 open import Function using (id; flip; const; _∘_)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; curry) renaming (map to _**_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_; curry) renaming (map to _**_)
 open import Data.List using (List; []; _∷_; map)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; trans; sym; cong; cong₂; setoid; proof-irrelevance)
 open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅; ≅-to-≡) renaming (refl to hrefl)
@@ -64,12 +64,12 @@ data ROrn {I J : Set} (e : J → I) : RDesc I → RDesc J → Set₁ where
   Δ   : (T : Set) {D : RDesc I} {E : T → RDesc J} (O : (t : T) → ROrn e D (E t)) → ROrn e D (σ T E)
   ∇   : {S : Set} (s : S) {D : S → RDesc I} {E : RDesc J} (O : ROrn e (D s) E) → ROrn e (σ S D) E
 
-syntax σ S (λ s → O) = σ[ s ∶ S ] O
-syntax Δ T (λ t → O) = Δ[ t ∶ T ] O
+syntax σ S (λ s → O) = σ[ s ∈ S ] O
+syntax Δ T (λ t → O) = Δ[ t ∈ T ] O
 
 idROrn : {I : Set} (D : RDesc I) → ROrn id D D
 idROrn (ṿ is)  = ṿ Ė-refl
-idROrn (σ S D) = σ[ s ∶ S ] idROrn (D s)
+idROrn (σ S D) = σ[ s ∈ S ] idROrn (D s)
 
 Erasure : {I J : Set} (e : J → I) (Y : List J → Set) (X : List I → Set) → Set
 Erasure {I} {J} e Y X = {is : List I} {js : List J} → Ė e js is → Y js → X is
@@ -166,8 +166,8 @@ und-Ṗ = Ṗ-toList und
 
 toRDesc : {I J : Set} {e : J → I} {D : RDesc I} → ROrnDesc J e D → RDesc J
 toRDesc (ṿ {is} js) = ṿ (und-Ṗ is js)
-toRDesc (σ S O)     = σ[ s ∶ S ] toRDesc (O s)
-toRDesc (Δ T O)     = σ[ t ∶ T ] toRDesc (O t)
+toRDesc (σ S O)     = σ[ s ∈ S ] toRDesc (O s)
+toRDesc (Δ T O)     = σ[ t ∈ T ] toRDesc (O t)
 toRDesc (∇ s O)     = toRDesc O
 
 ⌊_⌋ : {I J : Set} {e : J → I} {D : Desc I} → OrnDesc J e D → Desc J
@@ -179,8 +179,8 @@ to≡-Ṗ (i ∷ is) (j , js) = to≡ j ∷ to≡-Ṗ is js
 
 toROrn : {I J : Set} {e : J → I} {D : RDesc I} → (O : ROrnDesc J e D) → ROrn e D (toRDesc O)
 toROrn (ṿ js)  = ṿ (to≡-Ṗ _ js)
-toROrn (σ S O) = σ[ s ∶ S ] toROrn (O s)
-toROrn (Δ T O) = Δ[ t ∶ T ] toROrn (O t)
+toROrn (σ S O) = σ[ s ∈ S ] toROrn (O s)
+toROrn (Δ T O) = Δ[ t ∈ T ] toROrn (O t)
 toROrn (∇ s O) = ∇ s (toROrn O)
 
 ⌈_⌉ : {I J : Set} {e : J → I} {D : Desc I} → (O : OrnDesc J e D) → Orn e D ⌊ O ⌋
@@ -188,7 +188,7 @@ toROrn (∇ s O) = ∇ s (toROrn O)
 
 idROrnDesc : ∀ {I} (D : RDesc I) → ROrnDesc I id D
 idROrnDesc (ṿ is)  = ṿ (generate-Ṗ ok is)
-idROrnDesc (σ S D) = σ[ s ∶ S ] idROrnDesc (D s)
+idROrnDesc (σ S D) = σ[ s ∈ S ] idROrnDesc (D s)
 
 
 --------

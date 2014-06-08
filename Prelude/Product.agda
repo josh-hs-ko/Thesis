@@ -6,23 +6,23 @@ open import Prelude.Function
 import Prelude.Category.Isomorphism as Isomorphism; open Isomorphism Fun
 open import Prelude.Equality
 
-open import Function using (_∘_; type-signature)
-open import Data.Product using (Σ; _,_; _×_; curry) renaming (map to _**_)
+open import Function using (_∘_; _∋_)
+open import Data.Product using (Σ; Σ-syntax; _,_; _×_; curry) renaming (map to _**_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; sym; cong₂)
 open import Relation.Binary.HeterogeneousEquality using (_≅_) renaming (refl to hrefl)
 
 
-cong₂-pair : {A : Set} {B : A → Set} → {a a' : A} {b : B a} {b' : B a'} → a ≡ a' → b ≅ b' → (a , b ∶ Σ A B) ≡ (a' , b')
+cong₂-pair : {A : Set} {B : A → Set} → {a a' : A} {b : B a} {b' : B a'} → a ≡ a' → b ≅ b' → (Σ A B ∋ a , b) ≡ (a' , b')
 cong₂-pair refl hrefl = refl
 
-hcong₂-pair : {A A' B B' : Set} {a : A} {a' : A'} {b : B} {b' : B'} → a ≅ a' → b ≅ b' → (a , b ∶ A × B) ≅ (a' , b' ∶ A' × B')
+hcong₂-pair : {A A' B B' : Set} {a : A} {a' : A'} {b : B} {b' : B'} → a ≅ a' → b ≅ b' → (A × B ∋ a , b) ≅ (A' × B' ∋ a' , b')
 hcong₂-pair hrefl hrefl = hrefl
 
-cong-proj₂ : ∀ {a b} {A : Set a} {B : A → Set b} {x : A} {y y' : B x} → (x , y ∶ Σ A B) ≡ (x , y') → y ≡ y'
+cong-proj₂ : ∀ {a b} {A : Set a} {B : A → Set b} {x : A} {y y' : B x} → (Σ A B ∋ x , y) ≡ (x , y') → y ≡ y'
 cong-proj₂ refl = refl
 
 cong-split : ∀ {a b} {A A' : Set a} {B : Set b} {B' : Set b} →
-             A ≡ A' → B ≡ B' → ∀ {x y x' y'} → (x , y ∶ A × B) ≅ (x' , y' ∶ A' × B') → x ≅ x' × y ≅ y'
+             A ≡ A' → B ≡ B' → ∀ {x y x' y'} → (A × B ∋ x , y) ≅ (A' × B' ∋ x' , y') → x ≅ x' × y ≅ y'
 cong-split refl refl hrefl = hrefl , hrefl
 
 Σ' : {A : Set} (B : A → Set) (C : Σ A B → Set) → A → Set

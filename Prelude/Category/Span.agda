@@ -10,7 +10,7 @@ open import Prelude.Category.Slice
 
 open import Level
 open import Function using (_∘_)
-open import Data.Product using (Σ; _,_; proj₁; _×_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; _×_)
 open import Relation.Binary using (module Setoid)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
@@ -90,15 +90,15 @@ SpanMap F =
 span-mid-iso : {ℓ₀ ℓ₁ ℓ₂ : Level} {C : Category {ℓ₀} {ℓ₁} {ℓ₂}} {L R : Category.Object C} →
                (s : Span C L R) (X : Category.Object C) (i : Iso C (Span.M s) X) → Σ (Span C L R) (Iso (SpanCategory C L R) s)
 span-mid-iso {C = C} {L} {R} (span M l r) X i =
-  span X (l · Iso.from C i) (r · Iso.from C i) ,
-  record { to   = spanMorphism (Iso.to C i)
-                               (Setoid.trans (Morphism M L) (assoc l (Iso.from C i) (Iso.to C i))
-                                                            (Setoid.trans (Morphism M L) (cong-l l (Iso.from-to-inverse C i)) (id-r l)))
-                               (Setoid.trans (Morphism M R) (assoc r (Iso.from C i) (Iso.to C i))
-                                                            (Setoid.trans (Morphism M R) (cong-l r (Iso.from-to-inverse C i)) (id-r r)))
-         ; from = spanMorphism (Iso.from C i) (Setoid.refl (Morphism X L)) (Setoid.refl (Morphism X R))
-         ; from-to-inverse = Iso.from-to-inverse C i
-         ; to-from-inverse = Iso.to-from-inverse C i }
+  span X (l · Iso.from i) (r · Iso.from i) ,
+  record { to   = spanMorphism (Iso.to i)
+                               (Setoid.trans (Morphism M L) (assoc l (Iso.from i) (Iso.to i))
+                                                            (Setoid.trans (Morphism M L) (cong-l l (Iso.from-to-inverse i)) (id-r l)))
+                               (Setoid.trans (Morphism M R) (assoc r (Iso.from i) (Iso.to i))
+                                                            (Setoid.trans (Morphism M R) (cong-l r (Iso.from-to-inverse i)) (id-r r)))
+         ; from = spanMorphism (Iso.from i) (Setoid.refl (Morphism X L)) (Setoid.refl (Morphism X R))
+         ; from-to-inverse = Iso.from-to-inverse i
+         ; to-from-inverse = Iso.to-from-inverse i }
   where open Category C
 
 Product : {ℓ₀ ℓ₁ ℓ₂ : Level} (C : Category {ℓ₀} {ℓ₁} {ℓ₂}) (L R : Category.Object C) → Span C L R → Set (ℓ₀ ⊔ ℓ₁ ⊔ ℓ₂)

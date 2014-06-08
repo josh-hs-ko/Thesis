@@ -24,7 +24,7 @@ open import Ornament.ParallelComposition
 open import Ornament.ParallelComposition.Pullback
 
 open import Function using (id; _∘_)
-open import Data.Product using (Σ; proj₁; proj₂; _,_; _×_; <_,_>) renaming (map to _**_)
+open import Data.Product using (Σ; Σ-syntax; proj₁; proj₂; _,_; _×_; <_,_>) renaming (map to _**_)
 open import Relation.Binary using (module Setoid)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; cong; trans; sym; module ≡-Reasoning) renaming (setoid to ≡-Setoid)
 open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅; ≡-subst-removable) renaming (refl to hrefl; cong to hcong; trans to htrans)
@@ -82,7 +82,7 @@ module OptimisedPredicate {I J} {e : J → I} {D E} (O : Orn e D E) where
   wholeIso : Iso Fun (Σ (e ⋈ proj₁) (μ OptPD)) (Σ J (μ E))
   wholeIso = pullback-iso Fun l r OptP-square μE-square OptP-pullback μE-pullback
 
-  indexIso : ∀ j → Iso Fun (μ D (e j)) (Σ[ jix ∶ e ⋈ proj₁ {A = I} {μ D} ] π₁ jix ≡ j)
+  indexIso : ∀ j → Iso Fun (μ D (e j)) (Σ[ jix ∈ e ⋈ proj₁ {A = I} {μ D} ] π₁ jix ≡ j)
   indexIso j =
     record { to   = λ x → (ok j , ok (e j , x)) , refl
            ; from = λ { ((ok .j , ix) , refl) → subst (μ D) (to≡ ix) (proj₂ (und ix)) }

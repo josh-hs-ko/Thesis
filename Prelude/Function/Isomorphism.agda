@@ -10,9 +10,9 @@ import Prelude.Category.Isomorphism as Isomorphism; open Isomorphism Fun
 open import Prelude.InverseImage
 
 open import Level
-open import Function using (id; _∘_; type-signature)
+open import Function using (id; _∘_)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; proj₁; proj₂) renaming (map to _**_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂) renaming (map to _**_)
 import Relation.Binary.EqReasoning as EqReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; cong; cong₂; sym; trans; module ≡-Reasoning)
 open import Relation.Binary.HeterogeneousEquality using (_≅_; ≅-to-≡; ≡-to-≅; ≡-subst-removable)
@@ -22,7 +22,7 @@ open import Relation.Binary.HeterogeneousEquality using (_≅_; ≅-to-≡; ≡-
 --------
 -- isomorphisms in Fun
 
-mkIso : ∀ {A B} → (f : A → B) → (∀ x x' → f x ≡ f x' → x ≡ x') → (g : (y : B) → Σ[ x ∶ A ] f x ≡ y) → Iso A B
+mkIso : ∀ {A B} → (f : A → B) → (∀ x x' → f x ≡ f x' → x ≡ x') → (g : (y : B) → Σ[ x ∈ A ] f x ≡ y) → Iso A B
 mkIso f f-inj g =
   record { to   = f
          ; from = proj₁ ∘ g
@@ -41,7 +41,7 @@ mkIso' f g un =
 
 compIso : {I J : Set} {X : I → Set} {Y : J → Set} (iso : Iso (Σ I X) (Σ J Y)) →
           (e : I → J) (u : ∀ {i} → X i → Y (e i)) → Iso.to iso ≐ (e ** u) →
-          (Z : J → Set) (ziso : ∀ {j} → Iso (Z j) (Σ[ i ∶ I ] e i ≡ j)) →
+          (Z : J → Set) (ziso : ∀ {j} → Iso (Z j) (Σ[ i ∈ I ] e i ≡ j)) →
           (g : ∀ {j} → (y : Y j) → Z j) (fgeq : ∀ {j} (y : Y j) → proj₁ (Iso.from iso (j , y)) ≡ proj₁ (Iso.to ziso (g y))) →
           ∀ j → Iso (Σ (Z j) (X ∘ proj₁ ∘ Iso.to ziso)) (Y j)
 compIso {I} {J} {X} {Y} iso e u toeq Z ziso g fgeq j =
@@ -117,9 +117,9 @@ compIso {I} {J} {X} {Y} iso e u eq j =
     from-to-inverse (ok i , x) =
       ≅-to-≡
         (elim-≡ (λ eq' → subst (λ j' → Σ (e ⁻¹ j') (X ∘ und)) eq' (ok (proj₁ (Iso.from iso (e i , u x))) , proj₂ (Iso.from iso (e i , u x)))
-                           ≅ (ok i , x ∶ Σ (e ⁻¹ e i) (X ∘ und)))
-                (subst (λ y' → (ok (proj₁ y') , proj₂ y' ∶ Σ (e ⁻¹ e (proj₁ y')) (X ∘ und))
-                                 ≅ (ok i , x ∶ Σ (e ⁻¹ e i) (X ∘ und)))
+                           ≅ (ok i , x ∈ Σ (e ⁻¹ e i) (X ∘ und)))
+                (subst (λ y' → (ok (proj₁ y') , proj₂ y' ∈ Σ (e ⁻¹ e (proj₁ y')) (X ∘ und))
+                                 ≅ (ok i , x ∈ Σ (e ⁻¹ e i) (X ∘ und)))
                        (trans (sym (Iso.from-to-inverse iso (i , x))) (cong (Iso.from iso) (eq (i , x))))
                        hrefl)
                 (cong proj₁ (trans (sym (eq (Iso.from iso (e i , u x)))) (Iso.to-from-inverse iso (e i , u x)))))

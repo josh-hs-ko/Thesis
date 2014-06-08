@@ -16,7 +16,7 @@ open import Relation
 open import Relation.CompChain
 
 open import Function using (id; _∘_)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; <_,_>)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_; <_,_>)
 open import Relation.Binary using (Setoid)
 import Relation.Binary.PreorderReasoning as PreorderReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; trans; sym; cong; cong₂)

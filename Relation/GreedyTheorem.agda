@@ -21,7 +21,7 @@ open import Refinement
 open import Relation.CompChain
 
 open import Function using (id)
-open import Data.Product using (Σ; _,_; proj₁; proj₂)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂)
 open import Relation.Binary using (module Setoid)
 import Relation.Binary.PreorderReasoning as PreorderReasoning
 import Relation.Binary.EqReasoning as EqReasoning
@@ -117,4 +117,4 @@ GreedySolution i x = μ ⌊ GreedySolutionOD ⌋ (i , x)
 optimisation-proof : (i : I) (x : X i) (sol : GreedySolution i x) → ((min R •Λ (foldR S º)) !!) i x (forget ⌈ GreedySolutionOD ⌉ sol)
 optimisation-proof i x sol =
   modus-ponens-⊆ greedy-theorem i x (forget ⌈ GreedySolutionOD ⌉ sol)
-    (proj₂ (Iso.to Fun (Refinement.i (FRefinement.comp (toFRefinement (algOrn-FSwap D ((min Q •Λ (S º))º))) (ok (_ , x)))) sol))
+    (proj₂ (Iso.to (Refinement.i (FRefinement.comp (toFRefinement (algOrn-FSwap D ((min Q •Λ (S º))º))) (ok (_ , x)))) sol))

@@ -11,7 +11,7 @@ open import Prelude.Equality
 
 open import Function using (id; _∘_; const)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; <_,_>; uncurry) renaming (map to _**_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_; <_,_>; uncurry) renaming (map to _**_)
 open import Relation.Binary using (module Setoid)
 import Relation.Binary.EqReasoning as EqReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; cong; sym; trans)
@@ -37,7 +37,7 @@ Ref-refl = record { P = const ⊤
 
 Ref-trans : {X Y Z : Set} → Refinement X Y → Refinement Y Z → Refinement X Z
 Ref-trans {X} {Y} {Z} r s =
-  record { P = λ x → Σ[ p ∶ Refinement.P r x ] Refinement.P s (Iso.from (Refinement.i r) (x , p))
+  record { P = λ x → Σ[ p ∈ Refinement.P r x ] Refinement.P s (Iso.from (Refinement.i r) (x , p))
          ; i = begin
                  Z
                    ≅⟨ Refinement.i s ⟩
@@ -51,7 +51,7 @@ Ref-trans {X} {Y} {Z} r s =
 
 canonRef : {X Y : Set} → (Y → X) → Refinement X Y
 canonRef {X} {Y} f =
-  record { P = λ x → Σ[ y ∶ Y ] f y ≡ x
+  record { P = λ x → Σ[ y ∈ Y ] f y ≡ x
          ; i = record { to   = < f , < id , frefl > >
                       ; from = proj₁ ∘ proj₂
                       ; to-from-inverse = λ { (._ , y , refl) → refl }
@@ -95,7 +95,7 @@ promIso r s eq x =
          ; to-from-inverse = prom-inverse s r (fsym eq) eq x
          ; from-to-inverse = prom-inverse r s eq (fsym eq) x }
 
-coherence : {X Y : Set} (r : Refinement X Y) → ∀ x → Iso (Refinement.P r x) (Σ[ y ∶ Y ] Refinement.forget r y ≡ x)
+coherence : {X Y : Set} (r : Refinement X Y) → ∀ x → Iso (Refinement.P r x) (Σ[ y ∈ Y ] Refinement.forget r y ≡ x)
 coherence {X} {Y} r = promIso r (canonRef (Refinement.forget r)) frefl
 
 record FRefinement {I J : Set} (e : J → I) (X : I → Set) (Y : J → Set) : Set₁ where
@@ -180,7 +180,7 @@ new I r = record { P = λ x → ∀ i → Upgrade.P (r i) x
                  ; u = λ x p i → Upgrade.u (r i) x (p i)
                  ; c = λ x p i → Upgrade.c (r i) x (p i) }
 
-syntax new I (λ i → r) = ∀⁺[ i ∶ I ] r
+syntax new I (λ i → r) = ∀⁺[ i ∈ I ] r
 
 new' : {X : Set} (I : Set) {Y : I → Set} → (∀ i → Upgrade X (Y i)) → Upgrade X ({i : I} → Y i)
 new' I r = record { P = λ x → ∀ {i} → Upgrade.P (r i) x
@@ -188,7 +188,7 @@ new' I r = record { P = λ x → ∀ {i} → Upgrade.P (r i) x
                   ; u = λ x p {i} → Upgrade.u (r i) x (p {i})
                   ; c = λ x p {i} → Upgrade.c (r i) x (p {i}) }
 
-syntax new' I (λ i → r) = ∀⁺[[ i ∶ I ]] r
+syntax new' I (λ i → r) = ∀⁺[[ i ∈ I ]] r
 
 fixed : (I : Set) {X : I → Set} {Y : I → Set} → (∀ i → Upgrade (X i) (Y i)) → Upgrade ((i : I) → X i) ((i : I) → Y i)
 fixed I u = record { P = λ f → ∀ i → Upgrade.P (u i) (f i)
@@ -196,7 +196,7 @@ fixed I u = record { P = λ f → ∀ i → Upgrade.P (u i) (f i)
                    ; u = λ f h i → Upgrade.u (u i) (f i) (h i)
                    ; c = λ f h i → Upgrade.c (u i) (f i) (h i) }
 
-syntax fixed I (λ i → u) = ∀[ i ∶ I ] u
+syntax fixed I (λ i → u) = ∀[ i ∈ I ] u
 
 fixed' : (I : Set) {X : I → Set} {Y : I → Set} → (∀ i → Upgrade (X i) (Y i)) → Upgrade ({i : I} → X i) ({i : I} → Y i)
 fixed' I u = record { P = λ f → ∀ {i} → Upgrade.P (u i) (f {i})
@@ -204,7 +204,7 @@ fixed' I u = record { P = λ f → ∀ {i} → Upgrade.P (u i) (f {i})
                     ; u = λ f h {i} → Upgrade.u (u i) (f {i}) (h {i}) 
                     ; c = λ f h {i} → Upgrade.c (u i) (f {i}) (h {i}) }
 
-syntax fixed' I (λ i → u) = ∀[[ i ∶ I ]] u
+syntax fixed' I (λ i → u) = ∀[[ i ∈ I ]] u
 
 _′⇀_ : {I J : Set} {X : I → Set} {Y : J → Set} →
      (r : Refinement I J) → (∀ i j → Upgrade.C (toUpgrade r) i j → Upgrade (X i) (Y j)) → Upgrade ((i : I) → X i) ((j : J) → Y j)
@@ -216,12 +216,12 @@ r ′⇀ s = record { P = λ f → ∀ i j → (c : Upgrade.C (toUpgrade r) i j)
                                           in  Upgrade.c (s i j refl) (f i) (h i j refl) } }
 
 new-Σ : (I : Set) {X : Set} {Y : I → Set} → ((i : I) → Upgrade X (Y i)) → Upgrade X (Σ I Y)
-new-Σ I us = record { P = λ x → Σ[ i ∶ I ] Upgrade.P (us i) x
+new-Σ I us = record { P = λ x → Σ[ i ∈ I ] Upgrade.P (us i) x
                     ; C = λ { x (i , y) → Upgrade.C (us i) x y }
                     ; u = λ { x (i , p) → i , Upgrade.u (us i) x p }
                     ; c = λ { x (i , p) → Upgrade.c (us i) x p } }
 
-syntax new-Σ I (λ i → u) = Σ⁺[ i ∶ I ] u
+syntax new-Σ I (λ i → u) = Σ⁺[ i ∈ I ] u
 
 _×⁺_ : {X Y : Set} → Upgrade X Y → (Z : Set) → Upgrade X (Y × Z)
 u ×⁺ Z = record { P = λ x → Upgrade.P u x × Z

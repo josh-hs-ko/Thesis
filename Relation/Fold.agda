@@ -11,7 +11,7 @@ open import Relation.CompChain
 
 open import Function using (id; _∘_)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_)
 open import Data.List using (List; []; _∷_)
 open import Relation.Binary using (module Setoid)
 import Relation.Binary.EqReasoning as EqReasoning

@@ -1,6 +1,6 @@
 -- The `insert` function used in insertion sort upgraded to work with vectors, ordered lists, and ordered vectors.
 
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_) renaming (map to _**_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_) renaming (map to _**_)
 open import Relation.Nullary using (¬_; Dec; yes; no)
 
 module Examples.Insertion
@@ -76,7 +76,7 @@ vinsert = Upgrade.u upg insert insert-length
   where ref : (n : Nat) → Refinement (List Val) (Vec Val n)
         ref n = FRefinement.comp (toFRefinement (Length-FSwap Val)) (ok (ok tt , ok (tt , n)))
         upg : Upgrade (Val → List Val → List Val) (Val → {n : Nat} → Vec Val n → Vec Val (suc n))
-        upg = ∀[ _ ∶ Val ] ∀⁺[[ n ∶ Nat ]] ref n ⇀ toUpgrade (ref (suc n))
+        upg = ∀[ _ ∈ Val ] ∀⁺[[ n ∈ Nat ]] ref n ⇀ toUpgrade (ref (suc n))
 
 mutual
 
@@ -95,7 +95,7 @@ oinsert = Upgrade.u upg insert insert-ordered
   where ref : (b : Val) → Refinement (List Val) (OrdList b)
         ref b = FRefinement.comp (RSem' ⌈ OrdListOD ⌉) (ok b)
         upg : Upgrade (Val → List Val → List Val) ((y : Val) {b : Val} → OrdList b → {b' : Val} → b' ≤ b → b' ≤ y → OrdList b')
-        upg = ∀[ y ∶ Val ] ∀⁺[[ b ∶ Val ]] ref b ⇀ (∀⁺[[ b' ∶ Val ]] ∀⁺[ _ ∶ b' ≤ b ] ∀⁺[ _ ∶ b' ≤ y ] toUpgrade (ref b'))
+        upg = ∀[ y ∈ Val ] ∀⁺[[ b ∈ Val ]] ref b ⇀ (∀⁺[[ b' ∈ Val ]] ∀⁺[ _ ∈ b' ≤ b ] ∀⁺[ _ ∈ b' ≤ y ] toUpgrade (ref b'))
 
 ovinsert : (y : Val) {b : Val} {n : Nat} → OrdVec b n → {b' : Val} → b' ≤ b → b' ≤ y → OrdVec b' (suc n)
 ovinsert = Upgrade.u upg insert
@@ -105,4 +105,4 @@ ovinsert = Upgrade.u upg insert
     ref b n = FRefinement.comp (toFRefinement (⊗-FSwap ⌈ OrdListOD ⌉ (VecO Val) id-FSwap (Length-FSwap Val))) (ok (ok b , ok (ok tt , ok (tt , n))))
     upg : Upgrade (Val → List Val → List Val)
                   ((y : Val) {b : Val} {n : Nat} → OrdVec b n → {b' : Val} → b' ≤ b → b' ≤ y → OrdVec b' (suc n))
-    upg = ∀[ y ∶ Val ] ∀⁺[[ b ∶ Val ]] ∀⁺[[ n ∶ Nat ]] ref b n ⇀ (∀⁺[[ b' ∶ Val ]] ∀⁺[ _ ∶ b' ≤ b ] ∀⁺[ _ ∶ b' ≤ y ] toUpgrade (ref b' (suc n)))
+    upg = ∀[ y ∈ Val ] ∀⁺[[ b ∈ Val ]] ∀⁺[[ n ∈ Nat ]] ref b n ⇀ (∀⁺[[ b' ∈ Val ]] ∀⁺[ _ ∈ b' ≤ b ] ∀⁺[ _ ∈ b' ≤ y ] toUpgrade (ref b' (suc n)))

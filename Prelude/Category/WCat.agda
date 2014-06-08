@@ -53,36 +53,36 @@ WCat {ℓ₀} {ℓ₁} {ℓ₂} = record
                ; from-to-inverse = λ _ → id-l C (id C)
                ; to-from-inverse = λ _ → id-l C (id C) }
   ; cong-l = λ {C} {D} {E} {F} {G} H iso → record
-               { to   = record { comp = λ X → morphism H (NatTrans.comp (Iso.to (Funct C D) iso) X)
+               { to   = record { comp = λ X → morphism H (NatTrans.comp (Iso.to iso) X)
                                ; naturality = λ {X} {Y} f → Setoid.trans (Morphism E _ _)
                                                               (Setoid.sym (Morphism E _ _)
-                                                                 (comp-preserving H (morphism G f) (NatTrans.comp (Iso.to (Funct C D) iso) X)))
+                                                                 (comp-preserving H (morphism G f) (NatTrans.comp (Iso.to iso) X)))
                                                               (Setoid.trans (Morphism E _ _)
-                                                                 (≈-respecting H (NatTrans.naturality (Iso.to (Funct C D) iso) f))
-                                                                 (comp-preserving H (NatTrans.comp (Iso.to (Funct C D) iso) Y) (morphism F f))) }
-               ; from = record { comp = λ X → morphism H (NatTrans.comp (Iso.from (Funct C D) iso) X)
+                                                                 (≈-respecting H (NatTrans.naturality (Iso.to iso) f))
+                                                                 (comp-preserving H (NatTrans.comp (Iso.to iso) Y) (morphism F f))) }
+               ; from = record { comp = λ X → morphism H (NatTrans.comp (Iso.from iso) X)
                                ; naturality =  λ {X} {Y} f →
                                                  Setoid.trans (Morphism E _ _)
                                                    (Setoid.sym (Morphism E _ _)
-                                                      (comp-preserving H (morphism F f) (NatTrans.comp (Iso.from (Funct C D) iso) X)))
+                                                      (comp-preserving H (morphism F f) (NatTrans.comp (Iso.from iso) X)))
                                                    (Setoid.trans (Morphism E _ _)
-                                                      (≈-respecting H (NatTrans.naturality (Iso.from (Funct C D) iso) f))
-                                                      (comp-preserving H (NatTrans.comp (Iso.from (Funct C D) iso) Y) (morphism G f))) }
+                                                      (≈-respecting H (NatTrans.naturality (Iso.from iso) f))
+                                                      (comp-preserving H (NatTrans.comp (Iso.from iso) Y) (morphism G f))) }
   ; from-to-inverse = λ X → Setoid.trans (Morphism E _ _)
                               (Setoid.sym (Morphism E _ _)
-                                 (comp-preserving H (NatTrans.comp (Iso.from (Funct C D) iso) X) (NatTrans.comp (Iso.to (Funct C D) iso) X)))
-                              (Setoid.trans (Morphism E _ _) (≈-respecting H (Iso.from-to-inverse (Funct C D) iso X)) (id-preserving H))
+                                 (comp-preserving H (NatTrans.comp (Iso.from iso) X) (NatTrans.comp (Iso.to iso) X)))
+                              (Setoid.trans (Morphism E _ _) (≈-respecting H (Iso.from-to-inverse iso X)) (id-preserving H))
   ; to-from-inverse = λ X → Setoid.trans (Morphism E _ _)
                               (Setoid.sym (Morphism E _ _)
-                                 (comp-preserving H (NatTrans.comp (Iso.to (Funct C D) iso) X) (NatTrans.comp (Iso.from (Funct C D) iso) X)))
-                              (Setoid.trans (Morphism E _ _) (≈-respecting H (Iso.to-from-inverse (Funct C D) iso X)) (id-preserving H)) }
+                                 (comp-preserving H (NatTrans.comp (Iso.to iso) X) (NatTrans.comp (Iso.from iso) X)))
+                              (Setoid.trans (Morphism E _ _) (≈-respecting H (Iso.to-from-inverse iso X)) (id-preserving H)) }
   ; cong-r = λ {C} {D} {E} {F} {G} H iso → record
-               { to   = record { comp = λ X → NatTrans.comp (Iso.to (Funct D E) iso) (object H X)
-                               ; naturality = λ f → NatTrans.naturality (Iso.to (Funct D E) iso) (morphism H f) }
-               ; from = record { comp = λ X → NatTrans.comp (Iso.from (Funct D E) iso) (object H X)
-                               ; naturality = λ f → NatTrans.naturality (Iso.from (Funct D E) iso) (morphism H f) }
-               ; from-to-inverse = λ X → Iso.from-to-inverse (Funct D E) iso (object H X)
-               ; to-from-inverse = λ X → Iso.to-from-inverse (Funct D E) iso (object H X) } }
+               { to   = record { comp = λ X → NatTrans.comp (Iso.to iso) (object H X)
+                               ; naturality = λ f → NatTrans.naturality (Iso.to iso) (morphism H f) }
+               ; from = record { comp = λ X → NatTrans.comp (Iso.from iso) (object H X)
+                               ; naturality = λ f → NatTrans.naturality (Iso.from iso) (morphism H f) }
+               ; from-to-inverse = λ X → Iso.from-to-inverse iso (object H X)
+               ; to-from-inverse = λ X → Iso.to-from-inverse iso (object H X) } }
 
 CatEquiv : {ℓ₀ ℓ₁ ℓ₂ : Level} → (C D : Category {ℓ₀} {ℓ₁} {ℓ₂}) → Set (ℓ₀ ⊔ ℓ₁ ⊔ ℓ₂)
 CatEquiv = Iso WCat

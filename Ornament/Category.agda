@@ -17,7 +17,7 @@ open import Ornament.Equivalence
 open import Ornament.SequentialComposition
 
 open import Function using (id; _∘_)
-open import Data.Product using (Σ; proj₁; _,_) renaming (map to _**_)
+open import Data.Product using (Σ; Σ-syntax; proj₁; _,_) renaming (map to _**_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; module ≡-Reasoning)
 open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅) renaming (refl to hrefl)
 
@@ -25,7 +25,7 @@ open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅) rena
 Ōrn : Category
 Ōrn =  record { Object   = Σ Set Desc
               ; Morphism = λ { (J , E) (I , D) → 
-                               record { Carrier = Σ[ e ∶ (J → I) ] Orn e D E
+                               record { Carrier = Σ[ e ∈ (J → I) ] Orn e D E
                                       ; _≈_ = λ { (e , O) (f , P) → OrnEq O P }
                                       ; isEquivalence =
                                           record { refl  = λ { {e , O} → OrnEq-refl O }

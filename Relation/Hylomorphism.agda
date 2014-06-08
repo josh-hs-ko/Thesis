@@ -14,7 +14,7 @@ open import Relation.Division
 open import Relation.Fold
 
 open import Function using (_∘_; flip)
-open import Data.Product using (Σ; _,_; proj₁; proj₂)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂)
 open import Relation.Binary using (module Setoid)
 import Relation.Binary.PreorderReasoning as PreorderReasoning
 import Relation.Binary.EqReasoning as EqReasoning

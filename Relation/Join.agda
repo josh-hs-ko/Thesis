@@ -6,7 +6,7 @@ open import Prelude.Preorder
 open import Relation
 
 open import Function using (id; _∘_)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 import Relation.Binary.PreorderReasoning as PreorderReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)

@@ -11,12 +11,12 @@ open import Examples.Nat
 open import Examples.List
 
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; proj₁; proj₂)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂)
 
 
 OrdListOD : OrnDesc Val ! ⌊ ListOD Val ⌋
 OrdListOD = wrap λ { (ok b) → σ ListTag λ { `nil  → ṿ tt
-                                          ; `cons → σ[ x ∶ Val ] Δ[ _ ∶ b ≤ x ] ṿ (ok x , tt) } }
+                                          ; `cons → σ[ x ∈ Val ] Δ[ _ ∈ b ≤ x ] ṿ (ok x , tt) } }
 
 OrdList : Val → Set
 OrdList = μ ⌊ OrdListOD ⌋

@@ -10,15 +10,15 @@ open import Prelude.Product
 open import Refinement
 
 open import Function using (_∘_)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; <_,_>)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_; <_,_>)
 open import Relation.Binary using (module Setoid)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; cong)
 open import Relation.Binary.HeterogeneousEquality using (_≅_) renaming (refl to hrefl)
 
 FRef : Category
-FRef = record { Object   = Σ[ I ∶ Set ] (I → Set)
+FRef = record { Object   = Σ[ I ∈ Set ] (I → Set)
               ; Morphism = λ { (J , Y) (I , X) →
-                                 record { Carrier = Σ[ e ∶ (J → I) ] FRefinement e X Y
+                                 record { Carrier = Σ[ e ∈ (J → I) ] FRefinement e X Y
                                         ; _≈_ = λ { (e , r) (f , s) →
                                                     FamMorphismEq (J , Y) (I , X) (e , FRefinement.forget r) (f , FRefinement.forget s) }
                                         ; isEquivalence =

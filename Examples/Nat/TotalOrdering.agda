@@ -6,11 +6,11 @@ open import Description
 open import Ornament
 open import Examples.Nat
 
-open import Function using (_∘_; type-signature)
+open import Function using (_∘_; _∋_)
 open import Data.Empty using (⊥; ⊥-elim)
 open import Data.Unit using (⊤; tt)
 open import Data.List using (List; []; _∷_)
-open import Data.Product using (Σ; _,_; _×_) renaming (map to _**_)
+open import Data.Product using (Σ; Σ-syntax; _,_; _×_) renaming (map to _**_)
 open import Relation.Nullary using (¬_; Dec; yes; no)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; _≢_; cong; sym; trans)
 
@@ -20,8 +20,8 @@ open import Relation.Binary.PropositionalEquality using (_≡_; refl; _≢_; con
 
 LeD : Desc (Nat × Nat)
 LeD = wrap λ { (x , y) →
-               σ ListTag λ { `nil  → σ[ _ ∶ x ≡ zero ] ṿ []
-                           ; `cons → σ[ x' ∶ Nat ] σ[ y' ∶ Nat ] σ[ _ ∶ (suc x' , suc y') ≡ (x , y ∶ Nat × Nat) ] ṿ ((x' , y') ∷ []) } }
+               σ ListTag λ { `nil  → σ[ _ ∈ x ≡ zero ] ṿ []
+                           ; `cons → σ[ x' ∈ Nat ] σ[ y' ∈ Nat ] σ[ _ ∈ (suc x' , suc y') ≡ (Nat × Nat ∋ x , y) ] ṿ ((x' , y') ∷ []) } }
 
 _≤_ : Nat → Nat → Set
 x ≤ y = μ LeD (x , y)

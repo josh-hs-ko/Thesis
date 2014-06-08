@@ -8,7 +8,7 @@ open import Level
 
 module Prelude.Category.Isomorphism {ℓ₀ ℓ₁ ℓ₂ : Level} (C : Category {ℓ₀} {ℓ₁} {ℓ₂}) where
 
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_)
 open import Relation.Binary using (Setoid)
 import Relation.Binary.EqReasoning as EqReasoning
 

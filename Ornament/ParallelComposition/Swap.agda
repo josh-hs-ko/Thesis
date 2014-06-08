@@ -27,7 +27,7 @@ open import Ornament.ParallelComposition.Pullback
 open import Ornament.RefinementSemantics
 
 open import Function using (id; _∘_)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; <_,_>; uncurry) renaming (map to _**_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_; <_,_>; uncurry) renaming (map to _**_)
 open import Relation.Binary using (module Setoid)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; cong; cong₂) renaming (setoid to ≡-Setoid)
 open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅) renaming (proof-irrelevance to hproof-irrelevance)

@@ -11,8 +11,8 @@ open import Prelude.Category.Pullback
 open import Prelude.Function
 open import Prelude.Product
 
-open import Function using (_∘_; type-signature)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
+open import Function using (_∘_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; sym; trans; cong₂)
 open import Relation.Binary.HeterogeneousEquality using (_≅_; ≅-to-≡) renaming (refl to hrefl)
 
@@ -99,7 +99,7 @@ decouple {f = f} {g} {ok a , b} {ok .a , b'} refl eq = cong (_,_ {c = f a} (ok a
 -- canonical set-theoretic pullback
 
 STP-square : {A B C : Set} (f : A → C) (g : B → C) → Square Fun (slice A f) (slice B g)
-STP-square {A} {B} {C} f g = span (slice (Σ[ p ∶ A × B ] f (proj₁ p) ≡ g (proj₂ p)) (g ∘ proj₂ ∘ proj₁))
+STP-square {A} {B} {C} f g = span (slice (Σ[ p ∈ A × B ] f (proj₁ p) ≡ g (proj₂ p)) (g ∘ proj₂ ∘ proj₁))
                                   (sliceMorphism (proj₁ ∘ proj₁) proj₂)
                                   (sliceMorphism (proj₂ ∘ proj₁) frefl)
 
@@ -117,4 +117,4 @@ decouple' : {A B C : Set} (f : A → C) (g : B → C) (s : Square Fun (slice A f
             {p q : Square-T s} → SliceMorphism.m (Span.l s) p ≡ SliceMorphism.m (Span.l s) q → SliceMorphism.m (Span.r s) p ≡ SliceMorphism.m (Span.r s) q → p ≡ q
 decouple' f g s ps {p} {q} leq req =
   let iso = pullback-iso Fun (slice _ f) (slice _ g) s (STP-square f g) ps (STP-is-pullback f g)
-  in  trans (sym (Iso.from-to-inverse Fun iso p)) (trans (cong (Iso.from Fun iso) (STP-decouple f g leq req)) (Iso.from-to-inverse Fun iso q))
+  in  trans (sym (Iso.from-to-inverse iso p)) (trans (cong (Iso.from iso) (STP-decouple f g leq req)) (Iso.from-to-inverse iso q))

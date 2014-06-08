@@ -5,7 +5,7 @@ module Prelude.Equality where
 
 open import Level
 open import Function using (_on_)
-open import Data.Product using (Σ; _,_; _×_) renaming (map to _**_)
+open import Data.Product using (Σ; Σ-syntax; _,_; _×_) renaming (map to _**_)
 open import Relation.Binary using (Setoid; module Setoid)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 open import Relation.Binary.HeterogeneousEquality using (_≅_) renaming (refl to hrefl)
@@ -32,7 +32,7 @@ Unique : {ℓ₀ ℓ₁ : Level} (S : Setoid ℓ₀ ℓ₁) → Setoid.Carrier S
 Unique S x = (y : Carrier) → x ≈ y
   where open Setoid S
 
-equal : {ℓ₀ ℓ₁ : Level} (S : Setoid ℓ₀ ℓ₁) → Σ[ x ∶ Setoid.Carrier S ] Unique S x → ∀ y z → Setoid._≈_ S y z
+equal : {ℓ₀ ℓ₁ : Level} (S : Setoid ℓ₀ ℓ₁) → Σ[ x ∈ Setoid.Carrier S ] Unique S x → ∀ y z → Setoid._≈_ S y z
 equal S (x , u) y z = trans (sym (u y)) (u z)
   where open Setoid S
 

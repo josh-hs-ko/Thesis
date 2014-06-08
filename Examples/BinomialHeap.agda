@@ -13,7 +13,7 @@ open import Ornament
 open import Ornament.RefinementSemantics
 
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; _×_)
+open import Data.Product using (Σ; Σ-syntax; _,_; _×_)
 open import Data.Nat using (ℕ; zero; suc)
 open import Data.List using (List; []; _∷_)
 open import Relation.Binary.PropositionalEquality using (_≡_)
@@ -42,7 +42,7 @@ descend zero    = []
 descend (suc n) = n ∷ descend n
 
 BTreeD : Desc ℕ
-BTreeD = wrap λ r → σ[ _ ∶ Val ] ṿ (descend r)
+BTreeD = wrap λ r → σ[ _ ∈ Val ] ṿ (descend r)
 
 BTree : ℕ → Set
 BTree = μ BTreeD
@@ -55,7 +55,7 @@ link (con (x , ts)) (con (y , us)) | no  _ = con (y , con (x , ts) , us)
 BHeapOD : OrnDesc ℕ ! BinD
 BHeapOD = wrap λ { {._} (ok r) → σ BinTag λ { `nil  → ṿ tt
                                             ; `zero → ṿ (ok (suc r) , tt)
-                                            ; `one  → Δ[ _ ∶ BTree r ] ṿ (ok (suc r) , tt) } }
+                                            ; `one  → Δ[ _ ∈ BTree r ] ṿ (ok (suc r) , tt) } }
 
 BHeap : ℕ → Set
 BHeap = μ ⌊ BHeapOD ⌋
@@ -67,7 +67,7 @@ BHeap' : ℕ → Bin → Set
 BHeap' r b = OptP ⌈ BHeapOD ⌉ (ok r) b
 
 upg : Upgrade (Bin → Bin) ({r : ℕ} → BTree r → BHeap r → BHeap r)
-upg = ∀⁺[[ r ∶ ℕ ]] ∀⁺[ _ ∶ BTree r ] let ref = FRefinement.comp (RSem' ⌈ BHeapOD ⌉) (ok r) in ref ⇀ toUpgrade ref
+upg = ∀⁺[[ r ∈ ℕ ]] ∀⁺[ _ ∈ BTree r ] let ref = FRefinement.comp (RSem' ⌈ BHeapOD ⌉) (ok r) in ref ⇀ toUpgrade ref
 
 insT' : {r : ℕ} → BTree r → (b : Bin) → BHeap' r b → BHeap' r (incr b)  -- Upgrade.P upg incr
 insT' t (con (`nil  , _    )) h                 = con (t , con tt               , tt)
@@ -93,7 +93,7 @@ add (con (`one  , b , _)) (con (`zero , b' , _)) = con (`one  , add b b'        
 add (con (`one  , b , _)) (con (`one  , b' , _)) = con (`zero , incr (add b b') , tt)
 
 upg' : Upgrade (Bin → Bin → Bin) ({r : ℕ} → BHeap r → BHeap r → BHeap r)
-upg' = ∀⁺[[ r ∶ ℕ ]] let ref = FRefinement.comp (RSem' ⌈ BHeapOD ⌉) (ok r) in ref ⇀ ref ⇀ toUpgrade ref
+upg' = ∀⁺[[ r ∈ ℕ ]] let ref = FRefinement.comp (RSem' ⌈ BHeapOD ⌉) (ok r) in ref ⇀ ref ⇀ toUpgrade ref
 
 merge' : {r : ℕ} → (b : Bin) → BHeap' r b → (b' : Bin) → BHeap' r b' → BHeap' r (add b b')  -- Upgrade.P upg' add
 merge' (con (`nil  , _    )) h                 b'                     h'                 = h'

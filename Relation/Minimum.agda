@@ -5,7 +5,7 @@ module Relation.Minimum where
 open import Relation
 open import Relation.Meet
 
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_)
 import Relation.Binary.PreorderReasoning as PreorderReasoning
 
 

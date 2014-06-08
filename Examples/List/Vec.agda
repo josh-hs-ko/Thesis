@@ -14,7 +14,7 @@ open import Examples.List
 
 open import Function using (_∘_; flip)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; proj₁; proj₂)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; proof-irrelevance)
 
 

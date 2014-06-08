@@ -11,9 +11,9 @@ open import Description.Horizontal
 open import Ornament
 open import Ornament.Horizontal
 
-open import Function using (id; flip; const; _∘_; type-signature)
+open import Function using (id; flip; const; _∘_)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_) renaming (map to _**_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_) renaming (map to _**_)
 open import Data.List using (List; []; _∷_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; cong; trans; sym)
 open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅; ≅-to-≡; ≡-subst-removable)
@@ -55,7 +55,7 @@ OrnEq-forget {I} {J} {e} {e'} {D} {E} O P (eeq , oeq) = induction E (λ _ x → 
     aux''' []       _        _          = tt
     aux''' (j ∷ js) (x , xs) (ih , ihs) = ih , aux''' js xs ihs
     aux'' : (E' : RDesc J) (xs : ⟦ E' ⟧ (μ E)) → All E' (λ _ x → forget O x ≅ forget P x) xs →
-            Σ[ hs ∶ Ṡ E' ] Σ[ xs' ∶ Ṗ (next E' hs) (μ D ∘ e) ] Σ[ xs'' ∶ Ṗ (next E' hs) (μ D ∘ e') ]
+            Σ[ hs ∈ Ṡ E' ] Σ[ xs' ∈ Ṗ (next E' hs) (μ D ∘ e) ] Σ[ xs'' ∈ Ṗ (next E' hs) (μ D ∘ e') ]
               Ḣ-decomp E' (flip Ṗ (μ D ∘ e)) (mapFold E E' (ornAlg O) xs) ≡ (hs , xs')    ×
               (hs , xs'') ≡ Ḣ-decomp E' (flip Ṗ (μ D ∘ e')) (mapFold E E' (ornAlg P) xs)  ×  ṖHEq (next E' hs) xs' xs''
     aux'' (ṿ js)   xs       ihs = tt , mapFold-Ṗ E (ornAlg O) js xs , mapFold-Ṗ E (ornAlg P) js xs , refl , refl , aux''' js xs ihs

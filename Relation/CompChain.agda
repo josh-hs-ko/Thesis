@@ -7,7 +7,7 @@ open import Description
 open import Relation
 
 import Relation.Binary.PreorderReasoning as PreorderReasoning
-open import Data.Product using (Σ; _,_; proj₁; proj₂)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂)
 
 
 infix 2 _◇

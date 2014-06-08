@@ -16,8 +16,8 @@ open import Prelude.Function
 open import Prelude.Product
 open import Prelude.InverseImage
 
-open import Function using (_∘_; type-signature)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; <_,_>) renaming (map to _**_)
+open import Function using (_∘_; _∋_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_; <_,_>) renaming (map to _**_)
 open import Relation.Binary using (Setoid; module Setoid)
 import Relation.Binary.EqReasoning as EqReasoning
 open import Relation.Binary.PropositionalEquality
@@ -30,7 +30,7 @@ open Functor
 
 
 FamObject : Set₁
-FamObject = Σ[ I ∶ Set ] (I → Set)
+FamObject = Σ[ I ∈ Set ] (I → Set)
 
 _⇉_ : {I : Set} → (I → Set) → (I → Set) → Set
 X ⇉ Y = ∀ {i} → X i → Y i
@@ -91,7 +91,7 @@ FamF = record { object   = λ { (I , X) → Σ I X }
               ; id-preserving   = frefl
               ; comp-preserving = λ { (e , u) (f , v) (i , x) → cong₂-pair refl (≑-refl {f = u ∘ v} x x hrefl) } }
 
-compIso : {I J : Set} {X : I → Set} {Y : J → Set} → (iso : Iso Fam (I , X) (J , Y)) → ∀ i → Iso Fun (X i) (Y (FamMorphism.e (Iso.to Fam iso) i))
+compIso : {I J : Set} {X : I → Set} {Y : J → Set} → (iso : Iso Fam (I , X) (J , Y)) → ∀ i → Iso Fun (X i) (Y (FamMorphism.e (Iso.to iso) i))
 compIso {I} {J} {X} {Y} iso i =
   record { to   = FamMorphism.u to
          ; from = λ y → subst X (FamMorphismEq.e from-to-inverse i) (FamMorphism.u from y)
@@ -104,7 +104,7 @@ compIso {I} {J} {X} {Y} iso i =
   where open Iso Fam iso
 
 compIso-inv : {I J : Set} {X : I → Set} {Y : J → Set} →
-              (iso : Iso Fun I J) → (∀ i → Iso Fun (X i) (Y (Iso.to Fun iso i))) → Iso Fam (I , X) (J , Y)
+              (iso : Iso Fun I J) → (∀ i → Iso Fun (X i) (Y (Iso.to iso i))) → Iso Fam (I , X) (J , Y)
 compIso-inv {I} {J} {X} {Y} iso isos =
   record { to   = to iso , λ {i} → to (isos i)
          ; from = from iso , λ {j} y → from (isos (from iso j)) (subst Y (sym (to-from-inverse iso j)) y)
@@ -121,25 +121,25 @@ compIso-inv {I} {J} {X} {Y} iso isos =
   where open Iso Fun
 
 mkFamIso : {IX JY : FamObject} →
-           (idx-iso : Iso Fun (proj₁ IX) (proj₁ JY)) → (∀ i → Iso Fun (proj₂ IX i) (proj₂ JY (Iso.to Fun idx-iso i))) → Iso Fam IX JY
+           (idx-iso : Iso Fun (proj₁ IX) (proj₁ JY)) → (∀ i → Iso Fun (proj₂ IX i) (proj₂ JY (Iso.to idx-iso i))) → Iso Fam IX JY
 mkFamIso {I , X} {J , Y} idx-iso mem-iso =
-  record { to   = Iso.to Fun idx-iso , λ {i} → Iso.to Fun (mem-iso i)
-         ; from = Iso.from Fun idx-iso , λ {j} y → Iso.from Fun (mem-iso (Iso.from Fun idx-iso j))
-                                                     (subst Y (sym (Iso.to-from-inverse Fun idx-iso j)) y)
+  record { to   = Iso.to idx-iso , λ {i} → Iso.to (mem-iso i)
+         ; from = Iso.from idx-iso , λ {j} y → Iso.from (mem-iso (Iso.from idx-iso j))
+                                                     (subst Y (sym (Iso.to-from-inverse idx-iso j)) y)
          ; to-from-inverse =
-             Iso.to-from-inverse Fun idx-iso ,
-             λ {j} y y' heq → htrans (≡-to-≅ (Iso.to-from-inverse Fun (mem-iso _)
-                                     (subst Y (sym (Iso.to-from-inverse Fun idx-iso j)) y)))
-                                     (htrans (≡-subst-removable Y (sym (Iso.to-from-inverse Fun idx-iso j)) y) heq)
+             Iso.to-from-inverse idx-iso ,
+             λ {j} y y' heq → htrans (≡-to-≅ (Iso.to-from-inverse (mem-iso _)
+                                     (subst Y (sym (Iso.to-from-inverse idx-iso j)) y)))
+                                     (htrans (≡-subst-removable Y (sym (Iso.to-from-inverse idx-iso j)) y) heq)
          ; from-to-inverse =
-             Iso.from-to-inverse Fun idx-iso ,
+             Iso.from-to-inverse idx-iso ,
              λ {i} → pointwise
                        λ x → elim-≡
-                               (λ {i'} eq → ∀ eq' → eq' ≡ cong (Iso.to Fun idx-iso) eq →
-                                            Iso.from Fun (mem-iso i') (subst Y eq' (Iso.to Fun (mem-iso i) x)) ≅ x)
-                               (λ { refl refl → ≡-to-≅ (Iso.from-to-inverse Fun (mem-iso i) x) })
-                               (sym (Iso.from-to-inverse Fun idx-iso i))
-                               (sym (Iso.to-from-inverse Fun idx-iso (Iso.to Fun idx-iso i)))
+                               (λ {i'} eq → ∀ eq' → eq' ≡ cong (Iso.to idx-iso) eq →
+                                            Iso.from (mem-iso i') (subst Y eq' (Iso.to (mem-iso i) x)) ≅ x)
+                               (λ { refl refl → ≡-to-≅ (Iso.from-to-inverse (mem-iso i) x) })
+                               (sym (Iso.from-to-inverse idx-iso i))
+                               (sym (Iso.to-from-inverse idx-iso (Iso.to idx-iso i)))
                                (proof-irrelevance _ _) }
 
 module CanonicalPullback {B : Category.Object Fam} (f g : Slice Fam B) where
@@ -198,17 +198,20 @@ module CanonicalPullback {B : Category.Object Fam} (f g : Slice Fam B) where
       λ {i} → pointwise (λ t → aux' (FamMorphismEq.e leq i) (FamMorphismEq.u leq t t hrefl)
                                     (FamMorphismEq.e req i) (FamMorphismEq.u req t t hrefl))
       where aux : ∀ {i i' j j' eq eq'} → i ≡ i' → j ≡ j' →
-                  ((i , j) , eq ∶ Σ (proj₁ (Slice.T f) × proj₁ (Slice.T g))
-                                  λ { (i , j) → FamMorphism.e (Slice.s f) i ≡ FamMorphism.e (Slice.s g) j })
+                  ((Σ[ ij ∈ proj₁ (Slice.T f) × proj₁ (Slice.T g) ]
+                      FamMorphism.e (Slice.s f) (proj₁ ij) ≡ FamMorphism.e (Slice.s g) (proj₂ ij))
+                     ∋ (i , j) , eq)
                     ≡ ((i' , j') ,  eq')
             aux refl refl = cong₂-pair refl (≡-to-≅ (proof-irrelevance _ _))
             aux' : ∀ {i i' j j'}
                    {x : proj₂ (Slice.T f) i} {x' : proj₂ (Slice.T f) i'} {y : proj₂ (Slice.T g) j} {y' : proj₂ (Slice.T g) j'}
                    {eq eq'} → i ≡ i' → x ≅ x' → j ≡ j' → y ≅ y' →
-                   ((x , y) , eq ∶ Σ (proj₂ (Slice.T f) i × proj₂ (Slice.T g) j)
-                                     λ { (x , y) → FamMorphism.u (Slice.s f) x ≅ FamMorphism.u (Slice.s g) y })
-                     ≅ ((x' , y') ,  eq' ∶ Σ (proj₂ (Slice.T f) i' × proj₂ (Slice.T g) j')
-                                             λ { (x' , y') → FamMorphism.u (Slice.s f) x' ≅ FamMorphism.u (Slice.s g) y' })
+                   ((Σ[ xy ∈ proj₂ (Slice.T f) i × proj₂ (Slice.T g) j ]
+                      FamMorphism.u (Slice.s f) (proj₁ xy) ≅ FamMorphism.u (Slice.s g) (proj₂ xy))
+                     ∋ (x , y) , eq)
+                     ≅ ((Σ[ xy ∈ proj₂ (Slice.T f) i' × proj₂ (Slice.T g) j' ]
+                           FamMorphism.u (Slice.s f) (proj₁ xy) ≅ FamMorphism.u (Slice.s g) (proj₂ xy))
+                          ∋ (x' , y') ,  eq')
             aux' refl hrefl refl hrefl = ≡-to-≅ (cong₂-pair refl (≡-to-≅ (hproof-irrelevance _ _)))
 
     uniqueness : Unique (Category.Morphism (SpanCategory (SliceCategory Fam B) f g) p' p) p'-to-p
@@ -285,7 +288,7 @@ module CanonicalPullbackInFun {B' : Category.Object Fam} (f' g' : Slice Fam B') 
       where aux : ∀ {i i' j j'}
                   {x : proj₂ (Slice.T f') i} {x' : proj₂ (Slice.T f') i'} {y : proj₂ (Slice.T g') j} {y' : proj₂ (Slice.T g') j'} →
                   i ≡ i' → x ≅ x' → j ≡ j' → y ≅ y' → ∀ {ijeq xyeq ijeq' xyeq'} →
-                  (((i , j) , ijeq) , ((x , y) , xyeq) ∶ Slice.T (Span.M p)) ≡ (((i' , j') , ijeq') , ((x' , y') , xyeq'))
+                  (Slice.T (Span.M p) ∋ ((i , j) , ijeq) , ((x , y) , xyeq)) ≡ (((i' , j') , ijeq') , ((x' , y') , xyeq'))
             aux refl hrefl refl hrefl {ijeq} {xyeq} {ijeq'} {xyeq'} with proof-irrelevance ijeq ijeq' | hproof-irrelevance xyeq xyeq'
             aux refl hrefl refl hrefl {ijeq} {xyeq} {.ijeq} {.xyeq} | refl | refl = refl
 

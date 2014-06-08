@@ -13,7 +13,7 @@ open import Ornament
 
 open import Function using (id; flip; const; _∘_)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_; <_,_>; curry; uncurry) renaming (map to _**_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_; <_,_>; curry; uncurry) renaming (map to _**_)
 open import Data.List using (List; []; _∷_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; sym; trans; cong; cong₂; subst; module ≡-Reasoning)
 open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅; ≅-to-≡) renaming (refl to hrefl; cong to hcong; cong₂ to hcong₂)
@@ -52,16 +52,16 @@ cong-ḢTrans-app'-erase-Ṗ {D = D} t u e≐e' t≐u hs xs xs' heq =
 ḢTrans-app-comp {D = D} {E} {F} t u hs =
   cong (Ḣ-comp D (const ⊤))
        (cong₂ _,_ (cong (ḢTrans.s t)
-                        (cong proj₁ (sym (Iso.to-from-inverse Fun (Ḣ-iso E (const ⊤)) (ḢTrans.s u (proj₁ (Ḣ-decomp F (const ⊤) hs)) , tt)))))
+                        (cong proj₁ (sym (Iso.to-from-inverse (Ḣ-iso E (const ⊤)) (ḢTrans.s u (proj₁ (Ḣ-decomp F (const ⊤) hs)) , tt)))))
                   refl)
 
-ḢROrn-∇ : {I J : Set} {e : J → I} {D : RDesc I} {js : List J} → Σ[ hs ∶ Ṡ D ] Ė e js (next D hs) → ROrn e D (ṿ js)
+ḢROrn-∇ : {I J : Set} {e : J → I} {D : RDesc I} {js : List J} → Σ[ hs ∈ Ṡ D ] Ė e js (next D hs) → ROrn e D (ṿ js)
 ḢROrn-∇ {D = ṿ is } (hs       , eqs) = ṿ eqs
 ḢROrn-∇ {D = σ S D} ((s , hs) , eqs) = ∇ s (ḢROrn-∇ {D = D s} (hs , eqs))
 
 ḢROrn : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} → ḢTrans e D E → ROrn e D E
 ḢROrn {E = ṿ js } t = ḢROrn-∇ (ḢTrans.s t tt , ḢTrans.c t tt)
-ḢROrn {E = σ S E} t = Δ[ s ∶ S ] ḢROrn {E = E s} (curry (ḢTrans.s t) s , curry (ḢTrans.c t) s)
+ḢROrn {E = σ S E} t = Δ[ s ∈ S ] ḢROrn {E = E s} (curry (ḢTrans.s t) s , curry (ḢTrans.c t) s)
 
 erase'-ḢROrn-∇ : {I J : Set} {e : J → I} (D : RDesc I) {js : List J}
                  (hs : Ṡ D) (eqs : Ė e js (next D hs)) {X : List I → Set} {Y : List J → Set} (f : Erasure e Y X) →

@@ -17,7 +17,7 @@ module Prelude.Category.Pullback.Midpoint
 open import Prelude.Equality
 open import Prelude.Category.Pullback
 
-open import Data.Product using (Σ; _,_; proj₁; proj₂; <_,_>)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; <_,_>)
 open import Relation.Binary using (module Setoid)
 import Relation.Binary.EqReasoning as EqReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)

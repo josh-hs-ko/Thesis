@@ -8,7 +8,7 @@ open import Prelude.Category.Isomorphism
 
 open import Level
 open import Function using ()
-open import Data.Product using (Σ; _,_)
+open import Data.Product using (Σ; Σ-syntax; _,_)
 open import Relation.Binary using (module Setoid)
 import Relation.Binary.EqReasoning as EqReasoning
 
@@ -83,11 +83,11 @@ SliceMap {D = D} F {B} =
 slice-tip-iso : {ℓ₀ ℓ₁ ℓ₂ : Level} {C : Category {ℓ₀} {ℓ₁} {ℓ₂}} {B : Category.Object C} →
                 (s : Slice C B) (X : Category.Object C) (i : Iso C (Slice.T s) X) → Σ (Slice C B) (Iso (SliceCategory C B) s)
 slice-tip-iso {C = C} {B} (slice T m) X i =
-  slice X (m · Iso.from C i) ,
-  record { to   = sliceMorphism (Iso.to C i)
-                                (Setoid.trans (Morphism T B) (assoc m (Iso.from C i) (Iso.to C i))
-                                                             (Setoid.trans (Morphism T B) (cong-l m (Iso.from-to-inverse C i)) (id-r m)))
-         ; from = sliceMorphism (Iso.from C i) (Setoid.refl (Morphism X B))
-         ; from-to-inverse = Iso.from-to-inverse C i
-         ; to-from-inverse = Iso.to-from-inverse C i }
+  slice X (m · Iso.from i) ,
+  record { to   = sliceMorphism (Iso.to i)
+                                (Setoid.trans (Morphism T B) (assoc m (Iso.from i) (Iso.to i))
+                                                             (Setoid.trans (Morphism T B) (cong-l m (Iso.from-to-inverse i)) (id-r m)))
+         ; from = sliceMorphism (Iso.from i) (Setoid.refl (Morphism X B))
+         ; from-to-inverse = Iso.from-to-inverse i
+         ; to-from-inverse = Iso.to-from-inverse i }
   where open Category C

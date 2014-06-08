@@ -4,7 +4,7 @@ module Relation.Meet where
 
 open import Relation
 
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_)
 
 
 _∩⁻_ : {X Y : Set} → (X ↝⁻ Y) → (X ↝⁻ Y) → X ↝⁻ Y

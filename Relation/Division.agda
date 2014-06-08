@@ -4,7 +4,7 @@ module Relation.Division where
 
 open import Relation
 
-open import Data.Product using (Σ; _,_)
+open import Data.Product using (Σ; Σ-syntax; _,_)
 
 infixr 5 _/_
 

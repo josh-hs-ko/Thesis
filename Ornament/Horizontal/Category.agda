@@ -20,7 +20,7 @@ open import Ornament.Category
 
 open import Function using (id; const; _∘_)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; trans; sym; subst; cong)
 open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅) renaming (refl to hrefl; sym to hsym; trans to htrans)
 
@@ -32,9 +32,9 @@ record FḢTrans {I J : Set} (e : J → I) (D : Desc I) (E : Desc J) : Set₁ wh
 
 ḞḢTrans : Category
 ḞḢTrans = record
-  { Object   = Σ[ I ∶ Set ] Desc I
+  { Object   = Σ[ I ∈ Set ] Desc I
   ; Morphism = λ { (J , E) (I , D) → record
-                   { Carrier = Σ[ e ∶ (J → I) ] FḢTrans e D E
+                   { Carrier = Σ[ e ∈ (J → I) ] FḢTrans e D E
                    ; _≈_ = λ { (e , ts) (f , us) → (e ≐ f) × ((j : J) (h : Ṡ (Desc.comp E j)) → ḢTrans.s (FḢTrans.comp ts j) h ≅ ḢTrans.s (FḢTrans.comp us j) h) }
                    ; isEquivalence = record { refl  = frefl , λ j h → hrefl
                                             ; sym   = λ { (eeq , teqs) → fsym eeq , λ j h → hsym (teqs j h) }

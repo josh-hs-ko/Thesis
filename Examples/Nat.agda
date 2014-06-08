@@ -7,7 +7,7 @@ open import Description
 open import Data.Unit using (⊤; tt)
 open import Data.Nat using (ℕ)
 open import Data.List using (List; []; _∷_)
-open import Data.Product using (Σ; _,_)
+open import Data.Product using (Σ; Σ-syntax; _,_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; _≢_; cong; sym; trans)
 
 

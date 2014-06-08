@@ -18,7 +18,7 @@ open Functor
 
 private
 
-  inverse : {X Y : Object C} → (i : Iso C X Y) → morphism F (Iso.to C i) ·D morphism F (Iso.from C i) ≈D id D
+  inverse : {X Y : Object C} → (i : Iso C X Y) → morphism F (Iso.to i) ·D morphism F (Iso.from i) ≈D id D
   inverse {X} {Y} i =
     begin
       morphism F to ·D morphism F from

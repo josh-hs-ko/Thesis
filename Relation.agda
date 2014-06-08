@@ -10,10 +10,10 @@ open import Prelude.Function.Fam
 open import Prelude.Preorder
 open import Description
 
-open import Function using (id; _∘_; flip; type-signature)
+open import Function using (id; _∘_; flip)
 open import Data.Empty using (⊥)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_)
 open import Data.List using (List; []; _∷_)
 open import Relation.Binary using (Setoid; Preorder)
 import Relation.Binary.PreorderReasoning as PreorderReasoning
@@ -34,7 +34,7 @@ return : {A : Set} → A → ℘ A
 return = _≡_
 
 _>>=_ : {A B : Set} → (S : ℘ A) → (A → ℘ B) → ℘ B
-_>>=_ {A} s f = λ y → Σ[ x ∶ A ] s x × f x y
+_>>=_ {A} s f = λ y → Σ[ x ∈ A ] s x × f x y
 
 map℘ : {A B : Set} → (A → B) → ℘ A → ℘ B
 map℘ f s = s >>= (return ∘ f)
@@ -52,7 +52,7 @@ any : {A : Set} → ℘ A
 any _ = ⊤
 
 any>>=_ : {A B : Set} → (A → ℘ B) → ℘ B
-any>>=_ {A} f = λ y → Σ[ x ∶ A ] f x y
+any>>=_ {A} f = λ y → Σ[ x ∈ A ] f x y
 
 infix 2 any>>=_
 
@@ -192,22 +192,22 @@ idR⁻-r R = (wrap λ { x y (.x , refl , r) → r }) , wrap (λ x y r → x , re
 •⁻-assoc : {X Y Z W : Set} (R : Z ↝⁻ W) (S : Y ↝⁻ Z) (T : X ↝⁻ Y) → (R •⁻ S) •⁻ T ≃⁻ R •⁻ (S •⁻ T)
 •⁻-assoc R S T = wrap (λ { x w (y , t , z , s , r) → z , (y , t , s) , r }) , wrap (λ { x w (z , (y , t , s) , r) → y , t , z , s , r })
 
-iso⁻-conv : {X Y : Set} → (iso : Iso Fun X Y) → fun⁻ (Iso.to Fun iso) º⁻ ≃⁻ fun⁻ (Iso.from Fun iso)
+iso⁻-conv : {X Y : Set} → (iso : Iso Fun X Y) → fun⁻ (Iso.to iso) º⁻ ≃⁻ fun⁻ (Iso.from iso)
 iso⁻-conv iso =
   (wrap (λ y x eq → trans (sym (cong (from iso) eq)) (from-to-inverse iso x))) ,
   (wrap (λ y x eq → trans (sym (cong (to   iso) eq)) (to-from-inverse iso y)))
   where open Iso Fun
 
 iso⁻-idR⁻ : {X Y : Set} → (iso : Iso Fun X Y) →
-            fun⁻ (Iso.to Fun iso) •⁻ fun⁻ (Iso.to Fun iso) º⁻ ≃⁻ idR⁻
+            fun⁻ (Iso.to iso) •⁻ fun⁻ (Iso.to iso) º⁻ ≃⁻ idR⁻
 iso⁻-idR⁻ {Y = Y} iso =
   begin
-    fun⁻ (Iso.to Fun iso) •⁻ fun⁻ (Iso.to Fun iso) º⁻
-      ≃⁻⟨ •⁻-cong-l (fun⁻ (Iso.to Fun iso)) (iso⁻-conv iso) ⟩
-    fun⁻ (Iso.to Fun iso) •⁻ fun⁻ (Iso.from Fun iso)
-      ≃⁻⟨ Setoid.sym setoid (fun⁻-preserves-comp (Iso.to Fun iso) (Iso.from Fun iso)) ⟩
-    fun⁻ (Iso.to Fun iso ∘ Iso.from Fun iso)
-      ≃⁻⟨ fun⁻-cong (Iso.to-from-inverse Fun iso) ⟩
+    fun⁻ (Iso.to iso) •⁻ fun⁻ (Iso.to iso) º⁻
+      ≃⁻⟨ •⁻-cong-l (fun⁻ (Iso.to iso)) (iso⁻-conv iso) ⟩
+    fun⁻ (Iso.to iso) •⁻ fun⁻ (Iso.from iso)
+      ≃⁻⟨ Setoid.sym setoid (fun⁻-preserves-comp (Iso.to iso) (Iso.from iso)) ⟩
+    fun⁻ (Iso.to iso ∘ Iso.from iso)
+      ≃⁻⟨ fun⁻-cong (Iso.to-from-inverse iso) ⟩
     idR⁻
   □
   where setoid = ≃⁻-Setoid Y Y
@@ -420,11 +420,11 @@ idR-r R = wrap (λ i → proj₁ (idR⁻-r ((R !!) i))) , wrap (λ i → proj₂
 •-assoc R S T = wrap (λ i → proj₁ (•⁻-assoc ((R !!) i) ((S !!) i) ((T !!) i))) , wrap (λ i → proj₂ (•⁻-assoc ((R !!) i) ((S !!) i) ((T !!) i)))
 
 iso-conv : {I : Set} {X Y : I → Set} → (isos : ∀ i → Iso Fun (X i) (Y i)) →
-            fun (λ {i} → Iso.to Fun (isos i)) º ≃ fun (λ {i} → Iso.from Fun (isos i))
+            fun (λ {i} → Iso.to (isos i)) º ≃ fun (λ {i} → Iso.from (isos i))
 iso-conv isos = wrap (λ i → proj₁ (iso⁻-conv (isos i))) , wrap (λ i → proj₂ (iso⁻-conv (isos i)))
 
 iso-idR : {I : Set} {X Y : I → Set} → (isos : ∀ i → Iso Fun (X i) (Y i)) →
-           fun (λ {i} → Iso.to Fun (isos i)) • fun (λ {i} → Iso.to Fun (isos i)) º ≃ idR
+           fun (λ {i} → Iso.to (isos i)) • fun (λ {i} → Iso.to (isos i)) º ≃ idR
 iso-idR {Y = Y} isos = wrap (λ i → proj₁ (iso⁻-idR⁻ (isos i))) , wrap (λ i → proj₂ (iso⁻-idR⁻ (isos i)))
 
 fun-shunting-l-⇒ : {I : Set} {X Y Z : I → Set} (f : Y ⇉ Z) (R : X ↝ Y) (S : X ↝ Z) → fun f • R ⊆ S → R ⊆ fun f º • S
