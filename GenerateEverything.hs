@@ -28,7 +28,7 @@ readme_header =
     "(https://github.com/josh-hs-ko/dissertation/blob/master/dissertation.pdf).",
     "",
 		"All files typecheck with Agda (and Standard Library) 2.4.0. " ++
-		"Note that some files can take a very long time to typecheck. " ++
+		"Note that some files can take a very long time to typecheck.",
 		"",
     "See [the author's homepage]" ++
     "(http://www.cs.ox.ac.uk/people/hsiang-shang.ko/) " ++
