@@ -27,7 +27,7 @@ readme_header =
     "and forms the basis of [the author's DPhil dissertation]" ++
     "(https://github.com/josh-hs-ko/dissertation/blob/master/dissertation.pdf).",
     "",
-		"All files typecheck with Agda (and Standard Library) 2.4.0. " ++
+		"All files typecheck with Agda 2.4.0.1 and Standard Library 0.8. " ++
 		"Note that some files can take a very long time to typecheck.",
 		"",
     "See [the author's homepage]" ++

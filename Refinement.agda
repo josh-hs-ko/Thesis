@@ -206,6 +206,14 @@ fixed' I u = record { P = λ f → ∀ {i} → Upgrade.P (u i) (f {i})
 
 syntax fixed' I (λ i → u) = ∀[[ i ∈ I ]] u
 
+fixed'' : (I : Set) {X : I → Set} {Y : I → Set} → (∀ i → Upgrade (X i) (Y i)) → Upgrade ((i : I) → X i) ({i : I} → Y i)
+fixed'' I u = record { P = λ f → (i : I) → Upgrade.P (u i) (f i)
+                     ; C = λ f g → (i : I) → Upgrade.C (u i) (f i) (g {i})
+                     ; u = λ f h {i} → Upgrade.u (u i) (f i) (h i) 
+                     ; c = λ f h i → Upgrade.c (u i) (f i) (h i) }
+
+syntax fixed'' I (λ i → u) = ∀[[[ i ∈ I ]]] u
+
 _′⇀_ : {I J : Set} {X : I → Set} {Y : J → Set} →
      (r : Refinement I J) → (∀ i j → Upgrade.C (toUpgrade r) i j → Upgrade (X i) (Y j)) → Upgrade ((i : I) → X i) ((j : J) → Y j)
 r ′⇀ s = record { P = λ f → ∀ i j → (c : Upgrade.C (toUpgrade r) i j) → Upgrade.P (s i j c) (f i)
