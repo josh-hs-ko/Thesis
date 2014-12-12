@@ -22,11 +22,8 @@ ListOD A = wrap λ _ → σ ListTag λ { `nil   → ṿ tt
 List : Set → Set
 List A = μ ⌊ ListOD A ⌋ tt
 
-[] : {A : Set} → List A
-[] = con (`nil , tt)
-
-_∷_ : {A : Set} → A → List A → List A
-x ∷ xs = con (`cons , x , xs , tt)
+pattern []       = con (`nil , tt)
+pattern _∷_ x xs = con (`cons , x , xs , tt)
 
 infixr 5 _∷_
 

@@ -20,7 +20,7 @@ open import Ornament.ParallelComposition
 open import Ornament.RefinementSemantics
 open import Ornament.ParallelComposition.Swap
 open import Examples.Nat
-open import Examples.Nat.TotalOrdering renaming (_≤_ to _≤'_; ≤-refl to ≤'-refl; _≤?_ to _≤'?_; ≰-invert to ≰'-invert)
+open import Examples.Nat.TotalOrdering renaming (_≤_ to _≤'_; ≤-refl to ≤'-refl; ≤-trans to ≤'-trans; _≤?_ to _≤'?_; ≰-invert to ≰'-invert)
 open import Examples.List
 
 open import Function using (id; _∘_)
@@ -173,7 +173,7 @@ wlhrelax = Upgrade.u upg id λ { b'≤b _ → relax b'≤b ** id }
         upg = ∀⁺[[ b ∈ Val ]] ∀⁺[[ b' ∈ Val ]] ∀⁺[ _ ∈ b' ≤ b ] ∀⁺[[ n ∈ Nat ]] ref b n ⇀ toUpgrade (ref b' n)
 
 
-{-# NO_TERMINATION_CHECK #-}  -- to skip the construction of the well-ordering (_<'_) on natural numbers
+{-# TERMINATING #-}  -- to skip the construction of the well-ordering (_<'_) on natural numbers
 
 mutual
 

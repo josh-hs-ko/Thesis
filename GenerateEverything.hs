@@ -17,7 +17,7 @@ everything_header =
 
 readme_header :: [String]
 readme_header =
-  [ "# Analysis and synthesis of inductive families", 
+  [ "# Analysis and synthesis of inductive families",
     "",
     "This implements, in Agda, a framework of " ++
 		"composable datatype refinements and " ++
@@ -27,10 +27,11 @@ readme_header =
     "and forms the basis of [the author's DPhil dissertation]" ++
     "(https://github.com/josh-hs-ko/dissertation/blob/master/dissertation.pdf).",
     "",
-		"All files typecheck with Agda 2.4.0.1 and Standard Library 0.8. " ++
+		"All files typecheck with the development version of " ++
+    "Agda and the Standard Library (12 Dec 2014). " ++
 		"Note that some files can take a very long time to typecheck.",
 		"",
-    "See [the author's homepage]" ++
+    "See [the author's (old) homepage]" ++
     "(http://www.cs.ox.ac.uk/people/hsiang-shang.ko/) " ++
     "for more information, including published papers.",
     "",
@@ -71,7 +72,7 @@ preprocess =
   map (id &&& (map (takeWhile isAlpha) . tail . splitPath))
   where
     toIndex :: String -> Int
-    toIndex = maybe maxBound id . flip findIndex ordering . (==)    
+    toIndex = maybe maxBound id . flip findIndex ordering . (==)
 
 readHeader :: FilePath -> IO [String]
 readHeader path =

@@ -11,7 +11,7 @@ open import Prelude.Equality
 
 open import Function using (id; _∘_; const)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_; <_,_>; uncurry) renaming (map to _**_)
+open import Data.Product using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_; <_,_>; curry; uncurry) renaming (map to _**_)
 open import Relation.Binary using (module Setoid)
 import Relation.Binary.EqReasoning as EqReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst; cong; sym; trans)
@@ -236,3 +236,34 @@ u ×⁺ Z = record { P = λ x → Upgrade.P u x × Z
                 ; C = λ { x (y , z) → Upgrade.C u x y }
                 ; u = λ { x (p , z) → Upgrade.u u x p , z }
                 ; c = λ { x (p , z) → Upgrade.c u x p } }
+
+
+--------
+-- Forgetful upgrades
+
+record FUpgrade (X Y : Set) : Set₁ where
+  field
+    P      : X → Set
+    forget : Y → X
+    u      : ∀ x → P x → Y
+    c      : ∀ x → (p : P x) → forget (u x p) ≡ x
+
+fromFUpgrade : {X Y : Set} → FUpgrade X Y → Upgrade X Y
+fromFUpgrade fupg = record
+  { P = FUpgrade.P fupg
+  ; C = λ x y → FUpgrade.forget fupg y ≡ x
+  ; u = FUpgrade.u fupg
+  ; c = FUpgrade.c fupg }
+
+toFUpgrade : {X Y : Set} → Refinement X Y → FUpgrade X Y
+toFUpgrade ref = record
+  { P      = Refinement.P ref
+  ; forget = Refinement.forget ref
+  ; u      = curry (Iso.from (Refinement.i ref))
+  ; c      = curry (cong proj₁ ∘ Iso.to-from-inverse (Refinement.i ref)) }
+
+_⁺×_ : (X : Set) {Y Z : Set} → FUpgrade Y Z → FUpgrade Y (X × Z)
+X ⁺× fupg = record { P      = λ y → X × FUpgrade.P fupg y
+                   ; forget = FUpgrade.forget fupg ∘ proj₂
+                   ; u      = λ { y (x , p) → x , FUpgrade.u fupg y p }
+                   ; c      = λ { y (x , p) → FUpgrade.c fupg y p } }

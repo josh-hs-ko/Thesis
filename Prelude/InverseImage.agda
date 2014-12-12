@@ -29,6 +29,9 @@ InvImage = _⁻¹_
 und : ∀ {A B} {f : A → B} {y} → f ⁻¹ y → A
 und (ok x) = x
 
+und-proj₁ : {A : Set} {B : A → Set} {x : A} → proj₁ {A = A} {B} ⁻¹ x → B x
+und-proj₁ (ok (x , y)) = y
+
 from≡ : ∀ {A B} (f : A → B) {x y} → f x ≡ y → f ⁻¹ y
 from≡ f {x} refl = ok x
 

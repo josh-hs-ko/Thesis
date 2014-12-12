@@ -12,11 +12,13 @@ open import Description
 open import Ornament
 open import Ornament.RefinementSemantics
 
+open import Function using (_∘_; flip)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; Σ-syntax; _,_; _×_)
 open import Data.Nat using (ℕ; zero; suc; pred)
 open import Data.List using (List; []; _∷_)
 open import Relation.Binary.PropositionalEquality using (_≡_)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong)
 
 
 --------
@@ -142,30 +144,58 @@ add-merge-coherence = Upgrade.c upg' add merge'
 --------
 -- shifting and halving
 
-shift : ℕ → Bin → Bin
-shift zero    (con (`nil  ,     _)) = con (`nil , tt)
-shift zero    (con (`zero , b , _)) = b
-shift zero    (con (`one  , b , _)) = b
-shift (suc r) b                     = b
+shift : Bin → Bin
+shift (con (`nil  ,     _)) = con (`nil , tt)
+shift (con (`zero , b , _)) = b
+shift (con (`one  , b , _)) = b
 
-upg'' : Upgrade (ℕ → Bin → Bin) (({r : ℕ} → BTree (suc r) → BTree r) → {r : ℕ} → BHeap r → BHeap (pred r))
+upg'' : Upgrade (Bin → Bin) (({r : ℕ} → BTree (suc r) → BTree r) → {r : ℕ} → BHeap r → BHeap r)
 upg'' = ∀⁺[ _ ∈ ({r : ℕ} → BTree (suc r) → BTree r) ]
-        ∀[[[ r ∈ ℕ ]]] let ref r = FRefinement.comp (RSem' ⌈ BHeapOD ⌉) (ok r) in ref r ⇀ toUpgrade (ref (pred r))
+        ∀⁺[[ r ∈ ℕ ]] let ref = FRefinement.comp (RSem' ⌈ BHeapOD ⌉) (ok r) in ref ⇀ toUpgrade ref
 
 mapBHeap' : ({r : ℕ} → BTree (suc r) → BTree r) → {r : ℕ} {b : Bin} → BHeap' (suc r) b → BHeap' r b
 mapBHeap' f {r} {con (`nil  , _)} _                 = con tt
 mapBHeap' f {r} {con (`zero , _)} (con (    h , _)) = con (      mapBHeap' f h , tt)
 mapBHeap' f {r} {con (`one  , _)} (con (t , h , _)) = con (f t , mapBHeap' f h , tt)
 
-halve' : ({r : ℕ} → BTree (suc r) → BTree r) → (r : ℕ) (b : Bin) → BHeap' r b → BHeap' (pred r) (shift r b)  -- Upgrade.P upg'' shift
-halve' f zero    (con (`nil  , _)) _                 = con tt
-halve' f zero    (con (`zero , _)) (con (    h , _)) = mapBHeap' f h
-halve' f zero    (con (`one  , _)) (con (t , h , _)) = mapBHeap' f h
-halve' f (suc r) b                 h                 = mapBHeap' f h
+halve' : ({r : ℕ} → BTree (suc r) → BTree r) → {r : ℕ} (b : Bin) → BHeap' r b → BHeap' r (shift b)  -- Upgrade.P upg'' shift
+halve' f (con (`nil  , _)) _                 = con tt
+halve' f (con (`zero , _)) (con (    h , _)) = mapBHeap' f h
+halve' f (con (`one  , _)) (con (t , h , _)) = mapBHeap' f h
 
-halve : ({r : ℕ} → BTree (suc r) → BTree r) → {r : ℕ} → BHeap r → BHeap (pred r)
+halve : ({r : ℕ} → BTree (suc r) → BTree r) → {r : ℕ} → BHeap r → BHeap r
 halve = Upgrade.u upg'' shift halve'
 
-shift-halve-coherence : (f : {r : ℕ} → BTree (suc r) → BTree r) (r : ℕ) (b : Bin) (h : BHeap r) →
-                        toBin h ≡ b → toBin (halve f h) ≡ shift r b  -- Upgrade.C upg'' shift halve
+shift-halve-coherence : (f : {r : ℕ} → BTree (suc r) → BTree r) {r : ℕ} (b : Bin) (h : BHeap r) →
+                        toBin h ≡ b → toBin (halve f h) ≡ shift b  -- Upgrade.C upg'' shift halve
 shift-halve-coherence = Upgrade.c upg'' shift halve'
+
+{- The externalist approach:
+
+shift : Bin → Bin
+shift (con (`nil  ,     _)) = con (`nil , tt)
+shift (con (`zero , b , _)) = b
+shift (con (`one  , b , _)) = b
+
+mapBHeap : ({r : ℕ} → BTree (suc r) → BTree r) → {r : ℕ} → BHeap (suc r) → BHeap r
+mapBHeap f (con (`nil  ,         _)) = con (`nil  ,                      tt)
+mapBHeap f (con (`zero ,     h , _)) = con (`zero ,       mapBHeap f h , tt)
+mapBHeap f (con (`one  , t , h , _)) = con (`one  , f t , mapBHeap f h , tt)
+
+toBin-mapBHeap : (f : {r : ℕ} → BTree (suc r) → BTree r) {r : ℕ} (h : BHeap (suc r)) → toBin (mapBHeap f h) ≡ toBin h
+toBin-mapBHeap f (con (`nil  ,         _)) = refl
+toBin-mapBHeap f (con (`zero ,     h , _)) = cong con (cong (_,_ `zero) (cong (flip _,_ tt) (toBin-mapBHeap f h)))
+toBin-mapBHeap f (con (`one  , t , h , _)) = cong con (cong (_,_ `one ) (cong (flip _,_ tt) (toBin-mapBHeap f h)))
+
+halve : ({r : ℕ} → BTree (suc r) → BTree r) → {r : ℕ} → BHeap r → BHeap r
+halve f (con (`nil  ,         _)) = con (`nil , tt)
+halve f (con (`zero ,     h , _)) = mapBHeap f h
+halve f (con (`one  , t , h , _)) = mapBHeap f h
+
+shift-halve-coherence : (f : {r : ℕ} → BTree (suc r) → BTree r) {r : ℕ} (b : Bin) (h : BHeap r) →
+                        toBin h ≡ b → toBin (halve f h) ≡ shift b
+shift-halve-coherence f .(con (`nil  ,           _)) (con (`nil  ,         _)) refl = refl
+shift-halve-coherence f .(con (`zero , toBin h , _)) (con (`zero ,     h , _)) refl = toBin-mapBHeap f h
+shift-halve-coherence f .(con (`one  , toBin h , _)) (con (`one  , t , h , _)) refl = toBin-mapBHeap f h
+
+-}
