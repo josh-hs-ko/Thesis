@@ -58,7 +58,7 @@ Pullback-preserving {C = C} {D} F =
 
 particular-pullback-preservation :
   {ℓ₀ ℓ₁ ℓ₂ ℓ₃ ℓ₄ ℓ₅ : Level} {C : Category {ℓ₀} {ℓ₁} {ℓ₂}} {D : Category {ℓ₃} {ℓ₄} {ℓ₅}} (F : Functor C D) →
-  ({B : Object C} (f g : Slice C B) → Σ[ s ∈ Square C f g ] Pullback C f g s × Pullback D (object (SliceMap F) f) (object (SliceMap F) g) (object (SquareMap F) s)) →
+  ({B : Object C} (f g : Slice C B) → Σ[ s ∈ Square C f g ] (Pullback C f g s × Pullback D (object (SliceMap F) f) (object (SliceMap F) g) (object (SquareMap F) s))) →
   Pullback-preserving F
 particular-pullback-preservation {C = C} {D} F particular {B} f g s' ps' =
   let s   = proj₁ (particular f g)

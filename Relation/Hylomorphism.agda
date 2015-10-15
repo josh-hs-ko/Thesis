@@ -72,7 +72,7 @@ hylo-least T =
                 ⊆⟨ •-monotonic-r (S º) (Ṙ-monotonic D (/-universal-⇒ ⊆-refl)) ⟩
               Ṙ D T • S º
             □′)) ⟩
-    R • Ṙ D T • S º ⊆ T
+    (R • Ṙ D T • S º ⊆ T)
   □
   where open PreorderReasoning ⇐-Preorder renaming (_∼⟨_⟩_ to _⇐⟨_⟩_; _∎ to _□)
         open PreorderReasoning (⊆-Preorder X (Ḟ D Y)) renaming (begin_ to begin′_; _∼⟨_⟩_ to _⊆⟨_⟩_; _∎ to _□′)

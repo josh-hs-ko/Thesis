@@ -12,6 +12,8 @@ import Relation.Binary.PreorderReasoning as PreorderReasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
 
+infixr 5 _∪⁻_
+
 _∪⁻_ : {X Y : Set} → X ↝⁻ Y → X ↝⁻ Y → X ↝⁻ Y
 (R ∪⁻ S) x y = R x y ⊎ S x y
 
@@ -22,6 +24,8 @@ _∪⁻_ : {X Y : Set} → X ↝⁻ Y → X ↝⁻ Y → X ↝⁻ Y
 ∪⁻-universal-⇐ : {X Y : Set} {R S T : X ↝⁻ Y} → R ⊆⁻ T → S ⊆⁻ T → R ∪⁻ S ⊆⁻ T
 ∪⁻-universal-⇐ R⊆⁻T S⊆⁻T = wrap λ { x y (inj₁ r) → modus-ponens-⊆⁻ R⊆⁻T x y r
                                ; x y (inj₂ s) → modus-ponens-⊆⁻ S⊆⁻T x y s }
+
+infixr 5 _∪_
 
 _∪_ : {I : Set} {X Y : I → Set} → X ↝ Y → X ↝ Y → X ↝ Y
 (R ∪ S) = wrap λ i → (R !!) i ∪⁻ (S !!) i
@@ -77,7 +81,7 @@ R /⁻/⁻ = wrap λ i x y → R (i , x) (i , y)
        ⇐⟨ ⋃-cancellation ⟩
      ⋃ ((⋃ R) /⁻/⁻) ⊆⁻ ⋃ R
        ⇐⟨ ⋃-universal-⇐ ((⋃ R) /⁻/⁻) (⋃ R) ⟩
-     (⋃ R) /⁻/⁻ ⊆ (⋃ R) /⁻/⁻
+     ((⋃ R) /⁻/⁻ ⊆ (⋃ R) /⁻/⁻)
    □) ⊆-refl ,
   ⋃-universal-⇒ R (⋃ R) ⊆⁻-refl
   where open PreorderReasoning ⇐-Preorder renaming (_∼⟨_⟩_ to _⇐⟨_⟩_; _∎ to _□)

@@ -20,17 +20,15 @@ readme_header =
   [ "# Analysis and synthesis of inductive families",
     "",
     "This implements, in Agda, a framework of " ++
-		"composable datatype refinements and " ++
+    "composable datatype refinements and " ++
     "relational algebraic ornamentation " ++
     "based on [McBride's work on ornaments]" ++
-		"(http://personal.cis.strath.ac.uk/~conor/pub/OAAO/LitOrn.pdf), " ++
+    "(http://personal.cis.strath.ac.uk/~conor/pub/OAAO/LitOrn.pdf), " ++
     "and forms the basis of [the author's DPhil dissertation]" ++
     "(https://github.com/josh-hs-ko/dissertation/blob/master/dissertation.pdf).",
     "",
-		"All files typecheck with the development version of " ++
-    "Agda and the Standard Library (12 Dec 2014). " ++
-		"Note that some files can take a very long time to typecheck.",
-		"",
+    "All files typecheck with Agda 2.4.2.4 and Standard Library 0.10.",
+    "",
     "See [the author's (old) homepage]" ++
     "(http://www.cs.ox.ac.uk/people/hsiang-shang.ko/) " ++
     "for more information, including published papers.",

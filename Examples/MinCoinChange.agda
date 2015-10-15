@@ -324,7 +324,7 @@ insert1 {c} ._ | vnil              = cons' 1p (1p-minimum c) refl refl nil'
 insert1     ._ | vcons d d≤c {n} b = cons' d d≤c (solve 2 (λ m vd → vd :+ (:con 1 :+ m) := :con 1 :+ (vd :+ m)) refl n (value d)) refl (insert1 b)
 
 greedy-lemma :
-  (c d : Coin) → c ≤C d → (m n : ℕ) → value c + m ≡ value d + n → {l : ℕ} (b : CoinBag' c m l) → Σ[ l' ∈ ℕ ] CoinBag' d n l' × l' ≤ l
+  (c d : Coin) → c ≤C d → (m n : ℕ) → value c + m ≡ value d + n → {l : ℕ} (b : CoinBag' c m l) → Σ[ l' ∈ ℕ ] (CoinBag' d n l' × l' ≤ l)
 greedy-lemma  c   d  c≤d  m        n       eq       b  with view-ordered-coin c d c≤d
 greedy-lemma .1p .1p c≤d .n        n       refl {l} b  | 1p1p = l , b , ≤-refl
 greedy-lemma .1p .2p c≤d .(1 + n)  n       refl     b  | 1p2p with view'CoinBag' b
@@ -363,7 +363,7 @@ greedy-condition-aux c (`cons  , d , d≤c , n , tt) ._
              (_ , (proj₁ better-solution , proj₁ (proj₂ better-solution) , tt , tt , refl) , refl) , refl) , refl) , refl) ,
   _ , (_ , refl , s≤s better-evidence) , refl
   where
-    greedy-lemma-invocation : Σ[ l ∈ ℕ ] CoinBag' d n l × l ≤ count b
+    greedy-lemma-invocation : Σ[ l ∈ ℕ ] (CoinBag' d n l × l ≤ count b)
     greedy-lemma-invocation =
       greedy-lemma d' d d'≤d n' n d'+n'≡d+n
          (Iso.from (Refinement.i
@@ -374,7 +374,7 @@ greedy-condition-aux c (`cons  , d , d≤c , n , tt) ._
             (b , total-value-d'-b-n' , modus-ponens-⊆ (proj₁ (fun-preserves-fold CoinBagD count-alg)) d' b (count b) refl))
     l : ℕ
     l = proj₁ greedy-lemma-invocation
-    better-solution : Σ[ b' ∈ CoinBag d ] foldR' (fun total-value-alg) d b' n × foldR' (fun count-alg) d b' l
+    better-solution : Σ[ b' ∈ CoinBag d ] (foldR' (fun total-value-alg) d b' n × foldR' (fun count-alg) d b' l)
     better-solution =
       Iso.to (Refinement.i
         (FRefinement.comp
@@ -426,7 +426,7 @@ at-least-view (suc m) (suc  n       ) with at-least-view m n
 at-least-view (suc m) (suc .(m + n')) | at-least .m n' = at-least (suc m) n'
 at-least-view (suc m) (suc  n       ) | less-than n<m  = less-than (s≤s n<m)
 
-try-1p : (n : ℕ) → 0 < n → Σ[ d ∈ Coin ] UsableCoin n 1p d × ((e : Coin) → UsableCoin n 1p e → e ≤C d)
+try-1p : (n : ℕ) → 0 < n → Σ[ d ∈ Coin ] (UsableCoin n 1p d × ((e : Coin) → UsableCoin n 1p e → e ≤C d))
 try-1p  n       0<n with at-least-view 1 n
 try-1p .(1 + n) 0<n | at-least .1 n = 1p , (≤-refl , n , refl) , 1p-greatest
   where 1p-greatest : (e : Coin) → UsableCoin (1 + n) 1p e → e ≤C 1p
@@ -434,7 +434,7 @@ try-1p .(1 + n) 0<n | at-least .1 n = 1p , (≤-refl , n , refl) , 1p-greatest
         1p-greatest .1p (e≤1p , n' , eq) | 1p1p = ≤-refl
 try-1p .0       ()  | less-than (s≤s z≤n)
 
-try-2p : (n : ℕ) → 0 < n → Σ[ d ∈ Coin ] UsableCoin n 2p d × ((e : Coin) → UsableCoin n 2p e → e ≤C d)
+try-2p : (n : ℕ) → 0 < n → Σ[ d ∈ Coin ] (UsableCoin n 2p d × ((e : Coin) → UsableCoin n 2p e → e ≤C d))
 try-2p  n       0<n with at-least-view 2 n
 try-2p .(2 + n) 0<n | at-least .2 n = 2p , (≤-refl , n , refl) , 2p-greatest
   where 2p-greatest : (e : Coin) → UsableCoin (2 + n) 2p e → e ≤C 2p
@@ -446,7 +446,7 @@ try-2p  n       0<n | less-than n<2 | d , (lep , n' , eq) , d-greatest = d , (�
         2p-greatest .1p (e≤2p , n' , eq) | 1p2p = d-greatest 1p (≤-refl , n' , eq)
         2p-greatest .2p (e≤2p , n' , eq) | 2p2p = ⊥-elim (¬i+1+j≤i 2 (≤-trans (s≤s (≤-reflexive eq)) n<2))
 
-try-5p : (n : ℕ) → 0 < n → Σ[ d ∈ Coin ] UsableCoin n 5p d × ((e : Coin) → UsableCoin n 5p e → e ≤C d)
+try-5p : (n : ℕ) → 0 < n → Σ[ d ∈ Coin ] (UsableCoin n 5p d × ((e : Coin) → UsableCoin n 5p e → e ≤C d))
 try-5p  n       0<n with at-least-view 5 n
 try-5p .(5 + n) 0<n | at-least .5 n = 5p , (≤-refl , n , refl) , 5p-greatest
   where 5p-greatest : (e : Coin) → UsableCoin (5 + n) 5p e → e ≤C 5p
@@ -459,7 +459,7 @@ try-5p  n       0<n | less-than n<5 | d , (lep , n' , eq) , d-greatest = d , (�
         5p-greatest .2p (e≤5p , n' , eq) | 2p5p = d-greatest 2p (≤-refl , n' , eq)
         5p-greatest .5p (e≤5p , n' , eq) | 5p5p = ⊥-elim (¬i+1+j≤i 5 (≤-trans (s≤s (≤-reflexive eq)) n<5))
 
-maximum-coin : (n : ℕ) → 0 < n → (c : Coin) → Σ[ d ∈ Coin ] UsableCoin n c d × ((e : Coin) → UsableCoin n c e → e ≤C d)
+maximum-coin : (n : ℕ) → 0 < n → (c : Coin) → Σ[ d ∈ Coin ] (UsableCoin n c d × ((e : Coin) → UsableCoin n c e → e ≤C d))
 maximum-coin n 0<n 1p = try-1p n 0<n
 maximum-coin n 0<n 2p = try-2p n 0<n
 maximum-coin n 0<n 5p = try-5p n 0<n

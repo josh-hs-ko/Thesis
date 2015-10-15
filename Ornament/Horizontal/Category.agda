@@ -61,7 +61,7 @@ record FḢTrans {I J : Set} (e : J → I) (D : Desc I) (E : Desc J) : Set₁ wh
 
 Shape : Functor ḞḢTrans Fam
 Shape = record
-  { object   = λ { (I , D) → I , Ṡ ∘ Desc.comp D }
+  { object   = λ { (I , D) → I , (Ṡ ∘ Desc.comp D) }
   ; morphism = λ { (e , ts) → e , λ {j} → ḢTrans.s (FḢTrans.comp ts j) }
   ; ≈-respecting    = λ { (eeq , tseq) → eeq , λ { {j} h .h hrefl → tseq j h } }
   ; id-preserving   = frefl , λ _ _ → id

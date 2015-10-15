@@ -114,11 +114,11 @@ erase-Ṡ-to-clsP (∇ s O) hs       = cong (_,_ s) (erase-Ṡ-to-clsP O hs)
 -- isomorphism about algROrn
 
 algROrn-decomp : {I : Set} (D : RDesc I) (X : I → Set) (P : ℘ (⟦ D ⟧ X)) → Ṡ (toRDesc (algROrn D P)) → Σ (⟦ D ⟧ X) P
-algROrn-decomp (ṿ is)  X P (xs , p , _) = xs , p
-algROrn-decomp (σ S D) X P (s , hs)     = (_,_ s ** id) (algROrn-decomp (D s) X (curry P s) hs)
+algROrn-decomp (ṿ is)  X P (xs , (p , _)) = xs , p
+algROrn-decomp (σ S D) X P (s , hs)       = (_,_ s ** id) (algROrn-decomp (D s) X (curry P s) hs)
 
 algROrn-comp : {I : Set} (D : RDesc I) (X : I → Set) (P : ℘ (⟦ D ⟧ X)) → (xs : ⟦ D ⟧ X) → P xs → Ṡ (toRDesc (algROrn D P))
-algROrn-comp (ṿ is)  X P xs       p = xs , p , tt
+algROrn-comp (ṿ is)  X P xs       p = xs , (p , tt)
 algROrn-comp (σ S D) X P (s , xs) p = s , algROrn-comp (D s) X (curry P s) xs p
 
 algROrn-decomp-comp-inverse : {I : Set} (D : RDesc I) (X : I → Set) (P : ℘ (⟦ D ⟧ X)) → algROrn-decomp D X P ∘ uncurry (algROrn-comp D X P) ≐ id
@@ -126,8 +126,8 @@ algROrn-decomp-comp-inverse (ṿ is)  X P (xs , ps)       = refl
 algROrn-decomp-comp-inverse (σ S D) X P ((s , xs) , ps) = cong (_,_ s ** id) (algROrn-decomp-comp-inverse (D s) X (curry P s) (xs , ps))
 
 algROrn-comp-decomp-inverse : {I : Set} (D : RDesc I) (X : I → Set) (P : ℘ (⟦ D ⟧ X)) → uncurry (algROrn-comp D X P) ∘ algROrn-decomp D X P ≐ id
-algROrn-comp-decomp-inverse (ṿ is)  X P (xs , p , _) = refl
-algROrn-comp-decomp-inverse (σ S D) X P (s , hs)     = cong (_,_ s) (algROrn-comp-decomp-inverse (D s) X (curry P s) hs)
+algROrn-comp-decomp-inverse (ṿ is)  X P (xs , (p , _)) = refl
+algROrn-comp-decomp-inverse (σ S D) X P (s , hs)       = cong (_,_ s) (algROrn-comp-decomp-inverse (D s) X (curry P s) hs)
 
 algROrn-iso : {I : Set} (D : RDesc I) (X : I → Set) (P : ℘ (⟦ D ⟧ X)) → Iso Fun (Ṡ (toRDesc (algROrn D P))) (Σ (⟦ D ⟧ X) P)
 algROrn-iso D X P = record { to   = algROrn-decomp D X P
@@ -171,14 +171,14 @@ module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) 
   toAlgOrn-c : {D' : RDesc I} {E' : RDesc J} (O' : ROrn e D' E') (P : ℘ (⟦ D' ⟧ (InvImage e)))
                (hs : Ṡ (toRDesc (algROrn D' P))) (ps : clsP O' (proj₁ (algROrn-decomp D' (InvImage e) P hs))) →
                Ė g (next (toRDesc (algROrn D' P)) hs) (next E' (from-clsP O' (proj₁ (algROrn-decomp D' (InvImage e) P hs)) ps))
-  toAlgOrn-c (ṿ eqs)  P (js , p , _) ps          = toAlgOrn-Ė eqs js ps
-  toAlgOrn-c (σ S O') P (s , hs)     ps          = toAlgOrn-c (O' s) (curry P s) hs ps
-  toAlgOrn-c (Δ T O') P hs           (t , ps)    = toAlgOrn-c (O' t) P hs ps
-  toAlgOrn-c (∇ s O') P (.s , hs)    (refl , ps) = toAlgOrn-c O' (curry P s) hs ps
+  toAlgOrn-c (ṿ eqs)  P (js , (p , _)) ps          = toAlgOrn-Ė eqs js ps
+  toAlgOrn-c (σ S O') P (s , hs)       ps          = toAlgOrn-c (O' s) (curry P s) hs ps
+  toAlgOrn-c (Δ T O') P hs             (t , ps)    = toAlgOrn-c (O' t) P hs ps
+  toAlgOrn-c (∇ s O') P (.s , hs)      (refl , ps) = toAlgOrn-c O' (curry P s) hs ps
 
   toAlgOrn-t : (i : I) (j : e ⁻¹ i) → ḢTrans g (Desc.comp E (und j)) (toRDesc (algROrn (Desc.comp D i) (((clsAlg O !!) i º⁻) j)))
   toAlgOrn-t i j =
-    uncurry (from-clsP (Orn.comp O j)) ∘ algROrn-decomp (Desc.comp D i) (InvImage e) (((clsAlg O !!) i º⁻) j) ,
+    (uncurry (from-clsP (Orn.comp O j)) ∘ algROrn-decomp (Desc.comp D i) (InvImage e) (((clsAlg O !!) i º⁻) j)) ,
     λ hs → toAlgOrn-c (Orn.comp O j) (((clsAlg O !!) i º⁻) j) hs (proj₂ (algROrn-decomp (Desc.comp D i) (InvImage e) (((clsAlg O !!) i º⁻) j) hs))
 
   toAlgOrn : Orn g E ⌊ algOrn D (clsAlg O) ⌋
@@ -189,7 +189,7 @@ module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) 
     OrnEq-trans (O ⊙ toAlgOrn) (normOrn O ⊙ toAlgOrn) ⌈ algOrn D (clsAlg O) ⌉
       (⊙-cong-r toAlgOrn O (normOrn O) (OrnEq-sym (normOrn O) O (OrnEq-normal O)))
       (OrnEq-trans (normOrn O ⊙ toAlgOrn) (normOrn ⌈ algOrn D (clsAlg O) ⌉) ⌈ algOrn D (clsAlg O) ⌉
-         (to≡ ∘ proj₂ ,
+         ((to≡ ∘ proj₂) ,
           λ { (._ , ok j) →
               ROrnEq-trans (Orn.comp (normOrn O ⊙ toAlgOrn) (ok (e j , ok j)))
                            (ḢROrn (ḢTrans-normal (Orn.comp O (ok j)) ⊡ toAlgOrn-t (e j) (ok j)))
@@ -219,7 +219,7 @@ module AOCA {I J : Set} {e : J → I} {D : Desc I} {E : Desc J} (O : Orn e D E) 
 
   fromAlgOrn-t : (j : J) → ḢTrans h (toRDesc (algROrn (Desc.comp D (e j)) (((clsAlg O !!) (e j) º⁻) (ok j)))) (Desc.comp E j)
   fromAlgOrn-t j =
-    uncurry (algROrn-comp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º⁻) (ok j))) ∘ to-clsP (Orn.comp O (ok j)) ,
+    (uncurry (algROrn-comp (Desc.comp D (e j)) (InvImage e) (((clsAlg O !!) (e j) º⁻) (ok j))) ∘ to-clsP (Orn.comp O (ok j))) ,
     λ hs → fromAlgOrn-c (Orn.comp O (ok j)) (((clsAlg O !!) (e j) º⁻) (ok j)) hs (proj₂ (to-clsP (Orn.comp O (ok j)) hs))
 
   fromAlgOrn : Orn h ⌊ algOrn D (clsAlg O) ⌋ E
@@ -304,7 +304,7 @@ module CAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝ J) where
   CAAO-computation-ṿ (i ∷ is) (j , js) = refl , CAAO-computation-ṿ is js
 
   CAAO-computation : (D' : RDesc I) (P : ℘ (⟦ D' ⟧ J)) (js : ⟦ D' ⟧ J) → P js → clsP (toROrn (algROrn D' P)) (mapF D' g js)
-  CAAO-computation (ṿ is)   P js       p = js , p , CAAO-computation-ṿ is js
+  CAAO-computation (ṿ is)   P js       p = js , (p , CAAO-computation-ṿ is js)
   CAAO-computation (σ S D') P (s , js) p = CAAO-computation (D' s) (curry P s) js p
 
   CAAO-extraction-ṿ : (is : List I) (js js' : Ṗ is J) → clsP-Ṗ (to≡-Ṗ is (Ṗ-map g is js')) (Ṗ-map g is js) → js ≡ js'
@@ -312,21 +312,21 @@ module CAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝ J) where
   CAAO-extraction-ṿ (i ∷ is) (j , js) (.j , js') (refl , eqs) = cong (_,_ j) (CAAO-extraction-ṿ is js js' eqs)
 
   CAAO-extraction : (D' : RDesc I) (P : ℘ (⟦ D' ⟧ J)) (js : ⟦ D' ⟧ J) → clsP (toROrn (algROrn D' P)) (mapF D' g js) → P js
-  CAAO-extraction (ṿ is)   P js       (js' , p , eqs) with CAAO-extraction-ṿ is js js' eqs
-  CAAO-extraction (ṿ is)   P js       (.js , p , eqs) | refl = p
-  CAAO-extraction (σ S D') P (s , js) p                      = CAAO-extraction (D' s) (curry P s) js p
+  CAAO-extraction (ṿ is)   P js       (js' , (p , eqs)) with CAAO-extraction-ṿ is js js' eqs
+  CAAO-extraction (ṿ is)   P js       (.js , (p , eqs)) | refl = p
+  CAAO-extraction (σ S D') P (s , js) p                        = CAAO-extraction (D' s) (curry P s) js p
 
   R-to-clsAlg : fun g • R ≃ clsAlg ⌈ algOrn D R ⌉ • Ṙ D (fun g)
-  R-to-clsAlg = wrap (λ i → wrap λ { js ._ (j , r , refl) →
+  R-to-clsAlg = wrap (λ i → wrap λ { js ._ (j , (r , refl)) →
                                      Ḟ-map D g js ,
-                                     mapR-fun⁻-computation (Desc.comp D i) g js ,
-                                     CAAO-computation (Desc.comp D i) (((R !!) i º⁻) j) js r }) ,
-                wrap (λ i → wrap λ { js ij (ijs , rs , q) → aux js ij ijs rs q })
+                                     (mapR-fun⁻-computation (Desc.comp D i) g js ,
+                                      CAAO-computation (Desc.comp D i) (((R !!) i º⁻) j) js r) }) ,
+                wrap (λ i → wrap λ { js ij (ijs , (rs , q)) → aux js ij ijs rs q })
     where
       aux : ∀ {i} (js : Ḟ D J i) (ij : proj₁ {B = J} ⁻¹ i) (ijs : Ḟ D (InvImage proj₁) i) (rs : mapR (Desc.comp D i) (fun g) js ijs) →
             (q : (clsAlg ⌈ algOrn D R ⌉ !!) i ijs ij) → ((fun g • R) !!) i js ij
       aux js (ok (i , j)) ijs rs p with mapR-fun⁻-unique (Desc.comp D i) g js ijs rs
-      aux js (ok (i , j)) ._  rs p | refl = j , CAAO-extraction (Desc.comp D i) (((R !!) i º⁻) j) js p , refl
+      aux js (ok (i , j)) ._  rs p | refl = j , (CAAO-extraction (Desc.comp D i) (((R !!) i º⁻) j) js p , refl)
 
   clsAlg-to-R : fun h • clsAlg ⌈ algOrn D R ⌉ ≃ R • Ṙ D (fun h)
   clsAlg-to-R =
@@ -360,7 +360,7 @@ module CAAO {I : Set} {J : I → Set} (D : Desc I) (R : Ḟ D J ↝ J) where
               ∎′) ⟩
        R • Ṙ D (fun h) ≃ fun h • clsAlg ⌈ algOrn D R ⌉
          ⇒⟨ ≃-sym ⟩
-       fun h • clsAlg ⌈ algOrn D R ⌉ ≃ R • Ṙ D (fun h)
+       (fun h • clsAlg ⌈ algOrn D R ⌉ ≃ R • Ṙ D (fun h))
     ∎) R-to-clsAlg
     where open PreorderReasoning (⇒-Preorder) renaming (_∼⟨_⟩_ to _⇒⟨_⟩_)
           setoid = ≃-Setoid (Ḟ D (InvImage proj₁)) J
@@ -436,7 +436,7 @@ OrnEq-to-hom :
   {g : J → K} (Q : Orn g F E) (oeq : OrnEq (P ⊙ Q) O) →
   let h : InvImage e ⇉ InvImage f; h = InvImage-lift e f g (proj₁ oeq) in fun h • clsAlg O ⊆ clsAlg P • Ṙ D (fun h)
 OrnEq-to-hom {I} {J} {K} {e} {f} {D} {E} {F} O P {g} Q (eeq , roeq) =
-  wrap (λ i → wrap λ { js ._ (j , p , refl) → Ḟ-map D h js , mapR-fun⁻-computation (Desc.comp D i) h js , aux js j p })
+  wrap (λ i → wrap λ { js ._ (j , (p , refl)) → Ḟ-map D h js , (mapR-fun⁻-computation (Desc.comp D i) h js , aux js j p) })
   where
     h : InvImage e ⇉ InvImage f
     h = InvImage-lift e f g eeq
@@ -467,5 +467,5 @@ hom-to-OrnEq :
 hom-to-OrnEq D R S h inc =
   wrap λ { {._} (ok (i , j)) →
            hom-to-OrnEq-aux (Desc.comp D i) (((R !!) i º⁻) j) (((S !!) i º⁻) (h j)) h
-             (λ js r → let (ks , rs , s) = modus-ponens-⊆ inc i js (h j) (j , r , refl)
+             (λ js r → let (ks , (rs , s)) = modus-ponens-⊆ inc i js (h j) (j , (r , refl))
                        in  subst (((S !!) i º⁻) (h j)) (sym (mapR-fun⁻-unique (Desc.comp D i) h js ks rs)) s) }

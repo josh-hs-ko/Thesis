@@ -31,7 +31,7 @@ open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅) rena
                                           record { refl  = λ { {e , O} → OrnEq-refl O }
                                                  ; sym   = λ { {e , O} {f , P} → OrnEq-sym O P }
                                                  ; trans = λ { {e , O} {f , P} {g , Q} → OrnEq-trans O P Q } } } }
-              ; _·_ = λ { (e , O) (f , P) → e ∘ f , O ⊙ P }
+              ; _·_ = λ { (e , O) (f , P) → (e ∘ f) , (O ⊙ P) }
               ; id  = λ { {I , D} → id , idOrn D }
               ; id-l   = λ { (e , O) → ⊙-id-l O }
               ; id-r   = λ { (e , O) → ⊙-id-r O }

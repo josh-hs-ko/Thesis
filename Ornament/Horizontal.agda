@@ -29,7 +29,7 @@ record ḢTrans {I J : Set} (e : J → I) (D : RDesc I) (E : RDesc J) : Set wher
 ḢTrans-id = id , λ _ → Ė-refl
 
 _⊡_ : {I J K : Set} {e : J → I} {f : K → J} {D : RDesc I} {E : RDesc J} {F : RDesc K} → ḢTrans e D E → ḢTrans f E F → ḢTrans (e ∘ f) D F
-t ⊡ u = ḢTrans.s t ∘ ḢTrans.s u , λ hs → Ė-trans (ḢTrans.c t (ḢTrans.s u hs)) (ḢTrans.c u hs)
+t ⊡ u = (ḢTrans.s t ∘ ḢTrans.s u) , λ hs → Ė-trans (ḢTrans.c t (ḢTrans.s u hs)) (ḢTrans.c u hs)
 
 ḢTrans-app' : {I J : Set} {e : J → I} {D : RDesc I} {E : RDesc J} (t : ḢTrans e D E)
               {X : List I → Set} {Y : List J → Set} → Erasure e Y X → Σ (Ṡ E) (Y ∘ next E) → Σ (Ṡ D) (X ∘ next D)

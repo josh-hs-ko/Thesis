@@ -36,6 +36,8 @@ toℕ (suc n) = Data.Nat.suc (toℕ n)
 suc≢zero : {n : Nat} → (Nat ∋ suc n) ≢ zero
 suc≢zero ()
 
+infixr 5 _+_
+
 _+_ : Nat → Nat → Nat
 zero  + y = y
 suc x + y = suc (x + y)

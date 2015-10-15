@@ -180,7 +180,7 @@ erase-Ṡ-ok-und O (ok j) h = hrefl
 module PullbackInŌrn {I J K : Set} {e : J → I} {f : K → I} {D : Desc I} {E : Desc J} {F : Desc K} (O : Orn e D E) (P  : Orn f D F) where
 
   Ōrn-square : Square Ōrn (Ōrn-slice O) (Ōrn-slice P)
-  Ōrn-square = span (slice (e ⋈ f , ⌊ O ⊗ P ⌋) (pull , ⌈ O ⊗ P ⌉))
+  Ōrn-square = span (slice ((e ⋈ f) , ⌊ O ⊗ P ⌋) (pull , ⌈ O ⊗ P ⌉))
                     (sliceMorphism (π₁ , diffOrn-l O P) (triangle-l O P))
                     (sliceMorphism (π₂ , diffOrn-r O P) (triangle-r O P))
   
@@ -310,7 +310,7 @@ module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (
 
   integrate-Ind : (j : J) → μ E j → Set
   integrate-Ind j y = {k : K} (z : μ F k) → forget O y ≅ forget P z → ∀ jk → π₁ jk ≡ j → π₂ jk ≡ k →
-                      Σ[ p ∈ μ ⌊ O ⊗ P ⌋ jk ] forget (diffOrn-l O P) p ≅ y × forget (diffOrn-r O P) p ≅ z
+                      Σ[ p ∈ μ ⌊ O ⊗ P ⌋ jk ] (forget (diffOrn-l O P) p ≅ y × forget (diffOrn-r O P) p ≅ z)
 
   integrate-aux₀ :
     ∀ {j} (y : μ E j) → ∀ {k} (z : μ F k) → ∀ {i} (eeq : e j ≡ i) → ∀ {i'} (feq : f k ≡ i') → i ≡ i' →
@@ -343,8 +343,8 @@ module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (
     (eeqs : Ė e js is) (feqs : Ė f ks is) → (ys : Ṗ js (μ E)) → All-Ṗ integrate-Ind js ys → (zs : Ṗ ks (μ F)) →
     erase-Ṗ {X = μ D} eeqs (mapFold-Ṗ E (ornAlg O) js ys) ≡ erase-Ṗ feqs (mapFold-Ṗ F (ornAlg P) ks zs) →
     Σ[ ps ∈ Ṗ (und-Ṗ is (pc-Ė eeqs feqs)) (μ ⌊ O ⊗ P ⌋) ]
-      erase-Ṗ (diff-Ė-l eeqs feqs) (mapFold-Ṗ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-l O P) {jk}) (und-Ṗ is (pc-Ė eeqs feqs)) ps) ≡ ys
-    × erase-Ṗ (diff-Ė-r eeqs feqs) (mapFold-Ṗ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-r O P) {jk}) (und-Ṗ is (pc-Ė eeqs feqs)) ps) ≡ zs
+      (erase-Ṗ (diff-Ė-l eeqs feqs) (mapFold-Ṗ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-l O P) {jk}) (und-Ṗ is (pc-Ė eeqs feqs)) ps) ≡ ys ×
+       erase-Ṗ (diff-Ė-r eeqs feqs) (mapFold-Ṗ ⌊ O ⊗ P ⌋ (λ {jk} → ornAlg (diffOrn-r O P) {jk}) (und-Ṗ is (pc-Ė eeqs feqs)) ps) ≡ zs)
   integrate-aux-Ṗ []           []           _        _          _        _  = tt , refl , refl
   integrate-aux-Ṗ (eeq ∷ eeqs) (feq ∷ feqs) (y , ys) (ih , ihs) (z , zs) eq =
     let (heq , eq') = integrate-aux₀ y z eeq feq refl ys zs eeqs feqs (≡-to-≅ eq)
@@ -357,8 +357,8 @@ module Integration {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E) (
     (ys : ⟦ E' ⟧ (μ E)) → All E' integrate-Ind ys → (zs : ⟦ F' ⟧ (μ F)) →
     erase O' {μ D} (mapFold E E' (ornAlg O) ys) ≡ erase P' (mapFold F F' (ornAlg P) zs) →
     Σ[ ps ∈ ⟦ toRDesc (pcROrn O' P') ⟧ (μ ⌊ O ⊗ P ⌋) ]
-      erase (diffROrn-l O' P') (mapFold ⌊ O ⊗ P ⌋ (toRDesc (pcROrn O' P')) (λ {jk} → ornAlg (diffOrn-l O P) {jk}) ps) ≡ ys
-    × erase (diffROrn-r O' P') (mapFold ⌊ O ⊗ P ⌋ (toRDesc (pcROrn O' P')) (λ {jk} → ornAlg (diffOrn-r O P) {jk}) ps) ≡ zs
+      (erase (diffROrn-l O' P') (mapFold ⌊ O ⊗ P ⌋ (toRDesc (pcROrn O' P')) (λ {jk} → ornAlg (diffOrn-l O P) {jk}) ps) ≡ ys ×
+       erase (diffROrn-r O' P') (mapFold ⌊ O ⊗ P ⌋ (toRDesc (pcROrn O' P')) (λ {jk} → ornAlg (diffOrn-r O P) {jk}) ps) ≡ zs)
   integrate-aux (ṿ eeqs)    (ṿ feqs)     ys         ihs          zs         eq = integrate-aux-Ṗ eeqs feqs ys ihs zs eq
   integrate-aux (ṿ eeqs)    (Δ T P')     ys         ihs          (t , zs)   eq =
     let (ps , yseq , zseq) = integrate-aux (ṿ eeqs) (P' t) ys ihs zs eq in (t , ps) , yseq , cong (_,_ t) zseq
@@ -503,8 +503,8 @@ module PullbackInFam {I J K} {e : J → I} {f : K → I} {D E F} (O : Orn e D E)
       {i : L} → (t : proj₂ (Slice.T p') i) →
       Σ[ q ∈ μ ⌊ O ⊗ P ⌋ (from≡ e (FamMorphismEq.e (SliceMorphism.triangle p'-to-l) i) ,
                          from≡ f (FamMorphismEq.e (SliceMorphism.triangle p'-to-r) i)) ]
-         forget (diffOrn-l O P) q ≅ FamMorphism.u (SliceMorphism.m p'-to-l) t ×
-         forget (diffOrn-r O P) q ≅ FamMorphism.u (SliceMorphism.m p'-to-r) t
+         (forget (diffOrn-l O P) q ≅ FamMorphism.u (SliceMorphism.m p'-to-l) t ×
+          forget (diffOrn-r O P) q ≅ FamMorphism.u (SliceMorphism.m p'-to-r) t)
     integrate {i} t = Integration.integrate O P
                         (FamMorphism.u (SliceMorphism.m p'-to-l) t)
                         (FamMorphism.u (SliceMorphism.m p'-to-r) t)

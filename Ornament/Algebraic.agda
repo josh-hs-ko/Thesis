@@ -54,7 +54,7 @@ algOrn-iso {I} D {J} R =
       Setoid.trans (IsoSetoid Fun)
         (prodIso (ih j) (aux' is js ds ihs))
         (record { to   = λ { (r , rs) → j , r , js , rs , refl }
-                ; from = (Σ[ j' ∈ J i ] foldR' R i d j' × (Σ[ js' ∈ Ṗ is J ] mapFoldR-Ṗ D R is ds js' × (j' , js') ≡ (j , js)) →
+                ; from = (Σ[ j' ∈ J i ] (foldR' R i d j' × (Σ[ js' ∈ Ṗ is J ] (mapFoldR-Ṗ D R is ds js' × (j' , js') ≡ (j , js)))) →
                             foldR' R i d j × mapFoldR-Ṗ D R is ds js)
                            ∋ (λ { (j' , r , js' , rs , eq) → subst (foldR' R i d) (cong proj₁ eq) r ,
                                                              subst (mapFoldR-Ṗ D R is ds) (cong proj₂ eq) rs })
@@ -63,7 +63,7 @@ algOrn-iso {I} D {J} R =
                 ; to-from-inverse = λ { (.j , r , .js , rs , refl) → refl } })
     aux : (D' : RDesc I) (ds : ⟦ D' ⟧ (μ D)) → All D' (λ i x → (j : J i) → Iso Fun (OptP ⌈ algOrn D R ⌉ (ok (i , j)) x) (foldR' R i x j)) ds →
           (P : ℘ (⟦ D' ⟧ J)) →
-          Iso Fun (⟦ OptPRD (toROrn (algROrn D' P)) ds ⟧ (μ (OptPD ⌈ algOrn D R ⌉))) (Σ[ js ∈ ⟦ D' ⟧ J ] mapFoldR D D' R ds js × P js)
+          Iso Fun (⟦ OptPRD (toROrn (algROrn D' P)) ds ⟧ (μ (OptPD ⌈ algOrn D R ⌉))) (Σ[ js ∈ ⟦ D' ⟧ J ] (mapFoldR D D' R ds js × P js))
     aux (ṿ is)   ds       ihs P =
       iso-preserving FamF
         (compIso-inv (Setoid.refl (IsoSetoid Fun))
@@ -75,8 +75,8 @@ algOrn-iso {I} D {J} R =
         (aux (D' s) ds ihs (curry P s))
         (record { to   = λ { (js , rs , r) → (s , js) , (js , rs , refl) , r }
                 ; from = (Σ[ s'js ∈ (Σ[ s' ∈ S ] ⟦ D' s' ⟧ J) ]
-                            (Σ[ js' ∈ ⟦ D' s ⟧ J ] mapFoldR D (D' s) R ds js' × (s , js') ≡ s'js) × P s'js →
-                           Σ[ js ∈ ⟦ D' s ⟧ J ] mapFoldR D (D' s) R ds js × P (s , js))
+                            ((Σ[ js' ∈ ⟦ D' s ⟧ J ] (mapFoldR D (D' s) R ds js' × (s , js') ≡ s'js)) × P s'js) →
+                           Σ[ js ∈ ⟦ D' s ⟧ J ] (mapFoldR D (D' s) R ds js × P (s , js)))
                           ∋ (λ { ((.s , js) , (.js , rs , refl) , r) → js , rs , r })
                 ; from-to-inverse = frefl
                 ; to-from-inverse = λ { ((.s , js) , (.js , rs , refl) , r) → refl } })

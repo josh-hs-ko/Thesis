@@ -56,15 +56,15 @@ OrnEq-forget {I} {J} {e} {e'} {D} {E} O P (eeq , oeq) = induction E (λ _ x → 
     aux''' (j ∷ js) (x , xs) (ih , ihs) = ih , aux''' js xs ihs
     aux'' : (E' : RDesc J) (xs : ⟦ E' ⟧ (μ E)) → All E' (λ _ x → forget O x ≅ forget P x) xs →
             Σ[ hs ∈ Ṡ E' ] Σ[ xs' ∈ Ṗ (next E' hs) (μ D ∘ e) ] Σ[ xs'' ∈ Ṗ (next E' hs) (μ D ∘ e') ]
-              Ḣ-decomp E' (flip Ṗ (μ D ∘ e)) (mapFold E E' (ornAlg O) xs) ≡ (hs , xs')    ×
-              (hs , xs'') ≡ Ḣ-decomp E' (flip Ṗ (μ D ∘ e')) (mapFold E E' (ornAlg P) xs)  ×  ṖHEq (next E' hs) xs' xs''
-    aux'' (ṿ js)   xs       ihs = tt , mapFold-Ṗ E (ornAlg O) js xs , mapFold-Ṗ E (ornAlg P) js xs , refl , refl , aux''' js xs ihs
+              (Ḣ-decomp E' (flip Ṗ (μ D ∘ e)) (mapFold E E' (ornAlg O) xs) ≡ (hs , xs')    ×
+               (hs , xs'') ≡ Ḣ-decomp E' (flip Ṗ (μ D ∘ e')) (mapFold E E' (ornAlg P) xs)  ×  ṖHEq (next E' hs) xs' xs'')
+    aux'' (ṿ js)   xs       ihs = tt , (mapFold-Ṗ E (ornAlg O) js xs , (mapFold-Ṗ E (ornAlg P) js xs , (refl , (refl , aux''' js xs ihs))))
     aux'' (σ S E') (s , xs) ihs = (_,_ s ** (id ** (id ** (cong (_,_ s ** id) ** (cong (_,_ s ** id) ** id))))) (aux'' (E' s) xs ihs)
     aux' : {D' D'' : RDesc I} {E' : RDesc J} (O' : ROrn e D' E') (P' : ROrn e' D'' E') → D' ≡ D'' → ROrnEq O' P' →
            (xs : ⟦ E' ⟧ (μ E)) → All E' (λ _ x → forget O x ≅ forget P x) xs →
            ḢTrans-app (ḢTrans-normal O') erase-Ṗ (mapFold E E' (ornAlg O) xs) ≅ ḢTrans-app (ḢTrans-normal P') erase-Ṗ (mapFold E E' (ornAlg P) xs)
     aux' {._} {D'} {E'} O' P' refl roeq xs ihs =
-      let (hs , xs' , xs'' , eq , eq' , heq) = aux'' E' xs ihs
+      let (hs , (xs' , (xs'' , (eq , (eq' , heq))))) = aux'' E' xs ihs
       in  ≡-to-≅ (cong (Ḣ-comp D' (flip Ṗ (μ D)))
                        (trans (cong (ḢTrans-app' (ḢTrans-normal O') erase-Ṗ) eq)
                               (trans (cong-ḢTrans-app'-erase-Ṗ (ḢTrans-normal O') (ḢTrans-normal P') eeq (≅-to-≡ ∘ roeq) hs xs' xs'' heq)

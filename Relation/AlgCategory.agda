@@ -53,7 +53,7 @@ RAlgMorphism-comp-comm {X , R} {Y , S} {Z , T} (g , cg) (h , ch) i xs x r =
   subst (λ zs → (T !!) i zs (g (h x))) (sym (Ḟ-map-preserves-comp D g h i xs)) (cg i (Ḟ-map D h xs) (h x) (ch i xs x r))
 
 RAlgMorphism-comp : {R S T : RAlgebra} → RAlgMorphism S T → RAlgMorphism R S → RAlgMorphism R T
-RAlgMorphism-comp {R} {S} {T} m n = RAlgMorphism.h m ∘ RAlgMorphism.h n , RAlgMorphism-comp-comm m n
+RAlgMorphism-comp {R} {S} {T} m n = (RAlgMorphism.h m ∘ RAlgMorphism.h n) , RAlgMorphism-comp-comm m n
 
 HomCommEq : {R S : RAlgebra} → RAlgMorphism R S → RAlgMorphism R S → Set
 HomCommEq {X , R} {Y , S} (g , cg) (h , ch) = (i : I) (xs : Ḟ D X i) (x : X i) (r : (R !!) i xs x) → cg i xs x r ≅ ch i xs x r
@@ -149,7 +149,7 @@ RAlg = record
 -- banana-split algebras
 
 bs-alg : RAlgebra → RAlgebra → RAlgebra
-bs-alg (X , R) (Y , S) = X ×' Y , wrap λ { i xys (x , y) → (R !!) i (Ḟ-map D proj₁ xys) x × (S !!) i (Ḟ-map D proj₂ xys) y }
+bs-alg (X , R) (Y , S) = (X ×' Y) , wrap λ { i xys (x , y) → (R !!) i (Ḟ-map D proj₁ xys) x × (S !!) i (Ḟ-map D proj₂ xys) y }
 
 bs-alg-proj-l : (R S : RAlgebra) → RAlgMorphism (bs-alg R S) R
 bs-alg-proj-l (X , R) (Y , S) = proj₁ , λ i xys xy → proj₁

@@ -34,7 +34,7 @@ return : {A : Set} → A → ℘ A
 return = _≡_
 
 _>>=_ : {A B : Set} → (S : ℘ A) → (A → ℘ B) → ℘ B
-_>>=_ {A} s f = λ y → Σ[ x ∈ A ] s x × f x y
+_>>=_ {A} s f = λ y → Σ[ x ∈ A ] (s x × f x y)
 
 map℘ : {A B : Set} → (A → B) → ℘ A → ℘ B
 map℘ f s = s >>= (return ∘ f)
@@ -216,64 +216,64 @@ iso⁻-idR⁻ {Y = Y} iso =
 fun⁻-shunting-l-⇒ : {X Y Z : Set} (f : Y → Z) (R : X ↝⁻ Y) (S : X ↝⁻ Z) → fun⁻ f •⁻ R ⊆⁻ S → R ⊆⁻ fun⁻ f º⁻ •⁻ S
 fun⁻-shunting-l-⇒ f R S  =
   begin
-    fun⁻ f •⁻ R ⊆⁻ S
+    (fun⁻ f •⁻ R ⊆⁻ S)
       ⇒⟨ •⁻-monotonic-l (fun⁻ f º⁻) ⟩
-    fun⁻ f º⁻ •⁻ fun⁻ f •⁻ R ⊆⁻ fun⁻ f º⁻ •⁻ S
+    (fun⁻ f º⁻ •⁻ fun⁻ f •⁻ R ⊆⁻ fun⁻ f º⁻ •⁻ S)
       ⇒⟨ ⊆⁻-trans (proj₁ (•⁻-assoc (fun⁻ f º⁻) (fun⁻ f) R)) ⟩
-    (fun⁻ f º⁻ •⁻ fun⁻ f) •⁻ R ⊆⁻ fun⁻ f º⁻ •⁻ S
+    ((fun⁻ f º⁻ •⁻ fun⁻ f) •⁻ R ⊆⁻ fun⁻ f º⁻ •⁻ S)
       ⇒⟨ ⊆⁻-trans (•⁻-monotonic-r R (fun⁻-entire f)) ⟩
-    idR⁻ •⁻ R ⊆⁻ fun⁻ f º⁻ •⁻ S
+    (idR⁻ •⁻ R ⊆⁻ fun⁻ f º⁻ •⁻ S)
       ⇒⟨ ⊆⁻-trans (proj₂ (idR⁻-l R)) ⟩
-    R ⊆⁻ fun⁻ f º⁻ •⁻ S
+    (R ⊆⁻ fun⁻ f º⁻ •⁻ S)
   □
   where open PreorderReasoning ⇒-Preorder renaming (_∼⟨_⟩_ to _⇒⟨_⟩_; _∎ to _□)
 
 fun⁻-shunting-l-⇐ : {X Y Z : Set} (f : Y → Z) (R : X ↝⁻ Y) (S : X ↝⁻ Z) → R ⊆⁻ fun⁻ f º⁻ •⁻ S → fun⁻ f •⁻ R ⊆⁻ S
 fun⁻-shunting-l-⇐ f R S  =
   begin
-    R ⊆⁻ fun⁻ f º⁻ •⁻ S
+    (R ⊆⁻ fun⁻ f º⁻ •⁻ S)
       ⇒⟨ •⁻-monotonic-l (fun⁻ f) ⟩
-    fun⁻ f •⁻ R ⊆⁻ fun⁻ f •⁻ fun⁻ f º⁻ •⁻ S
+    (fun⁻ f •⁻ R ⊆⁻ fun⁻ f •⁻ fun⁻ f º⁻ •⁻ S)
       ⇒⟨ flip ⊆⁻-trans (proj₂ (•⁻-assoc (fun⁻ f) (fun⁻ f º⁻) S)) ⟩
-    fun⁻ f •⁻ R ⊆⁻ (fun⁻ f •⁻ fun⁻ f º⁻) •⁻ S
+    (fun⁻ f •⁻ R ⊆⁻ (fun⁻ f •⁻ fun⁻ f º⁻) •⁻ S)
       ⇒⟨ flip ⊆⁻-trans (•⁻-monotonic-r S (fun⁻-simple f)) ⟩
-    fun⁻ f •⁻ R ⊆⁻ idR⁻ •⁻ S
+    (fun⁻ f •⁻ R ⊆⁻ idR⁻ •⁻ S)
       ⇒⟨ flip ⊆⁻-trans (proj₁ (idR⁻-l S)) ⟩
-    fun⁻ f •⁻ R ⊆⁻ S
+    (fun⁻ f •⁻ R ⊆⁻ S)
   □
   where open PreorderReasoning ⇒-Preorder renaming (_∼⟨_⟩_ to _⇒⟨_⟩_; _∎ to _□)
 
 fun⁻-shunting-r-⇒ : {X Y Z : Set} (f : Y → X) (R : Y ↝⁻ Z) (S : X ↝⁻ Z) → R •⁻ fun⁻ f º⁻ ⊆⁻ S → R ⊆⁻ S •⁻ fun⁻ f
 fun⁻-shunting-r-⇒ f R S =
   begin
-    R •⁻ fun⁻ f º⁻ ⊆⁻ S
+    (R •⁻ fun⁻ f º⁻ ⊆⁻ S)
       ⇒⟨ º⁻-monotonic ⟩
-    (R •⁻ fun⁻ f º⁻) º⁻ ⊆⁻ S º⁻
+    ((R •⁻ fun⁻ f º⁻) º⁻ ⊆⁻ S º⁻)
       ⇒⟨ ⊆⁻-trans (proj₂ (º⁻-preserves-comp R (fun⁻ f º⁻))) ⟩
-    fun⁻ f •⁻ R º⁻ ⊆⁻ S º⁻
+    (fun⁻ f •⁻ R º⁻ ⊆⁻ S º⁻)
       ⇒⟨ fun⁻-shunting-l-⇒ f (R º⁻) (S º⁻) ⟩
-    R º⁻ ⊆⁻ fun⁻ f º⁻ •⁻ S º⁻
+    (R º⁻ ⊆⁻ fun⁻ f º⁻ •⁻ S º⁻)
       ⇒⟨ flip ⊆⁻-trans (proj₂ (º⁻-preserves-comp S (fun⁻ f))) ⟩
-    R º⁻ ⊆⁻ (S •⁻ fun⁻ f) º⁻
+    (R º⁻ ⊆⁻ (S •⁻ fun⁻ f) º⁻)
       ⇒⟨ º⁻-monotonic ⟩
-    R ⊆⁻ S •⁻ fun⁻ f
+    (R ⊆⁻ S •⁻ fun⁻ f)
   □
   where open PreorderReasoning ⇒-Preorder renaming (_∼⟨_⟩_ to _⇒⟨_⟩_; _∎ to _□)
 
 fun⁻-shunting-r-⇐ : {X Y Z : Set} (f : Y → X) (R : Y ↝⁻ Z) (S : X ↝⁻ Z) → R ⊆⁻ S •⁻ fun⁻ f → R •⁻ fun⁻ f º⁻ ⊆⁻ S
 fun⁻-shunting-r-⇐ f R S =
   begin
-    R •⁻ fun⁻ f º⁻ ⊆⁻ S
+    (R •⁻ fun⁻ f º⁻ ⊆⁻ S)
       ⇐⟨ º⁻-monotonic ⟩
-    (R •⁻ fun⁻ f º⁻) º⁻ ⊆⁻ S º⁻
+    ((R •⁻ fun⁻ f º⁻) º⁻ ⊆⁻ S º⁻)
       ⇐⟨ ⊆⁻-trans (proj₁ (º⁻-preserves-comp R (fun⁻ f º⁻))) ⟩
-    fun⁻ f •⁻ R º⁻ ⊆⁻ S º⁻
+    (fun⁻ f •⁻ R º⁻ ⊆⁻ S º⁻)
       ⇐⟨ fun⁻-shunting-l-⇐ f (R º⁻) (S º⁻) ⟩
-    R º⁻ ⊆⁻ fun⁻ f º⁻ •⁻ S º⁻
+    (R º⁻ ⊆⁻ fun⁻ f º⁻ •⁻ S º⁻)
       ⇐⟨ flip ⊆⁻-trans (proj₁ (º⁻-preserves-comp S (fun⁻ f))) ⟩
-    R º⁻ ⊆⁻ (S •⁻ fun⁻ f) º⁻
+    (R º⁻ ⊆⁻ (S •⁻ fun⁻ f) º⁻)
       ⇐⟨ º⁻-monotonic ⟩
-    R ⊆⁻ S •⁻ fun⁻ f
+    (R ⊆⁻ S •⁻ fun⁻ f)
   □
   where open PreorderReasoning ⇐-Preorder renaming (_∼⟨_⟩_ to _⇐⟨_⟩_; _∎ to _□)
 
@@ -549,20 +549,20 @@ fun-monotonic-alg-lemma :
  {I : Set} (D : Desc I) {X : I → Set} (f : Ḟ D X ⇉ X) (R : X ↝ X) → fun f • Ṙ D R ⊆ R • fun f → fun f • Ṙ D (R º) ⊆ R º • fun f
 fun-monotonic-alg-lemma D f R =
   begin
-    fun f • Ṙ D R ⊆ R • fun f
+    (fun f • Ṙ D R ⊆ R • fun f)
       ⇒⟨ º-monotonic ⟩
-    (fun f • Ṙ D R) º ⊆ (R • fun f) º
+    ((fun f • Ṙ D R) º ⊆ (R • fun f) º)
       ⇒⟨ ⊆-trans (proj₂ (º-preserves-comp (fun f) (Ṙ D R))) ⟩
-    Ṙ D R º • fun f º ⊆ (R • fun f) º
+    (Ṙ D R º • fun f º ⊆ (R • fun f) º)
       ⇒⟨ ⊆-trans (•-monotonic-r (fun f º) (proj₁ (Ṙ-preserves-conv D R))) ⟩
-    Ṙ D (R º) • fun f º ⊆ (R • fun f) º
+    (Ṙ D (R º) • fun f º ⊆ (R • fun f) º)
       ⇒⟨ flip ⊆-trans (proj₁ (º-preserves-comp R (fun f))) ⟩
-    Ṙ D (R º) • fun f º ⊆ fun f º • R º
+    (Ṙ D (R º) • fun f º ⊆ fun f º • R º)
       ⇒⟨ fun-shunting-l-⇐ f (Ṙ D (R º) • fun f º) (R º) ⟩
-    fun f • Ṙ D (R º) • fun f º ⊆ R º
+    (fun f • Ṙ D (R º) • fun f º ⊆ R º)
       ⇒⟨ ⊆-trans (proj₁ (•-assoc (fun f) (Ṙ D (R º)) (fun f º))) ⟩
-    (fun f • Ṙ D (R º)) • fun f º ⊆ R º
+    ((fun f • Ṙ D (R º)) • fun f º ⊆ R º)
       ⇒⟨ fun-shunting-r-⇒ f (fun f • Ṙ D (R º)) (R º) ⟩
-    fun f • Ṙ D (R º) ⊆ R º • fun f
+    (fun f • Ṙ D (R º) ⊆ R º • fun f)
   □
   where open PreorderReasoning ⇒-Preorder renaming (_∼⟨_⟩_ to _⇒⟨_⟩_; _∎ to _□)
