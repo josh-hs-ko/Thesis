@@ -22,7 +22,7 @@ upg-⊆ = let refS : (i : I) (x : X i) → Refinement (μ D i) (μ ⌊ algOrn D 
             refS i x = FRefinement.comp (toFRefinement (algOrn-FSwap D S)) (ok (i , x))
             refT : (i : I) (y : Y i) → Refinement (μ D i) (μ ⌊ algOrn D T ⌋ (i , y))
             refT i y = FRefinement.comp (toFRefinement (algOrn-FSwap D T)) (ok (i , y))
-        in  ∀[[ i ∈ I ]] ∀⁺[[ x ∈ X i ]] refS i x ⇀ (∀⁺[[ y ∈ Y i ]] ∀⁺[ _ ∈ (R !!) i x y ] toUpgrade (refT i y))
+        in  ∀[[ i ∈ I ]] ∀⁺[[ x ∈ X i ]] (refS i x ⇀ (∀⁺[[ y ∈ Y i ]] ∀⁺[ _ ∈ (R !!) i x y ] toUpgrade (refT i y)))
 
 FusionCondition-⊆ : Set
 FusionCondition-⊆ = R • S ⊆ T • Ṙ D R
@@ -43,7 +43,7 @@ upg-⊇ = let refS : (i : I) (x : X i) → Refinement (μ D i) (μ ⌊ algOrn D 
             refS i x = FRefinement.comp (toFRefinement (algOrn-FSwap D S)) (ok (i , x))
             refT : (i : I) (y : Y i) → Refinement (μ D i) (μ ⌊ algOrn D T ⌋ (i , y))
             refT i y = FRefinement.comp (toFRefinement (algOrn-FSwap D T)) (ok (i , y))
-        in  ∀[[ i ∈ I ]] ∀⁺[[ y ∈ Y i ]] refT i y ⇀ (Σ⁺[ x ∈ X i ] toUpgrade (refS i x) ×⁺ (R !!) i x y)
+        in  ∀[[ i ∈ I ]] ∀⁺[[ y ∈ Y i ]] (refT i y ⇀ (Σ⁺[ x ∈ X i ] (toUpgrade (refS i x) ×⁺ (R !!) i x y)))
 
 FusionCondition-⊇ : Set
 FusionCondition-⊇ = R • S ⊇ T • Ṙ D R

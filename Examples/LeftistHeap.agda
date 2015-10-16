@@ -70,7 +70,7 @@ toList : {A I : Set} {D : Desc I} → Orn ! ⌊ ITreeOD A ⌋ D → {i : I} → 
 toList {A} {I} {D} O = Upgrade.u upg preorder (λ _ _ → tt)
   where
     upg : Upgrade (ITree A → List A) ({i : I} → μ D i → List A)
-    upg = ∀⁺[[ i ∈ I ]] FRefinement.comp (RSem' O) (ok i) ⇀ toUpgrade Ref-refl
+    upg = ∀⁺[[ i ∈ I ]] (FRefinement.comp (RSem' O) (ok i) ⇀ toUpgrade Ref-refl)
 
 
 --------
@@ -108,7 +108,7 @@ lhrelax = Upgrade.u upg id (λ b'≤b _ → relax b'≤b ** id)
   where ref : (b : Val) (r : Nat) → Refinement Tree (LHeap b r)
         ref b r = FRefinement.comp (toFRefinement (⊗-FSwap TreeD-HeapD ⌈ LTreeOD ⌉ id-FSwap id-FSwap)) (ok (ok b , ok r))
         upg : Upgrade (Tree → Tree) ({b b' : Val} → b' ≤ b → {r : Nat} → LHeap b r → LHeap b' r)
-        upg = ∀⁺[[ b ∈ Val ]] ∀⁺[[ b' ∈ Val ]] ∀⁺[ _ ∈ b' ≤ b ] ∀⁺[[ r ∈ Nat ]] ref b r ⇀ toUpgrade (ref b' r)
+        upg = ∀⁺[[ b ∈ Val ]] ∀⁺[[ b' ∈ Val ]] ∀⁺[ _ ∈ b' ≤ b ] ∀⁺[[ r ∈ Nat ]] (ref b r ⇀ toUpgrade (ref b' r))
 
 makeT : (x : Val) {r₀ : Nat} → LHeap x r₀ → {r₁ : Nat} → LHeap x r₁ → Σ[ r ∈ Nat ] LHeap x r
 makeT x {r₀} h₀ {r₁} h₁ with r₀ ≤'? r₁
@@ -170,7 +170,7 @@ wlhrelax = Upgrade.u upg id λ { b'≤b _ → relax b'≤b ** id }
   where ref : (b : Val) (n : Nat) → Refinement Tree (WLHeap b n)
         ref b r = FRefinement.comp (toFRefinement (⊗-FSwap TreeD-HeapD ⌈ WLTreeOD ⌉ id-FSwap id-FSwap)) (ok (ok b , ok r))
         upg : Upgrade (Tree → Tree) ({b b' : Val} → b' ≤ b → {n : Nat} → WLHeap b n → WLHeap b' n)
-        upg = ∀⁺[[ b ∈ Val ]] ∀⁺[[ b' ∈ Val ]] ∀⁺[ _ ∈ b' ≤ b ] ∀⁺[[ n ∈ Nat ]] ref b n ⇀ toUpgrade (ref b' n)
+        upg = ∀⁺[[ b ∈ Val ]] ∀⁺[[ b' ∈ Val ]] ∀⁺[ _ ∈ b' ≤ b ] ∀⁺[[ n ∈ Nat ]] (ref b n ⇀ toUpgrade (ref b' n))
 
 
 {-# TERMINATING #-}  -- to skip the construction of the well-ordering (_<'_) on natural numbers
