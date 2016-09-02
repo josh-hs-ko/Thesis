@@ -27,7 +27,7 @@ readme_header =
     "and forms the basis of [the author's DPhil dissertation]" ++
     "(https://github.com/josh-hs-ko/dissertation/blob/master/dissertation.pdf).",
     "",
-    "All files typecheck with Agda 2.4.3 (commit 87d25ccc) and Standard Library 0.10 (commit 08e95de5).",
+    "All files have been typechecked with Agda 2.5.1.1 and Standard Library 0.12.",
     "",
     "See [the author's (old) homepage]" ++
     "(http://www.cs.ox.ac.uk/people/hsiang-shang.ko/) " ++
@@ -46,10 +46,12 @@ ordering =
 
 exclusion :: [FindClause Bool]
 exclusion =
-  [ liftOp (flip isPrefixOf) directory "./Notes",
-    fileName ==? "Everything.agda",
-    fileName ==? "Playground.agda",
-    fileName ==? "Scribble.agda" ]
+  [ liftOp (flip isPrefixOf) directory "./Notes"
+  , fileName ==? "Everything.agda"
+  , fileName ==? "Playground.agda"
+  , fileName ==? "Scribble.agda"
+  , fileName ==? "Promotion.agda"
+  , fileName ==? "STLC.agda" ]
 
 main :: IO ()
 main = do

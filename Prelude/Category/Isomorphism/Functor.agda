@@ -31,7 +31,7 @@ private
     ∎
     where setoid = Morphism D (object F Y) (object F Y)
           open EqReasoning setoid
-          open Iso C i
+          open Iso i
 
 iso-preserving : {X Y : Object C} → Iso C X Y → Iso D (object F X) (object F Y)
 iso-preserving {X} {Y} i =
@@ -39,4 +39,4 @@ iso-preserving {X} {Y} i =
          ; from = morphism F from
          ; to-from-inverse = inverse i
          ; from-to-inverse = inverse (Setoid.sym (IsoSetoid C) i) }
-  where open Iso C i
+  where open Iso i

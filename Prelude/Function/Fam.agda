@@ -101,7 +101,7 @@ compIso {I} {J} {X} {Y} iso i =
          ; from-to-inverse =
              λ x → ≅-to-≡ (elim-≡ (λ eq → subst X eq (FamMorphism.u from (FamMorphism.u to x)) ≅ x)
                                   (FamMorphismEq.u from-to-inverse x x hrefl) (FamMorphismEq.e from-to-inverse i)) }
-  where open Iso Fam iso
+  where open Iso iso
 
 compIso-inv : {I J : Set} {X : I → Set} {Y : J → Set} →
               (iso : Iso Fun I J) → (∀ i → Iso Fun (X i) (Y (Iso.to iso i))) → Iso Fam (I , X) (J , Y)
@@ -118,7 +118,7 @@ compIso-inv {I} {J} {X} {Y} iso isos =
                                      (λ { refl → htrans (≡-to-≅ (from-to-inverse (isos i) x)) heq })
                                      (sym (from-to-inverse iso i))
                                      (sym (to-from-inverse iso (to iso i))) }
-  where open Iso Fun
+  where open Iso
 
 mkFamIso : {IX JY : FamObject} →
            (idx-iso : Iso Fun (proj₁ IX) (proj₁ JY)) → (∀ i → Iso Fun (proj₂ IX i) (proj₂ JY (Iso.to idx-iso i))) → Iso Fam IX JY

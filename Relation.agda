@@ -196,7 +196,7 @@ iso⁻-conv : {X Y : Set} → (iso : Iso Fun X Y) → fun⁻ (Iso.to iso) º⁻ 
 iso⁻-conv iso =
   (wrap (λ y x eq → trans (sym (cong (from iso) eq)) (from-to-inverse iso x))) ,
   (wrap (λ y x eq → trans (sym (cong (to   iso) eq)) (to-from-inverse iso y)))
-  where open Iso Fun
+  where open Iso
 
 iso⁻-idR⁻ : {X Y : Set} → (iso : Iso Fun X Y) →
             fun⁻ (Iso.to iso) •⁻ fun⁻ (Iso.to iso) º⁻ ≃⁻ idR⁻
