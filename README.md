@@ -2,7 +2,7 @@
 
 This implements, in Agda, a framework of composable datatype refinements and relational algebraic ornamentation based on [McBride's work on ornaments](http://personal.cis.strath.ac.uk/~conor/pub/OAAO/LitOrn.pdf), and forms the basis of [the author's DPhil dissertation](https://github.com/josh-hs-ko/dissertation/blob/master/dissertation.pdf).
 
-All files have been typechecked with Agda 2.5.1.1 and Standard Library 0.12.
+All files have been typechecked with Agda 2.5.2 and Standard Library 0.13.
 
 See [the author's (old) homepage](http://www.cs.ox.ac.uk/people/hsiang-shang.ko/) for more information, including published papers.
 

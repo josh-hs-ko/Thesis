@@ -115,7 +115,9 @@ compIso-inv {I} {J} {X} {Y} iso isos =
          ; from-to-inverse =
              from-to-inverse iso ,
              λ {i} x x' heq → elim-≡ (λ {i'} eq → (eq' : to iso i ≡ to iso i') → from (isos i') (subst Y eq' (to (isos i) x)) ≅ x')
-                                     (λ { refl → htrans (≡-to-≅ (from-to-inverse (isos i) x)) heq })
+                                     (((eq' : to iso i ≡ to iso i) →
+                                         from (isos i) (subst Y eq' (to (isos i) x)) ≅ x')
+                                       ∋ (λ { refl → htrans (≡-to-≅ (from-to-inverse (isos i) x)) heq }))
                                      (sym (from-to-inverse iso i))
                                      (sym (to-from-inverse iso (to iso i))) }
   where open Iso
